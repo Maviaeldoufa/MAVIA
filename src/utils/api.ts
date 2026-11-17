@@ -102,3 +102,6 @@ export async function apiRequest<T>(
 
   return data;
 }
+export function hasRegisteredBefore() {
+  return false;
+}
