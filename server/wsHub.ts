@@ -1,9 +1,9 @@
 import crypto from 'crypto';
 import type { Server as HttpServer } from 'http';
 import { WebSocket, WebSocketServer } from 'ws';
-import { getUserByToken } from './auth.ts';
-import { db, getUserRankBadge } from './db.ts';
-import type { ChatMessage } from './types.ts';
+import { getUserByToken } from './auth.js';
+import { db, getUserRankBadge } from './db.js';
+import type { ChatMessage } from './types.js';
 
 const ALLOWED_CHAT_ROOMS = new Set(['general', 'year-1', 'year-2', 'year-3', 'year-4']);
 
