@@ -2181,7 +2181,7 @@ export function CourseDetailModal({
                         )}
 
                         {folders.length === 0 ? (
-                          <div className="py-10 text-center space-y-2 rounded-xl bg-[#0D0D10] border border-white/10">
+                          <div className="py-10 px-4 text-center space-y-3 rounded-xl bg-[#0D0D10] border border-white/10">
                             <Folder className="w-8 h-8 text-[#D4AF37] mx-auto opacity-80" />
                             <p className="text-sm text-[#A8A29E]">
                               {tr(
@@ -2189,6 +2189,18 @@ export function CourseDetailModal({
                                 'No custom folders inside this course yet.'
                               )}
                             </p>
+                            {isAdmin && !showFolderForm && (
+                              <div className="flex justify-center pt-1">
+                                <GoldChip
+                                  active={true}
+                                  onClick={() => setShowFolderForm(true)}
+                                  className="text-sm px-4 py-2 font-semibold"
+                                >
+                                  <FolderPlus className="w-4 h-4" />
+                                  <span>{tr('إضافة مجلد جديد بصورة', 'Add New Folder with Image')}</span>
+                                </GoldChip>
+                              </div>
+                            )}
                           </div>
                         ) : (
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

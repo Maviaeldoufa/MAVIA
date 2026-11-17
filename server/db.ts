@@ -364,28 +364,7 @@ export function toLeaderboardUser(user: User): SafeUser {
 
 function buildSeedData(): DatabaseSchema {
   const now = new Date().toISOString();
-  const bootstrapAdminPass =
-    process.env.ADMIN_BOOTSTRAP_PASSWORD?.trim() ||
-    crypto.randomBytes(32).toString('hex');
-  const bootstrapAdminEmail =
-    process.env.ADMIN_BOOTSTRAP_EMAIL?.trim().toLowerCase() || '';
-
-  const users: User[] = [
-    {
-      id: 'user-founder-admin',
-      name: 'القائد — أدمن ماڤيا',
-      email: bootstrapAdminEmail,
-      phone: '',
-      passwordHash: hashPassword(bootstrapAdminPass),
-      year: 4,
-      role: 'admin',
-      adminRankId: 'rank-super-admin',
-      isProtected: true,
-      points: 0,
-      quizzesCompleted: 0,
-      createdAt: now,
-    },
-  ];
+  const users: User[] = [];
 
   const courses = [
     {
@@ -809,18 +788,7 @@ function buildSeedData(): DatabaseSchema {
     },
   ];
 
-  const chatMessages = [
-    {
-      id: 'msg-1',
-      room: 'general',
-      userId: 'user-founder-admin',
-      userName: 'القائد — أدمن ماڤيا',
-      userRole: 'admin' as const,
-      userYear: 4 as const,
-      text: 'أهلاً بكم في منصة ماڤيا! هذه الساحة مخصصة للتواصل الفوري بين طلاب جميع الدفعات في GIS والبرمجة.',
-      createdAt: now,
-    },
-  ];
+  const chatMessages: DatabaseSchema['chatMessages'] = [];
 
   const fiveDaysLater = new Date(Date.now() + 5 * 86400000).toISOString();
   const twoDaysLater = new Date(Date.now() + 2 * 86400000).toISOString();
@@ -884,6 +852,8 @@ function buildSeedData(): DatabaseSchema {
     adminOfficials: [],
     supportTeam: [],
     userProfileNotes: [],
+    comprehensiveExams: [],
+    comprehensiveSubmissions: [],
   };
 }
 
@@ -930,6 +900,8 @@ function normalizeLoadedStore(data: DatabaseSchema): DatabaseSchema {
   if (!Array.isArray(data.adminOfficials)) data.adminOfficials = [];
   if (!Array.isArray(data.supportTeam)) data.supportTeam = [];
   if (!Array.isArray(data.userProfileNotes)) data.userProfileNotes = [];
+  if (!Array.isArray(data.comprehensiveExams)) data.comprehensiveExams = [];
+  if (!Array.isArray(data.comprehensiveSubmissions)) data.comprehensiveSubmissions = [];
   for (const u of data.users || []) {
     if (u.role === 'admin' && u.isProtected && !u.adminRankId) {
       u.adminRankId = 'rank-super-admin';
@@ -948,6 +920,7 @@ class MafiaStore {
   private data: DatabaseSchema;
   private dirty = false;
   private remoteVersion = 0;
+  private hasSyncedFromRemote = false;
   private syncPromise: Promise<void> | null = null;
   private flushPromise: Promise<void> | null = null;
 
@@ -1023,9 +996,12 @@ class MafiaStore {
     this.syncPromise = (async () => {
       try {
         const res = await loadLatestStateFromSupabase(this.remoteVersion);
-        if (res.status === 'updated') {
+        if (res.status === 'unchanged') {
+          this.hasSyncedFromRemote = true;
+        } else if (res.status === 'updated') {
           this.data = normalizeLoadedStore(res.data);
           this.dirty = false;
+          this.hasSyncedFromRemote = true;
           this.writeLocalCache();
           if (res.version === 0) {
             const initSave = await saveStateToSupabase(this.data, 1);
@@ -1038,6 +1014,7 @@ class MafiaStore {
           if (seedSave.ok) {
             this.remoteVersion = 1;
             this.dirty = false;
+            this.hasSyncedFromRemote = true;
           }
         }
       } finally {
@@ -1050,6 +1027,10 @@ class MafiaStore {
 
   public async flushRemoteIfDirty(): Promise<void> {
     if (!this.dirty || !isSupabaseDbEnabled()) return;
+    if (!this.hasSyncedFromRemote) {
+      await this.ensureRemoteSynced();
+      if (!this.hasSyncedFromRemote || !this.dirty) return;
+    }
     if (this.flushPromise) {
       await this.flushPromise;
       if (!this.dirty) return;
@@ -1188,6 +1169,8 @@ export function pushNotification(params: {
   type: 'course' | 'exam' | 'lecture' | 'announcement' | 'general';
   targetSection: 'home' | 'courses' | 'learning' | 'gpa' | 'community';
   year?: 0 | 1 | 2 | 3 | 4;
+  userId?: string;
+  comprehensiveExamId?: string;
   createdBy: string;
 }) {
   const store = db.get();
@@ -1201,13 +1184,15 @@ export function pushNotification(params: {
     type: params.type,
     targetSection: params.targetSection,
     year: params.year ?? 0,
+    userId: params.userId,
+    comprehensiveExamId: params.comprehensiveExamId,
     readBy: [],
     createdBy: params.createdBy,
     createdAt: new Date().toISOString(),
   };
   store.notifications.unshift(item);
-  if (store.notifications.length > 60) {
-    store.notifications = store.notifications.slice(0, 60);
+  if (store.notifications.length > 80) {
+    store.notifications = store.notifications.slice(0, 80);
   }
   db.save();
   return item;

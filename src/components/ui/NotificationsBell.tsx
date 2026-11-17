@@ -85,6 +85,13 @@ export function NotificationsBell({ onNavigate }: NotificationsBellProps) {
       );
     }
     onNavigate(item.targetSection);
+    if (item.comprehensiveExamId) {
+      window.dispatchEvent(
+        new CustomEvent('mvia:open-comprehensive-results', {
+          detail: { examId: item.comprehensiveExamId },
+        })
+      );
+    }
     setOpen(false);
   };
 

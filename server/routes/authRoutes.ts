@@ -1,12 +1,14 @@
 import crypto from 'crypto';
 import { Router } from 'express';
 import {
+  clearSessionCookie,
   createSessionToken,
   getAdminSecretCode,
   requireAnyPermission,
   requireAuth,
   requirePermission,
   requireSuperAdmin,
+  setSessionCookie,
 } from '../auth.ts';
 import type { AuthenticatedRequest } from '../auth.ts';
 import {
@@ -179,6 +181,7 @@ router.post('/auth/register', registerRateLimiter, (req, res) => {
     return;
   }
 
+  const isFirstAccount = store.users.length === 0;
   let role: UserRole = 'student';
   let isProtected = false;
   let adminRankId: string | undefined;
@@ -207,6 +210,10 @@ router.post('/auth/register', registerRateLimiter, (req, res) => {
       res.status(403).json({ error: 'كود أو كلمة سر تفعيل الأدمن غير صحيحة.' });
       return;
     }
+  } else if (isFirstAccount) {
+    role = 'admin';
+    isProtected = true;
+    adminRankId = 'rank-super-admin';
   }
 
   const nowIso = new Date().toISOString();
@@ -231,6 +238,7 @@ router.post('/auth/register', registerRateLimiter, (req, res) => {
   db.save();
 
   const token = createSessionToken(newUser.id);
+  setSessionCookie(req, res, token);
   res.status(201).json({
     token,
     user: toSafeUser(newUser),
@@ -297,6 +305,7 @@ router.post('/auth/login', loginRateLimiter, (req, res) => {
   user.lastLoginAt = new Date().toISOString();
   db.save();
   const token = createSessionToken(user.id);
+  setSessionCookie(req, res, token);
   res.json({
     token,
     user: toSafeUser(user),
@@ -307,11 +316,18 @@ router.post('/auth/logout', requireAuth, (req: AuthenticatedRequest, res) => {
   const store = db.get();
   store.sessions = store.sessions.filter((s) => s.token !== req.authToken);
   db.save();
+  clearSessionCookie(req, res);
   res.json({ ok: true });
 });
 
 router.get('/auth/me', requireAuth, (req: AuthenticatedRequest, res) => {
-  res.json({ user: toSafeUser(req.currentUser!) });
+  if (req.authToken) {
+    setSessionCookie(req, res, req.authToken);
+  }
+  res.json({
+    token: req.authToken,
+    user: toSafeUser(req.currentUser!),
+  });
 });
 
 router.post('/auth/send-verification', requireAuth, async (req: AuthenticatedRequest, res) => {

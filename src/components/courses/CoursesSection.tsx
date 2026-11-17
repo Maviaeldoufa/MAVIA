@@ -43,6 +43,11 @@ export function CoursesSection({
   const { user } = useAuth();
   const { tr, formatYear } = useLanguage();
   const isAdmin = user?.role === 'admin';
+  const canManageCourses =
+    isAdmin &&
+    (Boolean(user?.isSuperAdmin) ||
+      Boolean(user?.rankBadge?.isSuperAdminRank) ||
+      (user?.permissions ? user.permissions.includes('manage_courses') : true));
 
   const [courses, setCourses] = useState<Course[]>([]);
   const [folders, setFolders] = useState<CourseFolder[]>([]);
@@ -102,6 +107,19 @@ export function CoursesSection({
   const [folderCoverPreview, setFolderCoverPreview] = useState<string | null>(null);
   const [savingFolder, setSavingFolder] = useState(false);
   const [folderError, setFolderError] = useState<string | null>(null);
+  const folderFormRef = useRef<HTMLFormElement | null>(null);
+
+  const openFolderCreator = (targetCourseId?: string) => {
+    const resolvedId = targetCourseId || folderCourseId || courses[0]?.id || '';
+    if (resolvedId) {
+      setFolderCourseId(resolvedId);
+    }
+    setFolderError(null);
+    setShowFolderAddForm(true);
+    window.setTimeout(() => {
+      folderFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 60);
+  };
 
   // Admin add Courses release countdown banner
   const [showTimerForm, setShowTimerForm] = useState(false);
@@ -408,11 +426,31 @@ export function CoursesSection({
         </div>
 
         {isAdmin && (
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2.5">
+            {canManageCourses && (
+              <GoldChip
+                active={true}
+                onClick={() => {
+                  if (showFolderAddForm) {
+                    setShowFolderAddForm(false);
+                  } else {
+                    openFolderCreator();
+                  }
+                }}
+                className="text-sm px-4 py-2.5 font-bold"
+              >
+                <FolderPlus className="w-4 h-4" />
+                <span>
+                  {showFolderAddForm
+                    ? tr('إغلاق إضافة المجلد', 'Close Folder Form')
+                    : tr('إضافة مجلد جديد', 'Add New Folder')}
+                </span>
+              </GoldChip>
+            )}
             <GoldChip
               active={showTimerForm}
               onClick={() => setShowTimerForm((p) => !p)}
-              className="text-xs px-3 py-2"
+              className="text-sm px-3.5 py-2"
             >
               <Clock className="w-4 h-4" />
               <span>
@@ -421,35 +459,20 @@ export function CoursesSection({
                   : tr('إضافة مؤقت تنزيل', 'Add Release Timer')}
               </span>
             </GoldChip>
-            <GoldChip
-              active={showFolderAddForm}
-              onClick={() => {
-                setShowFolderAddForm((p) => !p);
-                if (!folderCourseId && courses.length > 0) {
-                  setFolderCourseId(courses[0].id);
-                }
-              }}
-              className="text-xs px-3.5 py-2"
-            >
-              <FolderPlus className="w-4 h-4" />
-              <span>
-                {showFolderAddForm
-                  ? tr('إغلاق إضافة المجلد', 'Close Folder Form')
-                  : tr('إضافة مجلد جديد', 'Add New Folder')}
-              </span>
-            </GoldChip>
-            <GoldChip
-              active={showAddForm}
-              onClick={() => setShowAddForm((p) => !p)}
-              className="text-xs px-3.5 py-2"
-            >
-              <Plus className="w-4 h-4" />
-              <span>
-                {showAddForm
-                  ? tr('إغلاق نموذج المادة', 'Close Course Form')
-                  : tr('إضافة مادة جديدة', 'New Course')}
-              </span>
-            </GoldChip>
+            {canManageCourses && (
+              <GoldChip
+                active={showAddForm}
+                onClick={() => setShowAddForm((p) => !p)}
+                className="text-sm px-3.5 py-2"
+              >
+                <Plus className="w-4 h-4" />
+                <span>
+                  {showAddForm
+                    ? tr('إغلاق نموذج المادة', 'Close Course Form')
+                    : tr('إضافة مادة جديدة', 'New Course')}
+                </span>
+              </GoldChip>
+            )}
           </div>
         )}
       </div>
@@ -578,8 +601,9 @@ export function CoursesSection({
       </div>
 
       {/* Separate Admin Add Folder Panel (with Device Image Upload) */}
-      {isAdmin && showFolderAddForm && (
+      {canManageCourses && showFolderAddForm && (
         <form
+          ref={folderFormRef}
           onSubmit={handleAddStandaloneFolder}
           className="p-5 rounded-2xl bg-[#121216] border border-[#D4AF37]/40 space-y-4 shadow-[0_0_24px_rgba(212,175,55,0.12)]"
         >
@@ -779,20 +803,66 @@ export function CoursesSection({
       )}
 
       {/* Standalone Quick-Access Folders Section */}
-      {!loading && filteredFolders.length > 0 && (
-        <section className="space-y-3">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <FolderOpen className="w-4 h-4 text-[#D4AF37]" />
-              <h2 className="font-display text-lg font-bold text-[#E5C158]">
-                {tr('المجلدات الدراسية', 'Study Folders')} ({filteredFolders.length})
-              </h2>
+      {!loading && (filteredFolders.length > 0 || canManageCourses) && (
+        <section className="space-y-3.5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-2">
+                <FolderOpen className="w-5 h-5 text-[#D4AF37]" />
+                <h2 className="font-display text-lg sm:text-xl font-bold text-[#E5C158]">
+                  {tr('المجلدات الدراسية', 'Study Folders')} ({filteredFolders.length})
+                </h2>
+              </div>
+              <p className="text-xs sm:text-sm text-[#A8A29E]">
+                {tr(
+                  'اضغط على أي مجلد لفتح الكتاب والملخصات والتكليفات والمدرس الذكي والامتحان الذكي',
+                  'Click any folder to open books, summaries, assignments, smart tutor & AI quizzes'
+                )}
+              </p>
             </div>
-            <span className="text-xs text-[#A8A29E]">
-              {tr('اضغط على أي مجلد لفتح الكتاب والملخصات والتكليفات والمدرس الذكي والامتحان الذكي', 'Click any folder to open books, summaries, assignments, smart tutor & AI quizzes')}
-            </span>
+
+            {canManageCourses && (
+              <GoldChip
+                active={showFolderAddForm}
+                onClick={() => openFolderCreator()}
+                className="text-sm px-3.5 py-2 font-semibold shrink-0"
+              >
+                <FolderPlus className="w-4 h-4" />
+                <span>{tr('إضافة مجلد', 'Add Folder')}</span>
+              </GoldChip>
+            )}
           </div>
 
+          {filteredFolders.length === 0 ? (
+            <div className="p-6 rounded-2xl bg-[#121216] border border-dashed border-[#D4AF37]/35 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3 text-center sm:text-start">
+                <div className="w-11 h-11 rounded-xl bg-[#D4AF37]/12 border border-[#D4AF37]/30 flex items-center justify-center text-[#F5D061] shrink-0">
+                  <FolderPlus className="w-5 h-5" />
+                </div>
+                <div className="space-y-0.5">
+                  <h3 className="font-display text-base font-bold text-[#F5F0E6]">
+                    {tr('لا توجد مجلدات دراسية بعد', 'No study folders yet')}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-[#A8A29E]">
+                    {tr(
+                      'أنشئ أول مجلد بصورة من جهازك واربطه بأي مادة لإضافة الكتب والملخصات والتكليفات وامتحانات AI.',
+                      'Create your first folder with a device image and link it to any course.'
+                    )}
+                  </p>
+                </div>
+              </div>
+              {canManageCourses && (
+                <GoldChip
+                  active={true}
+                  onClick={() => openFolderCreator()}
+                  className="text-sm px-4 py-2 font-bold shrink-0"
+                >
+                  <FolderPlus className="w-4 h-4" />
+                  <span>{tr('إضافة مجلد جديد', 'Add New Folder')}</span>
+                </GoldChip>
+              )}
+            </div>
+          ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredFolders.map((folder) => {
               const viewsCount = folder.viewsCount ?? 0;
@@ -838,20 +908,20 @@ export function CoursesSection({
                   <div className="p-4 space-y-2.5 flex-1 flex flex-col justify-between">
                     <div className="space-y-1.5">
                       <div className="flex flex-wrap items-center justify-between gap-1.5">
-                        <span className="text-[11px] font-mono text-[#D4AF37]">
+                        <span className="text-xs font-mono text-[#D4AF37]">
                           {folder.courseCode || ''} {folder.courseTitle ? `· ${folder.courseTitle}` : ''}
                         </span>
                         <div className="flex items-center gap-1.5">
                           <span
-                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#09090B] border border-white/10 text-[11px] font-mono text-[#E5C158] tabular-nums"
+                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#09090B] border border-white/10 text-xs font-mono text-[#E5C158] tabular-nums"
                             title={tr('عدد الأشخاص الذين دخلوا المجلد', 'Users who entered this folder')}
                           >
-                            <Eye className="w-3 h-3" />
+                            <Eye className="w-3.5 h-3.5" />
                             <span>{viewsCount}</span>
                           </span>
                           {isTrending && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/20 border border-amber-400/50 text-[11px] font-bold text-amber-300">
-                              <Flame className="w-3 h-3" />
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/20 border border-amber-400/50 text-xs font-bold text-amber-300">
+                              <Flame className="w-3.5 h-3.5" />
                               <span>{tr('رائج · أكثر إقبالاً', 'Trending')}</span>
                             </span>
                           )}
@@ -860,19 +930,19 @@ export function CoursesSection({
 
                       <div className="flex items-center gap-2">
                         <FolderOpen className="w-4 h-4 text-[#F5D061] shrink-0" />
-                        <h3 className="font-display text-sm sm:text-base font-bold text-[#F5F0E6] group-hover:text-[#F5D061] truncate">
+                        <h3 className="font-display text-base font-bold text-[#F5F0E6] group-hover:text-[#F5D061] truncate">
                           {folder.name}
                         </h3>
                       </div>
 
                       {folder.description && (
-                        <p className="text-xs text-[#C8C2B8] line-clamp-2">
+                        <p className="text-xs sm:text-sm text-[#C8C2B8] line-clamp-2">
                           {folder.description}
                         </p>
                       )}
                     </div>
 
-                    <div className="flex items-center justify-between gap-2 pt-2 border-t border-white/10 text-[11px] text-[#A8A29E] tabular-nums">
+                    <div className="flex items-center justify-between gap-2 pt-2 border-t border-white/10 text-xs text-[#A8A29E] tabular-nums">
                       <span>
                         {folder.booksCount ?? 0} {tr('كتب', 'Books')} ·{' '}
                         {folder.summariesCount ?? 0} {tr('ملخصات', 'Summaries')} ·{' '}
@@ -904,6 +974,7 @@ export function CoursesSection({
               );
             })}
           </div>
+          )}
         </section>
       )}
 
@@ -1063,7 +1134,7 @@ export function CoursesSection({
                   )}
                 </div>
 
-                <div className="flex items-center justify-between gap-3 pt-4 border-t border-white/10">
+                <div className="flex flex-wrap items-center justify-between gap-2.5 pt-4 border-t border-white/10">
                   <div className="flex flex-wrap items-center gap-2 text-xs text-[#A8A29E] tabular-nums">
                     {(course.foldersCount ?? 0) > 0 && (
                       <>
@@ -1082,13 +1153,27 @@ export function CoursesSection({
                     </span>
                   </div>
 
-                  <GoldChip
-                    onClick={() => handleOpenCourseCard(course.id)}
-                    className="text-xs px-3 py-1.5"
+                  <div
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex flex-wrap items-center gap-2"
                   >
-                    <Folder className="w-3.5 h-3.5" />
-                    <span>{tr('فتح المادة', 'Open Course')}</span>
-                  </GoldChip>
+                    {canManageCourses && (
+                      <GoldChip
+                        onClick={() => openFolderCreator(course.id)}
+                        className="text-xs px-3 py-1.5"
+                      >
+                        <FolderPlus className="w-3.5 h-3.5" />
+                        <span>{tr('إضافة مجلد', 'Add Folder')}</span>
+                      </GoldChip>
+                    )}
+                    <GoldChip
+                      onClick={() => handleOpenCourseCard(course.id)}
+                      className="text-xs px-3 py-1.5"
+                    >
+                      <Folder className="w-3.5 h-3.5" />
+                      <span>{tr('فتح المادة', 'Open Course')}</span>
+                    </GoldChip>
+                  </div>
                 </div>
               </div>
             </motion.article>

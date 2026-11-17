@@ -275,9 +275,68 @@ export interface NotificationItem {
   type: 'course' | 'exam' | 'lecture' | 'announcement' | 'general';
   targetSection: 'home' | 'courses' | 'learning' | 'gpa' | 'community';
   year: AcademicYear | 0; // 0 = all years
+  userId?: string; // Optional single-recipient target
+  comprehensiveExamId?: string;
   readBy: string[];
   createdBy: string;
   createdAt: string;
+}
+
+export type ComprehensiveQuestionType = 'mcq' | 'true_false' | 'essay';
+
+export interface ComprehensiveQuestion {
+  id: string;
+  type: ComprehensiveQuestionType;
+  question: string;
+  points: number;
+  options?: string[];
+  correctIndex?: number; // Reference only (never returned to students until graded)
+  modelAnswer?: string; // Reference rubric for Admin manual grading
+}
+
+export interface ComprehensiveExam {
+  id: string;
+  subjectName: string;
+  durationMinutes: number;
+  targetYear: AcademicYear | 0; // 0 = all years
+  isActive: boolean;
+  questions: ComprehensiveQuestion[];
+  createdBy: string;
+  createdById: string;
+  createdAt: string;
+  closedAt?: string;
+}
+
+export interface ComprehensiveAnswerItem {
+  questionId: string;
+  questionType: ComprehensiveQuestionType;
+  questionText: string;
+  maxPoints: number;
+  options?: string[];
+  selectedIndex?: number;
+  essayAnswer?: string;
+  awardedPoints?: number;
+  isCorrect?: boolean;
+  correctAnswerText?: string;
+  adminFeedback?: string;
+}
+
+export interface ComprehensiveSubmission {
+  id: string;
+  examId: string;
+  subjectName: string;
+  userId: string;
+  studentName: string;
+  studentYear: AcademicYear;
+  answers: ComprehensiveAnswerItem[];
+  status: 'pending_grading' | 'graded';
+  totalScore: number;
+  maxScore: number;
+  timeSpentSeconds: number;
+  adminNote?: string;
+  submittedAt: string;
+  gradedAt?: string;
+  gradedBy?: string;
 }
 
 export interface LectureNote {
@@ -511,4 +570,6 @@ export interface DatabaseSchema {
   adminOfficials?: AdminOfficial[];
   supportTeam?: SupportTeamMember[];
   userProfileNotes?: UserProfileNote[];
+  comprehensiveExams?: ComprehensiveExam[];
+  comprehensiveSubmissions?: ComprehensiveSubmission[];
 }

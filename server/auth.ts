@@ -3,6 +3,72 @@ import type { NextFunction, Request, Response } from 'express';
 import { db, hasUserPermission, isUserSuperAdmin } from './db.ts';
 import type { AdminPermissionKey, User } from './types.ts';
 
+export const SESSION_COOKIE_NAME = 'mvia_session';
+const SESSION_COOKIE_MAX_AGE_SECONDS = 365 * 24 * 60 * 60; // 1 year
+
+function parseCookieHeader(cookieHeader: string | undefined): Record<string, string> {
+  const result: Record<string, string> = {};
+  if (!cookieHeader) return result;
+  for (const part of cookieHeader.split(';')) {
+    const eqIdx = part.indexOf('=');
+    if (eqIdx === -1) continue;
+    const key = part.slice(0, eqIdx).trim();
+    const val = part.slice(eqIdx + 1).trim();
+    if (!key) continue;
+    try {
+      result[key] = decodeURIComponent(val);
+    } catch {
+      result[key] = val;
+    }
+  }
+  return result;
+}
+
+export function extractAuthToken(req: Request): string | undefined {
+  const authHeader = req.headers.authorization;
+  if (authHeader?.startsWith('Bearer ')) {
+    const bearer = authHeader.slice(7).trim();
+    if (bearer) return bearer;
+  }
+  const cookies = parseCookieHeader(req.headers.cookie);
+  const cookieToken = cookies[SESSION_COOKIE_NAME]?.trim();
+  return cookieToken || undefined;
+}
+
+function isHttpsRequest(req: Request): boolean {
+  const protoHeader = String(req.headers['x-forwarded-proto'] || '')
+    .split(',')[0]
+    .trim()
+    .toLowerCase();
+  return Boolean(req.secure || protoHeader === 'https');
+}
+
+export function setSessionCookie(req: Request, res: Response, token: string): void {
+  const isHttps = isHttpsRequest(req);
+  const attrs = [
+    `${SESSION_COOKIE_NAME}=${encodeURIComponent(token)}`,
+    'Path=/',
+    `Max-Age=${SESSION_COOKIE_MAX_AGE_SECONDS}`,
+    'HttpOnly',
+    isHttps ? 'SameSite=None' : 'SameSite=Lax',
+    ...(isHttps ? ['Secure'] : []),
+  ];
+  res.append('Set-Cookie', attrs.join('; '));
+}
+
+export function clearSessionCookie(req: Request, res: Response): void {
+  const isHttps = isHttpsRequest(req);
+  const attrs = [
+    `${SESSION_COOKIE_NAME}=`,
+    'Path=/',
+    'Max-Age=0',
+    'HttpOnly',
+    isHttps ? 'SameSite=None' : 'SameSite=Lax',
+    ...(isHttps ? ['Secure'] : []),
+  ];
+  res.append('Set-Cookie', attrs.join('; '));
+}
+
 export function getAdminSecretCode(): string {
   return (process.env.ADMIN_SECRET_CODE || '').trim();
 }
@@ -37,10 +103,7 @@ export function requireAuth(
   res: Response,
   next: NextFunction
 ): void {
-  const authHeader = req.headers.authorization;
-  const token = authHeader?.startsWith('Bearer ')
-    ? authHeader.slice(7).trim()
-    : undefined;
+  const token = extractAuthToken(req);
 
   const user = getUserByToken(token);
   if (!user) {

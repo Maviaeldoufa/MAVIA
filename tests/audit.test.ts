@@ -82,6 +82,7 @@ describe('MVIA Production-Readiness Audit Suite', () => {
   let studentToken = '';
   let studentId = '';
   let adminToken = '';
+  let founderId = '';
 
   test('1. Production SPA serving & bundle secret hygiene', async () => {
     const htmlRes = await fetch(`${BASE_URL}/`);
@@ -119,6 +120,34 @@ describe('MVIA Production-Readiness Audit Suite', () => {
   });
 
   test('3. Registration validation, admin secret verification, login & logout', async () => {
+    // First registered user on fresh DB automatically becomes protected Super Admin with all permissions
+    const firstFounderReg = await api<{
+      token: string;
+      user: {
+        id: string;
+        role: string;
+        isSuperAdmin?: boolean;
+        adminRankId?: string;
+        permissions?: string[];
+      };
+    }>('/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: 'First Platform Founder',
+        email: 'founder.audit@test.edu',
+        phone: '01999999990',
+        password: 'founderPassword123',
+        year: 4,
+        acceptedTerms: true,
+      }),
+    });
+    assert.equal(firstFounderReg.status, 201);
+    assert.equal(firstFounderReg.data.user.role, 'admin');
+    assert.equal(firstFounderReg.data.user.isSuperAdmin, true);
+    assert.equal(firstFounderReg.data.user.adminRankId, 'rank-super-admin');
+    assert.equal(firstFounderReg.data.user.permissions?.length, 10);
+    founderId = firstFounderReg.data.user.id;
+
     // Missing terms acceptance
     const noTerms = await api('/api/auth/register', {
       method: 'POST',
@@ -148,7 +177,7 @@ describe('MVIA Production-Readiness Audit Suite', () => {
     });
     assert.equal(badAdmin.status, 403);
 
-    // Valid student registration
+    // Subsequent normal registration strictly creates a student (no privilege escalation)
     const stdReg = await api<{ token: string; user: { id: string; role: string } }>(
       '/api/auth/register',
       {
@@ -986,13 +1015,13 @@ describe('MVIA Production-Readiness Audit Suite', () => {
     assert.equal(activateTeacher.data.user.isSuspended, false);
 
     // Founder admin cannot be suspended or deleted
-    const suspendFounder = await api('/api/admin/users/user-founder-admin/suspend', {
+    const suspendFounder = await api(`/api/admin/users/${founderId}/suspend`, {
       method: 'POST',
       token: adminToken,
       body: JSON.stringify({ reason: 'Invalid' }),
     });
     assert.equal(suspendFounder.status, 403);
-    const deleteFounder = await api('/api/admin/users/user-founder-admin', {
+    const deleteFounder = await api(`/api/admin/users/${founderId}`, {
       method: 'DELETE',
       token: adminToken,
     });

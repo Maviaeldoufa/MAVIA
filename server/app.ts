@@ -1,6 +1,6 @@
 import express from 'express';
 import fs from 'fs';
-import { getUserByToken } from './auth.ts';
+import { extractAuthToken, getUserByToken } from './auth.ts';
 import { db, recordAppError, UPLOADS_DIR } from './db.ts';
 import { globalApiRateLimiter } from './rateLimit.ts';
 import { IS_VERCEL } from './storage.ts';
@@ -9,6 +9,7 @@ import accountRoutes from './routes/accountRoutes.ts';
 import aiRoutes from './routes/aiRoutes.ts';
 import authRoutes from './routes/authRoutes.ts';
 import communityRoutes from './routes/communityRoutes.ts';
+import comprehensiveExamRoutes from './routes/comprehensiveExamRoutes.ts';
 import courseRoutes from './routes/courseRoutes.ts';
 import courseTutorRoutes from './routes/courseTutorRoutes.ts';
 import dashboardRoutes from './routes/dashboardRoutes.ts';
@@ -49,10 +50,8 @@ export function createApp(): express.Express {
         allowedOrigins.includes('*') ||
         allowedOrigins.includes(origin);
       if (isAllowed) {
-        res.setHeader(
-          'Access-Control-Allow-Origin',
-          allowedOrigins.includes('*') ? '*' : origin
-        );
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
         res.setHeader('Vary', 'Origin');
         res.setHeader(
           'Access-Control-Allow-Methods',
@@ -150,10 +149,7 @@ export function createApp(): express.Express {
       return;
     }
 
-    const authHeader = req.headers.authorization;
-    const token = authHeader?.startsWith('Bearer ')
-      ? authHeader.slice(7).trim()
-      : undefined;
+    const token = extractAuthToken(req);
     const user = getUserByToken(token);
     if (user?.role === 'admin') {
       next();
@@ -171,6 +167,7 @@ export function createApp(): express.Express {
   app.use('/api', authRoutes);
   app.use('/api', accountRoutes);
   app.use('/api', courseRoutes);
+  app.use('/api', comprehensiveExamRoutes);
   app.use('/api', courseTutorRoutes);
   app.use('/api', dashboardRoutes);
   app.use('/api', learningRoutes);

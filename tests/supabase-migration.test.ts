@@ -110,7 +110,7 @@ describe('MVIA Supabase Schema & Migration Readiness Suite', () => {
       report.summary.usersCount,
       'Every user scrypt password hash must be preserved'
     );
-    assert.ok(report.summary.usersCount >= 1);
+    assert.equal(report.summary.usersCount, 0, 'Fresh wiped DB starts with zero prior registrations');
     assert.ok(report.summary.coursesCount >= 1);
     assert.ok(report.summary.adminRanksCount === 7);
 
@@ -120,8 +120,7 @@ describe('MVIA Supabase Schema & Migration Readiness Suite', () => {
     assert.deepEqual(bundle1.courses, bundle2.courses);
     assert.deepEqual(bundle1.quiz_questions, bundle2.quiz_questions);
 
-    // Founder admin and primary GIS course IDs remain identical
-    assert.ok(bundle1.users.some((u) => u.id === 'user-founder-admin'));
+    // Primary GIS course and Super Admin rank IDs remain intact
     assert.ok(bundle1.courses.some((c) => c.id === 'course-gis-101'));
     assert.ok(bundle1.admin_ranks.some((r) => r.id === 'rank-super-admin'));
   });

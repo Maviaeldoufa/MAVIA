@@ -7,10 +7,13 @@ import { FloatingLogo } from '../ui/FloatingLogo';
 import { GeoEngineeringBackground } from '../ui/GeoEngineeringBackground';
 import { GoldChip } from '../ui/GoldChip';
 import { AdminAnalyticsPanel } from './AdminAnalyticsPanel';
+import { AdminComprehensiveExamPanel } from './AdminComprehensiveExamPanel';
 import { AdminRanksPanel } from './AdminRanksPanel';
 import { AdminUsersPanel } from './AdminUsersPanel';
+import { HeroGeoCodingBackdrop } from './HeroGeoCodingBackdrop';
 import { HomeCountdownPanel } from './HomeCountdownPanel';
 import { LeaderboardPanel } from './LeaderboardPanel';
+import { StudentComprehensiveResultsPanel } from './StudentComprehensiveResultsPanel';
 import { StudentDashboardPanel } from './StudentDashboardPanel';
 
 interface HomeSectionProps {
@@ -28,14 +31,16 @@ export function HomeSection({ onNavigate, onOpenCourse }: HomeSectionProps) {
       {/* Editorial Hero Introduction */}
       <section className="relative overflow-hidden rounded-2xl border border-[#D4AF37]/25 bg-[#121216]">
         <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
-          <div className="lg:col-span-7 p-6 sm:p-10 flex flex-col justify-between space-y-6">
-            <div className="space-y-4">
+          <div className="relative overflow-hidden lg:col-span-7 p-6 sm:p-10 flex flex-col justify-between space-y-6">
+            <HeroGeoCodingBackdrop />
+
+            <div className="relative z-10 space-y-4">
               <div className="flex flex-wrap items-center gap-2 text-xs text-[#D4AF37]">
                 <span>{tr('منصة MAVIA التعليمية', 'MAVIA Educational Platform')}</span>
                 <span aria-hidden="true">·</span>
                 <span>{user ? formatYear(user.year) : tr('جميع الدفعات', 'All Years')}</span>
                 <span aria-hidden="true">·</span>
-                <span>{tr('GIS والبرمجة', 'GIS & Programming')}</span>
+                <span>{tr('الأقمار الصناعية · GIS والبرمجة', 'Satellites · GIS & Programming')}</span>
               </div>
 
               <h1 className="font-display text-3xl sm:text-4xl font-bold text-[#F5F0E6] leading-tight text-balance">
@@ -53,7 +58,7 @@ export function HomeSection({ onNavigate, onOpenCourse }: HomeSectionProps) {
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2.5 pt-2">
+            <div className="relative z-10 flex flex-wrap items-center gap-2.5 pt-2">
               <GoldChip active={true} onClick={() => onNavigate('courses')}>
                 <BookOpen className="w-4 h-4" />
                 <span>{tr('استكشاف الكورسات والمواد', 'Explore Courses & Folders')}</span>
@@ -114,11 +119,17 @@ export function HomeSection({ onNavigate, onOpenCourse }: HomeSectionProps) {
       {/* Upcoming Exam News & Countdowns */}
       <HomeCountdownPanel />
 
+      {/* Student's Submitted / Graded Comprehensive Exam Results & Mistake Review */}
+      <StudentComprehensiveResultsPanel />
+
       {/* Personal Student Dashboard */}
       <StudentDashboardPanel onOpenCourse={onOpenCourse} />
 
       {/* Batch Leaderboard */}
       <LeaderboardPanel refreshTrigger={leaderboardRefresh} />
+
+      {/* Admin-Only Comprehensive Exam Builder & Manual Grading */}
+      <AdminComprehensiveExamPanel />
 
       {/* Admin-Only Visitor Analytics */}
       <AdminAnalyticsPanel />

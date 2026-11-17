@@ -10,10 +10,16 @@ import {
   User as UserIcon,
 } from 'lucide-react';
 import { motion } from 'motion/react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import type { AcademicYear } from '../../types';
+import {
+  clearAuthHistory,
+  getLastIdentifier,
+  hasRegisteredBefore,
+  resolveApiUrl,
+} from '../../utils/api';
 import { FloatingLogo } from '../ui/FloatingLogo';
 import { Footer } from '../ui/Footer';
 import { GeoEngineeringBackground } from '../ui/GeoEngineeringBackground';
@@ -39,7 +45,9 @@ interface FieldErrors {
 export function AuthScreen() {
   const { login, register, suspensionNotice, clearSuspensionNotice } = useAuth();
   const { lang, toggleLang, tr } = useLanguage();
-  const [mode, setMode] = useState<'register' | 'login'>('register');
+  const [mode, setMode] = useState<'register' | 'login'>(() =>
+    hasRegisteredBefore() ? 'login' : 'register'
+  );
   const [termsOpen, setTermsOpen] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
@@ -53,12 +61,27 @@ export function AuthScreen() {
   const [adminCode, setAdminCode] = useState('');
 
   // Login fields
-  const [identifier, setIdentifier] = useState('');
+  const [identifier, setIdentifier] = useState(() => getLastIdentifier());
   const [loginPassword, setLoginPassword] = useState('');
 
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [requiresInitialAdminSetup, setRequiresInitialAdminSetup] = useState(false);
+
+  useEffect(() => {
+    fetch(resolveApiUrl('/api/platform/config'))
+      .then((r) => (r.ok ? (r.json() as Promise<{ requiresInitialAdminSetup?: boolean }>) : null))
+      .then((data) => {
+        if (data?.requiresInitialAdminSetup) {
+          clearAuthHistory();
+          setIdentifier('');
+          setMode('register');
+          setRequiresInitialAdminSetup(true);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const years: Array<{ value: AcademicYear; label: string }> = [
     { value: 1, label: tr('الأولى', 'Year 1') },
@@ -241,6 +264,18 @@ export function AuthScreen() {
                 {tr('تسجيل الدخول', 'Sign In')}
               </GoldChip>
             </div>
+
+            {requiresInitialAdminSetup && mode === 'register' && (
+              <div className="p-3.5 rounded-xl bg-[#D4AF37]/12 border border-[#D4AF37]/45 text-[#F5D061] text-xs sm:text-sm flex items-start gap-2.5">
+                <ShieldCheck className="w-5 h-5 text-[#F5D061] shrink-0 mt-0.5" />
+                <span>
+                  {tr(
+                    'التسجيل التأسيسي الأول: أول حساب يتم إنشاؤه الآن سيُمنح تلقائياً رتبة المدير العام مع كامل صلاحيات الأدمن.',
+                    'First-Time Setup: The first account registered now will automatically receive Super Admin rank with all admin permissions.'
+                  )}
+                </span>
+              </div>
+            )}
 
             {suspensionNotice && (
               <div

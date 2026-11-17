@@ -3,6 +3,7 @@ import { AnimatePresence, MotionConfig, motion } from 'motion/react';
 import { Suspense, lazy, useEffect, useState } from 'react';
 import { AuthScreen } from './components/auth/AuthScreen';
 import { WelcomeCelebrationScreen } from './components/auth/WelcomeCelebrationScreen';
+import { ComprehensiveExamBannerAndModal } from './components/exams/ComprehensiveExamBannerAndModal';
 import { FloatingChatbotWidget } from './components/ui/FloatingChatbotWidget';
 import { FloatingLogo } from './components/ui/FloatingLogo';
 import { Footer } from './components/ui/Footer';
@@ -265,6 +266,8 @@ function MviaWorkspace() {
         activeSection={activeSection}
         onChangeSection={setActiveSection}
       />
+
+      <ComprehensiveExamBannerAndModal />
 
       <main
         id="main-content"

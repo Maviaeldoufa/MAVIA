@@ -13,9 +13,12 @@ router.get('/notifications', requireAuth, (req: AuthenticatedRequest, res) => {
   const userYear = req.currentUser!.year;
   const isAdmin = req.currentUser!.role === 'admin';
 
-  const relevant = (store.notifications || []).filter(
-    (n) => isAdmin || n.year === 0 || n.year === userYear
-  );
+  const relevant = (store.notifications || []).filter((n) => {
+    if (n.userId) {
+      return n.userId === userId;
+    }
+    return isAdmin || n.year === 0 || n.year === userYear;
+  });
 
   const items = relevant.map((n) => ({
     ...n,

@@ -12,6 +12,7 @@ router.get('/platform/config', (_req, res) => {
   const store = db.get();
   const config = store.platformConfig;
   res.json({
+    requiresInitialAdminSetup: store.users.length === 0,
     config: {
       whatsappNumber: config?.whatsappNumber || '01159637247',
       telegramUrl: config?.telegramUrl || 'https://t.me/+201159637247',

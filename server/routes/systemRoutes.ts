@@ -1,6 +1,7 @@
 import fs from 'fs';
 import { Router } from 'express';
 import {
+  extractAuthToken,
   getUserByToken,
   requireAuth,
   requirePermission,
@@ -80,10 +81,7 @@ router.post('/monitoring/client-error', (req, res) => {
     return;
   }
 
-  const authHeader = req.headers.authorization;
-  const token = authHeader?.startsWith('Bearer ')
-    ? authHeader.slice(7).trim()
-    : undefined;
+  const token = extractAuthToken(req);
   const user = getUserByToken(token);
 
   recordAppError({
