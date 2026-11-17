@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
-import { getSupabaseAdminClient, isSupabaseConfigured } from './supabase.ts';
+import { getSupabaseAdminClient, isSupabaseConfigured } from './supabase.js';
 
 export const IS_VERCEL = Boolean(
   process.env.VERCEL ||
