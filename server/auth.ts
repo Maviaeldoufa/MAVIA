@@ -34,7 +34,7 @@ import type { AcademicYear, User, UserProfileNote, UserRole } from '../types.ts'
 
 const router = Router();
 
-const SUPER_ADMIN_EMAIL = 'fmha1994@gmail.com';
+const SUPER_ADMIN_EMAIL = 'MAVIAMahmou1@1';
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const VERIFICATION_TTL_MS = 15 * 60 * 1000;
 
@@ -181,7 +181,7 @@ router.post('/auth/register', registerRateLimiter, (req, res) => {
     return;
   }
 
-  const isOwnerEmail = cleanEmail === SUPER_ADMIN_EMAIL;
+  const isOwnerEmail = cleanEmail === SUPER_ADMIN_EMAIL.toLowerCase();
   const isFirstAccount = store.users.length === 0 || isOwnerEmail;
 
   let role: UserRole = 'student';
@@ -299,13 +299,13 @@ router.post('/auth/login', loginRateLimiter, (req, res) => {
     res.status(403).json({
       suspended: true,
       error:
-        'تم حظر حسابك مؤقتاً لمخالفة الشروط والأحكام (في الشات أو المنصة)، ولا يمكنك الدخول مجدداً إلا بإذن وموافقة من الأدمن.',
+        'تم حظر حسابك مؤقتاً لمخالفة الشروط والأحكام، ولا يمكنك الدخول مجدداً إلا بإذن وموافقة من الأدمن.',
     });
     return;
   }
 
   // ترقية الحساب تلقائياً لمدير عام عند تسجيل الدخول إذا كان هو نفس الإيميل المحدد
-  if ((user.email || '').toLowerCase() === SUPER_ADMIN_EMAIL) {
+  if ((user.email || '').toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) {
     user.role = 'admin';
     user.isProtected = true;
     user.adminRankId = 'rank-super-admin';
@@ -338,135 +338,6 @@ router.get('/auth/me', requireAuth, (req: AuthenticatedRequest, res) => {
     token: req.authToken,
     user: toSafeUser(req.currentUser!),
   });
-});
-
-router.post('/auth/send-verification', requireAuth, async (req: AuthenticatedRequest, res) => {
-  const user = req.currentUser!;
-  if (user.emailVerified) {
-    res.json({
-      sent: false,
-      alreadyVerified: true,
-      requiresConfig: false,
-      message: 'البريد الإلكتروني مؤكد بالفعل.',
-    });
-    return;
-  }
-
-  if (!user.email || !EMAIL_REGEX.test(user.email)) {
-    res.status(400).json({ error: 'لا يوجد بريد إلكتروني صالح مرتبط بهذا الحساب.' });
-    return;
-  }
-
-  const emailConfig = getEmailDeliveryConfig();
-  if (!emailConfig.enabled) {
-    res.json({
-      sent: false,
-      disabled: true,
-      requiresConfig: true,
-      message:
-        'إرسال البريد الإلكتروني معطّل مؤقتاً لأن إعداد Resend أو عنوان المرسل (EMAIL_FROM) غير مكتمل، وتعمل باقي مزايا المنصة والتسجيل بشكل طبيعي.',
-    });
-    return;
-  }
-
-  const otpCode = String(crypto.randomInt(100000, 999999));
-
-  try {
-    const emailRes = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${emailConfig.apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: emailConfig.fromEmail,
-        to: [user.email],
-        subject: 'كود تأكيد البريد الإلكتروني — منصة MAVIA',
-        html: `<div dir="rtl" style="font-family:sans-serif;line-height:1.8">
-          <h2>مرحباً ${user.name}</h2>
-          <p>استخدم الكود التالي لتأكيد بريدك الإلكتروني في منصة MAVIA:</p>
-          <div style="font-size:28px;font-weight:bold;letter-spacing:6px;padding:12px 18px;background:#f4f4f5;display:inline-block;border-radius:8px">${otpCode}</div>
-          <p style="color:#666;font-size:13px">الكود صالح لمدة 15 دقيقة فقط.</p>
-        </div>`,
-      }),
-    });
-
-    if (!emailRes.ok) {
-      const errText = await emailRes.text();
-      recordAppError({
-        source: 'server',
-        message: `فشل إرسال بريد التحقق عبر Resend: ${emailRes.status} ${errText.slice(0, 120)}`,
-        path: '/api/auth/send-verification',
-        userId: user.id,
-        notifyAdmin: true,
-      });
-      res.status(502).json({
-        error: 'تعذر إرسال رسالة التحقق عبر مزود البريد الإلكتروني.',
-      });
-      return;
-    }
-
-    user.emailVerificationTokenHash = hashOtpCode(otpCode);
-    user.emailVerificationExpiresAt = new Date(Date.now() + VERIFICATION_TTL_MS).toISOString();
-    db.save();
-
-    res.json({
-      sent: true,
-      requiresConfig: false,
-      message: 'تم إرسال كود التأكيد إلى بريدك الإلكتروني بنجاح.',
-    });
-  } catch (err) {
-    recordAppError({
-      source: 'server',
-      message: err instanceof Error ? err.message : 'Email verification transport error',
-      path: '/api/auth/send-verification',
-      userId: user.id,
-      notifyAdmin: true,
-    });
-    res.status(502).json({ error: 'حدث خطأ أثناء الاتصال بخدمة البريد الإلكتروني.' });
-  }
-});
-
-router.post('/auth/verify-email', requireAuth, (req: AuthenticatedRequest, res) => {
-  const { code } = req.body as { code?: string };
-  const user = req.currentUser!;
-
-  if (user.emailVerified) {
-    res.json({ user: toSafeUser(user) });
-    return;
-  }
-
-  if (!code || !/^\d{6}$/.test(code.trim())) {
-    res.status(400).json({ error: 'يرجى إدخال كود التحقق المكون من 6 أرقام.' });
-    return;
-  }
-
-  if (!user.emailVerificationTokenHash || !user.emailVerificationExpiresAt) {
-    res.status(400).json({ error: 'لا يوجد كود تحقق نشط حالياً. اطلب إرسال كود جديد.' });
-    return;
-  }
-
-  if (new Date(user.emailVerificationExpiresAt).getTime() < Date.now()) {
-    res.status(400).json({ error: 'انتهت صلاحية كود التحقق. يرجى طلب كود جديد.' });
-    return;
-  }
-
-  const submittedBuf = Buffer.from(hashOtpCode(code), 'hex');
-  const storedBuf = Buffer.from(user.emailVerificationTokenHash, 'hex');
-  if (
-    submittedBuf.length !== storedBuf.length ||
-    !crypto.timingSafeEqual(submittedBuf, storedBuf)
-  ) {
-    res.status(400).json({ error: 'كود التحقق غير صحيح.' });
-    return;
-  }
-
-  user.emailVerified = true;
-  user.emailVerificationTokenHash = undefined;
-  user.emailVerificationExpiresAt = undefined;
-  db.save();
-
-  res.json({ user: toSafeUser(user) });
 });
 
 router.get('/users', requireAuth, (req: AuthenticatedRequest, res) => {
@@ -532,487 +403,6 @@ router.get('/admin/users', requireAuth, requireAnyPermission('manage_students', 
   });
 });
 
-router.get('/admin/users/export.csv', requireAuth, requirePermission('view_sensitive_data'), (req: AuthenticatedRequest, res) => {
-  const store = db.get();
-  const includeContact = req.query.includeContact === 'true';
-  const filtered = filterAndSortAdminUsers(
-    store.users,
-    req.query as Record<string, unknown>
-  );
-
-  const header = [
-    'id',
-    'name',
-    'role',
-    'academic_year',
-    'account_status',
-    'email',
-    'phone',
-    'email_verified',
-    'points',
-    'quizzes_completed',
-    'created_at',
-    'last_login_at',
-  ]
-    .map(csvEscapeCell)
-    .join(',');
-
-  const rows = filtered.map((u) =>
-    [
-      u.id,
-      u.name,
-      u.role,
-      u.year,
-      u.isSuspended ? 'suspended' : 'active',
-      includeContact ? u.email || '' : maskEmail(u.email || ''),
-      includeContact ? u.phone || '' : maskPhone(u.phone || ''),
-      Boolean(u.emailVerified),
-      u.points,
-      u.quizzesCompleted,
-      u.createdAt,
-      u.lastLoginAt || '',
-    ]
-      .map(csvEscapeCell)
-      .join(',')
-  );
-
-  recordAdminAudit({
-    actorId: req.currentUser!.id,
-    actorName: req.currentUser!.name,
-    action: 'users.csv_export',
-    details: `Exported ${filtered.length} user(s) as CSV (${
-      includeContact ? 'full contact' : 'privacy-masked contact'
-    })`,
-    ip: getClientIp(req),
-  });
-
-  const csvBody = `\uFEFF${[header, ...rows].join('\r\n')}`;
-  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-  res.setHeader(
-    'Content-Disposition',
-    `attachment; filename="mvia-users-${new Date().toISOString().slice(0, 10)}.csv"`
-  );
-  res.send(csvBody);
-});
-
-router.get('/admin/audit-logs', requireAuth, requirePermission('view_sensitive_data'), (_req: AuthenticatedRequest, res) => {
-  const store = db.get();
-  res.json({ logs: (store.adminAuditLogs || []).slice(0, 100) });
-});
-
-router.post('/admin/users', requireAuth, requirePermission('manage_students'), (req: AuthenticatedRequest, res) => {
-  const { name, email, phone, password, year, role } = req.body as {
-    name?: string;
-    email?: string;
-    phone?: string;
-    password?: string;
-    year?: number;
-    role?: UserRole;
-  };
-
-  if (!name?.trim() || !email?.trim() || !phone?.trim() || !password || !year) {
-    res.status(400).json({ error: 'يرجى ملء جميع بيانات العضو الجديد بما فيها البريد الإلكتروني.' });
-    return;
-  }
-
-  const cleanEmail = email.trim().toLowerCase();
-  if (!EMAIL_REGEX.test(cleanEmail)) {
-    res.status(400).json({ error: 'صيغة البريد الإلكتروني غير صحيحة.' });
-    return;
-  }
-
-  if (password.length < 4) {
-    res.status(400).json({ error: 'كلمة المرور يجب أن تكون 4 أحرف على الأقل.' });
-    return;
-  }
-
-  const parsedYear = Number(year) as AcademicYear;
-  if (![1, 2, 3, 4].includes(parsedYear)) {
-    res.status(400).json({ error: 'السنة الدراسية غير صالحة.' });
-    return;
-  }
-
-  const store = db.get();
-  const cleanPhone = phone.trim();
-  if (store.users.some((u) => u.phone === cleanPhone)) {
-    res.status(409).json({ error: 'رقم التليفون مستخدم بالفعل.' });
-    return;
-  }
-  if (store.users.some((u) => (u.email || '').toLowerCase() === cleanEmail)) {
-    res.status(409).json({ error: 'البريد الإلكتروني مستخدم بالفعل.' });
-    return;
-  }
-
-  const assignedRole: UserRole =
-    role === 'admin' ? 'admin' : role === 'teacher' ? 'teacher' : 'student';
-  if (assignedRole === 'admin' && !isUserSuperAdmin(req.currentUser)) {
-    res.status(403).json({
-      error: 'إنشاء حساب مسؤول/أدمن جديد محصور بالمدير العام فقط.',
-    });
-    return;
-  }
-  const newUser: User = {
-    id: `user-${crypto.randomUUID()}`,
-    name: name.trim(),
-    email: cleanEmail,
-    phone: cleanPhone,
-    passwordHash: hashPassword(password),
-    year: parsedYear,
-    role: assignedRole,
-    isProtected: false,
-    points: 0,
-    quizzesCompleted: 0,
-    emailVerified: false,
-    createdAt: new Date().toISOString(),
-  };
-
-  store.users.push(newUser);
-  db.save();
-
-  recordAdminAudit({
-    actorId: req.currentUser!.id,
-    actorName: req.currentUser!.name,
-    action: 'user.create',
-    targetUserId: newUser.id,
-    targetUserName: newUser.name,
-    details: `Created ${assignedRole} account (Year ${parsedYear})`,
-    ip: getClientIp(req),
-  });
-
-  res.status(201).json({ user: toSafeUser(newUser) });
-});
-
-router.get('/admin/users/:id/profile', requireAuth, requireAnyPermission('manage_students', 'manage_user_notes'), (req: AuthenticatedRequest, res) => {
-  const targetId = req.params.id;
-  const store = db.get();
-  const target = store.users.find((u) => u.id === targetId);
-
-  if (!target) {
-    res.status(404).json({ error: 'المستخدم غير موجود.' });
-    return;
-  }
-
-  const progress = store.studentProgress?.[target.id];
-  const submissions = (store.quizSubmissions || []).filter(
-    (s) => s.userId === target.id
-  );
-  const totalMaxScore = submissions.reduce((sum, s) => sum + (s.maxScore || 0), 0);
-  const totalScore = submissions.reduce((sum, s) => sum + (s.score || 0), 0);
-  const avgQuizScorePercent =
-    totalMaxScore > 0 ? Math.round((totalScore / totalMaxScore) * 100) : 0;
-
-  const enrolledIds = new Set(progress?.enrolledCourseIds || []);
-  const enrolledCourses = store.courses
-    .filter((c) => enrolledIds.has(c.id))
-    .map((c) => ({
-      id: c.id,
-      title: c.title,
-      code: c.code,
-      year: c.year,
-    }));
-
-  const recentSubmissions = [...submissions]
-    .sort(
-      (a, b) =>
-        new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()
-    )
-    .slice(0, 10)
-    .map((s) => {
-      const quiz = store.quizzes.find((q) => q.id === s.quizId);
-      const course = store.courses.find((c) => c.id === s.courseId);
-      return {
-        id: s.id,
-        quizId: s.quizId,
-        quizTitle: quiz?.title || 'اختبار',
-        courseId: s.courseId,
-        courseTitle: course?.title || 'مادة دراسية',
-        score: s.score,
-        maxScore: s.maxScore,
-        correctCount: s.correctCount,
-        totalQuestions: s.totalQuestions,
-        timeSpentSeconds: s.timeSpentSeconds,
-        submittedAt: s.submittedAt,
-      };
-    });
-
-  const lecturesWatchedCount = Object.keys(
-    store.lectureProgress?.[target.id] || {}
-  ).length;
-  const supportTicketsCount = (store.supportTickets || []).filter(
-    (t) => t.userId === target.id
-  ).length;
-  const tasks = progress?.tasks || [];
-
-  recordAdminAudit({
-    actorId: req.currentUser!.id,
-    actorName: req.currentUser!.name,
-    action: 'user.profile_view',
-    targetUserId: target.id,
-    targetUserName: target.name,
-    details: 'Viewed user profile and academic statistics',
-    ip: getClientIp(req),
-  });
-
-  const userNotes = [...(store.userProfileNotes || [])]
-    .filter((n) => n.targetUserId === target.id)
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
-  const canViewSensitive = hasUserPermission(req.currentUser, 'view_sensitive_data');
-  const safeProfile = toSafeUser(target);
-  res.json({
-    user: canViewSensitive
-      ? safeProfile
-      : {
-          ...safeProfile,
-          email: maskEmail(safeProfile.email),
-          phone: maskPhone(safeProfile.phone),
-        },
-    academicStats: {
-      points: target.points,
-      quizzesCompleted: target.quizzesCompleted,
-      totalSubmissions: submissions.length,
-      avgQuizScorePercent,
-      enrolledCoursesCount: enrolledCourses.length,
-      completedSummariesCount: progress?.completedSummaryIds?.length || 0,
-      studyMinutes: progress?.studyMinutes || 0,
-      tasksTotal: tasks.length,
-      tasksCompleted: tasks.filter((t) => t.completed).length,
-      gpaEntriesCount: (store.gpaTables?.[target.id] || []).length,
-      lecturesWatchedCount,
-      supportTicketsCount,
-      enrolledCourses,
-    },
-    recentSubmissions,
-    notes: userNotes,
-  });
-});
-
-router.post(
-  '/admin/users/:id/notes',
-  requireAuth,
-  requireAnyPermission('manage_students', 'manage_user_notes'),
-  (req: AuthenticatedRequest, res) => {
-    const targetId = req.params.id;
-    const { content } = req.body as { content?: string };
-    const cleanContent = content?.trim() || '';
-
-    if (cleanContent.length < 2 || cleanContent.length > 600) {
-      res.status(400).json({
-        error: 'نص الملاحظة يجب أن يكون بين حرفين و600 حرف.',
-      });
-      return;
-    }
-
-    const store = db.get();
-    const target = store.users.find((u) => u.id === targetId);
-    if (!target) {
-      res.status(404).json({ error: 'المستخدم غير موجود.' });
-      return;
-    }
-
-    if (!Array.isArray(store.userProfileNotes)) {
-      store.userProfileNotes = [];
-    }
-
-    const now = new Date().toISOString();
-    const note: UserProfileNote = {
-      id: `note-${crypto.randomUUID()}`,
-      targetUserId: target.id,
-      authorId: req.currentUser!.id,
-      authorName: req.currentUser!.name,
-      content: cleanContent,
-      reactions: [],
-      createdAt: now,
-      updatedAt: now,
-    };
-
-    store.userProfileNotes.unshift(note);
-    db.save();
-
-    recordAdminAudit({
-      actorId: req.currentUser!.id,
-      actorName: req.currentUser!.name,
-      action: 'user.note_create',
-      targetUserId: target.id,
-      targetUserName: target.name,
-      details: cleanContent.slice(0, 140),
-      ip: getClientIp(req),
-    });
-
-    res.status(201).json({ note });
-  }
-);
-
-router.delete(
-  '/admin/users/:id/notes/:noteId',
-  requireAuth,
-  requireAnyPermission('manage_students', 'manage_user_notes'),
-  (req: AuthenticatedRequest, res) => {
-    const { id: targetId, noteId } = req.params;
-    const store = db.get();
-    const note = (store.userProfileNotes || []).find(
-      (n) => n.id === noteId && n.targetUserId === targetId
-    );
-    if (!note) {
-      res.status(404).json({ error: 'الملاحظة غير موجودة.' });
-      return;
-    }
-
-    store.userProfileNotes = (store.userProfileNotes || []).filter(
-      (n) => n.id !== noteId
-    );
-    db.save();
-
-    const target = store.users.find((u) => u.id === targetId);
-    recordAdminAudit({
-      actorId: req.currentUser!.id,
-      actorName: req.currentUser!.name,
-      action: 'user.note_delete',
-      targetUserId: targetId,
-      targetUserName: target?.name,
-      details: `Deleted profile note (${noteId})`,
-      ip: getClientIp(req),
-    });
-
-    res.json({ ok: true });
-  }
-);
-
-router.patch(
-  '/admin/users/:id/credentials',
-  requireAuth,
-  requireSuperAdmin,
-  (req: AuthenticatedRequest, res) => {
-    const targetId = req.params.id;
-    const { email, newPassword } = req.body as {
-      email?: string;
-      newPassword?: string;
-    };
-
-    const store = db.get();
-    const target = store.users.find((u) => u.id === targetId);
-    if (!target) {
-      res.status(404).json({ error: 'المستخدم غير موجود.' });
-      return;
-    }
-
-    const hasEmailUpdate = typeof email === 'string' && email.trim().length > 0;
-    const hasPasswordUpdate = typeof newPassword === 'string' && newPassword.length > 0;
-
-    if (!hasEmailUpdate && !hasPasswordUpdate) {
-      res.status(400).json({
-        error: 'يرجى إدخال البريد الإلكتروني الجديد أو كلمة المرور الجديدة للتعديل.',
-      });
-      return;
-    }
-
-    const updatedFields: string[] = [];
-
-    if (hasEmailUpdate) {
-      const cleanEmail = email!.trim().toLowerCase();
-      if (!EMAIL_REGEX.test(cleanEmail)) {
-        res.status(400).json({ error: 'صيغة البريد الإلكتروني غير صحيحة.' });
-        return;
-      }
-      if (
-        store.users.some(
-          (u) => u.id !== target.id && (u.email || '').toLowerCase() === cleanEmail
-        )
-      ) {
-        res.status(409).json({ error: 'البريد الإلكتروني مستخدم بالفعل لحساب آخر.' });
-        return;
-      }
-      target.email = cleanEmail;
-      updatedFields.push('email');
-    }
-
-    if (hasPasswordUpdate) {
-      if (newPassword!.length < 4) {
-        res.status(400).json({
-          error: 'كلمة المرور الجديدة يجب أن تكون 4 أحرف على الأقل.',
-        });
-        return;
-      }
-      target.passwordHash = hashPassword(newPassword!);
-      updatedFields.push('password');
-      if (target.id !== req.currentUser!.id) {
-        store.sessions = store.sessions.filter((s) => s.userId !== target.id);
-      }
-    }
-
-    db.save();
-
-    recordAdminAudit({
-      actorId: req.currentUser!.id,
-      actorName: req.currentUser!.name,
-      action: 'user.credentials_update',
-      targetUserId: target.id,
-      targetUserName: target.name,
-      details: `Super Admin updated credentials (${updatedFields.join(', ')})`,
-      ip: getClientIp(req),
-    });
-
-    res.json({ user: toSafeUser(target) });
-  }
-);
-
-router.delete('/admin/users/:id', requireAuth, requirePermission('manage_students'), (req: AuthenticatedRequest, res) => {
-  const targetId = req.params.id;
-  const store = db.get();
-  const target = store.users.find((u) => u.id === targetId);
-
-  if (!target) {
-    res.status(404).json({ error: 'المستخدم غير موجود.' });
-    return;
-  }
-
-  if (target.isProtected || target.role === 'admin' || target.id === req.currentUser!.id) {
-    res.status(403).json({ error: 'حساب الأدمن محمي ولا يمكن حذفه من المنصة.' });
-    return;
-  }
-
-  store.users = store.users.filter((u) => u.id !== targetId);
-  store.sessions = store.sessions.filter((s) => s.userId !== targetId);
-  store.quizSubmissions = store.quizSubmissions.filter((s) => s.userId !== targetId);
-  store.chatMessages = store.chatMessages.filter((m) => m.userId !== targetId);
-  if (store.supportTickets) {
-    store.supportTickets = store.supportTickets.filter((t) => t.userId !== targetId);
-  }
-  if (store.supportTeam) {
-    store.supportTeam = store.supportTeam.filter((m) => m.userId !== targetId);
-  }
-  if (store.userProfileNotes) {
-    store.userProfileNotes = store.userProfileNotes.filter(
-      (n) => n.targetUserId !== targetId
-    );
-  }
-  if (store.studentProgress) {
-    delete store.studentProgress[targetId];
-  }
-  if (store.gpaTables) {
-    delete store.gpaTables[targetId];
-  }
-  if (store.lectureProgress) {
-    delete store.lectureProgress[targetId];
-  }
-  if (store.analytics?.visitors) {
-    delete store.analytics.visitors[targetId];
-  }
-  db.save();
-
-  recordAdminAudit({
-    actorId: req.currentUser!.id,
-    actorName: req.currentUser!.name,
-    action: 'user.delete',
-    targetUserId: targetId,
-    targetUserName: target.name,
-    details: `Deleted ${target.role} account (${target.email || target.phone})`,
-    ip: getClientIp(req),
-  });
-
-  res.json({ ok: true, kickedUserId: targetId });
-});
-
 router.post('/admin/users/:id/suspend', requireAuth, requirePermission('manage_students'), (req: AuthenticatedRequest, res) => {
   const targetId = req.params.id;
   const { reason } = req.body as { reason?: string };
@@ -1040,13 +430,41 @@ router.post('/admin/users/:id/suspend', requireAuth, requirePermission('manage_s
     actorId: req.currentUser!.id,
     actorName: req.currentUser!.name,
     action: 'user.suspend',
-    targetUserId: target.id,
+    targetUserId: targetId,
     targetUserName: target.name,
-    details: finalReason,
+    details: `Suspended user: ${finalReason}`,
     ip: getClientIp(req),
   });
 
-  res.json({ user: toSafeUser(target) });
+  res.json({ ok: true, user: toSafeUser(target) });
+});
+
+router.post('/admin/users/:id/unsuspend', requireAuth, requirePermission('manage_students'), (req: AuthenticatedRequest, res) => {
+  const targetId = req.params.id;
+  const store = db.get();
+  const target = store.users.find((u) => u.id === targetId);
+
+  if (!target) {
+    res.status(404).json({ error: 'المستخدم غير موجود.' });
+    return;
+  }
+
+  target.isSuspended = false;
+  target.suspendedReason = undefined;
+  target.suspendedAt = undefined;
+  db.save();
+
+  recordAdminAudit({
+    actorId: req.currentUser!.id,
+    actorName: req.currentUser!.name,
+    action: 'user.unsuspend',
+    targetUserId: targetId,
+    targetUserName: target.name,
+    details: 'Lifted suspension and restored user access',
+    ip: getClientIp(req),
+  });
+
+  res.json({ ok: true, user: toSafeUser(target) });
 });
 
 export default router;
