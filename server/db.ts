@@ -12,14 +12,14 @@ import type {
   SafeUser,
   User,
   UserRankBadge,
-} from './types.ts';
+} from './types.js';
 
 import {
   isSupabaseDbEnabled,
   loadLatestStateFromSupabase,
   saveStateToSupabase,
-} from './supabase.ts';
-import { IS_VERCEL, UPLOADS_DIR } from './storage.ts';
+} from './supabase.js';
+import { IS_VERCEL, UPLOADS_DIR } from './storage.js';
 export { UPLOADS_DIR };
 
 const BUNDLED_DB_FILE = path.resolve(process.cwd(), 'data', 'mafia-db.json');
