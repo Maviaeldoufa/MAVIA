@@ -1,24 +1,24 @@
 import express from 'express';
 import fs from 'fs';
-import { extractAuthToken, getUserByToken } from './auth.ts';
-import { db, recordAppError, UPLOADS_DIR } from './db.ts';
-import { globalApiRateLimiter } from './rateLimit.ts';
-import { IS_VERCEL } from './storage.ts';
-import { isSupabaseDbEnabled } from './supabase.ts';
-import accountRoutes from './routes/accountRoutes.ts';
-import aiRoutes from './routes/aiRoutes.ts';
-import authRoutes from './routes/authRoutes.ts';
-import communityRoutes from './routes/communityRoutes.ts';
-import comprehensiveExamRoutes from './routes/comprehensiveExamRoutes.ts';
-import courseRoutes from './routes/courseRoutes.ts';
-import courseTutorRoutes from './routes/courseTutorRoutes.ts';
-import dashboardRoutes from './routes/dashboardRoutes.ts';
-import learningRoutes from './routes/learningRoutes.ts';
-import notificationRoutes from './routes/notificationRoutes.ts';
-import platformRoutes from './routes/platformRoutes.ts';
-import ranksRoutes from './routes/ranksRoutes.ts';
-import supportRoutes from './routes/supportRoutes.ts';
-import systemRoutes from './routes/systemRoutes.ts';
+import { extractAuthToken, getUserByToken } from './auth.js';
+import { db, recordAppError, UPLOADS_DIR } from './db.js';
+import { globalApiRateLimiter } from './rateLimit.js';
+import { IS_VERCEL } from './storage.js';
+import { isSupabaseDbEnabled } from './supabase.js';
+import accountRoutes from './routes/accountRoutes.js';
+import aiRoutes from './routes/aiRoutes.js';
+import authRoutes from './routes/authRoutes.js';
+import communityRoutes from './routes/communityRoutes.js';
+import comprehensiveExamRoutes from './routes/comprehensiveExamRoutes.js';
+import courseRoutes from './routes/courseRoutes.js';
+import courseTutorRoutes from './routes/courseTutorRoutes.js';
+import dashboardRoutes from './routes/dashboardRoutes.js';
+import learningRoutes from './routes/learningRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
+import platformRoutes from './routes/platformRoutes.js';
+import ranksRoutes from './routes/ranksRoutes.js';
+import supportRoutes from './routes/supportRoutes.js';
+import systemRoutes from './routes/systemRoutes.js';
 
 const MAINTENANCE_EXEMPT_PATHS = new Set([
   '/status',
@@ -77,8 +77,6 @@ export function createApp(): express.Express {
     app.use('/uploads', express.static(UPLOADS_DIR));
   }
 
-  // Sync latest shared snapshot from Supabase before API routes and flush dirty
-  // state to Supabase before transmitting responses (required for Vercel serverless).
   app.use('/api', (req, res, next) => {
     if (isSupabaseDbEnabled()) {
       let responseFlushDone = false;
