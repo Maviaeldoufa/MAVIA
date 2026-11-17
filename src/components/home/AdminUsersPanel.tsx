@@ -10,6 +10,7 @@ import {
   GraduationCap,
   History,
   Lock,
+  LogOut,
   Mail,
   Phone,
   RefreshCw,
@@ -50,7 +51,8 @@ interface AdminUsersPanelProps {
 type ConfirmAction =
   | { type: 'suspend'; user: User; reason: string }
   | { type: 'activate'; user: User }
-  | { type: 'delete'; user: User };
+  | { type: 'delete'; user: User }
+  | { type: 'revoke_non_admins' };
 
 export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
   const { user: currentUser } = useAuth();
@@ -286,9 +288,44 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
 
   const executeConfirmedAction = async () => {
     if (!confirmAction) return;
-    const { type, user: target } = confirmAction;
     setErrorMsg(null);
     setStatusMsg(null);
+
+    if (confirmAction.type === 'revoke_non_admins') {
+      setBusyId('__revoke_non_admins__');
+      try {
+        const res = await apiRequest<{
+          ok: boolean;
+          revokedSessionsCount: number;
+          affectedUsersCount: number;
+          keptAdminSessionsCount: number;
+        }>('/api/admin/sessions/revoke-non-admins', {
+          method: 'POST',
+        });
+        setStatusMsg(
+          tr(
+            `تم إنهاء ${res.revokedSessionsCount} جلسة لعدد ${res.affectedUsersCount} حساب من الطلاب والمعلمين بنجاح (مع الإبقاء على ${res.keptAdminSessionsCount} جلسة للأدمن دون تغيير).`,
+            `Ended ${res.revokedSessionsCount} session(s) across ${res.affectedUsersCount} non-admin account(s); preserved ${res.keptAdminSessionsCount} admin session(s).`
+          )
+        );
+        setConfirmAction(null);
+        await loadUsers();
+        if (showAuditLogs) loadAuditLogs();
+        onUsersChanged();
+      } catch (err) {
+        setErrorMsg(
+          err instanceof Error
+            ? err.message
+            : tr('تعذر إنهاء جلسات المسجلين.', 'Failed to revoke non-admin sessions.')
+        );
+        setConfirmAction(null);
+      } finally {
+        setBusyId(null);
+      }
+      return;
+    }
+
+    const { type, user: target } = confirmAction;
     setBusyId(target.id);
     try {
       if (type === 'activate') {
@@ -427,6 +464,8 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
         return tr('تحديث عضو دعم فني', 'Support Team Updated');
       case 'support_team.remove':
         return tr('إزالة عضو دعم فني', 'Support Team Removed');
+      case 'sessions.revoke_non_admins':
+        return tr('إنهاء جلسات المسجلين (عدا الأدمن)', 'Revoked Non-Admin Sessions');
       default:
         return action;
     }
@@ -483,18 +522,30 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
           )}
 
           {canManageStudents && (
-            <GoldChip
-              active={showAddForm}
-              onClick={() => setShowAddForm((p) => !p)}
-              className="text-xs px-3.5 py-2"
-            >
-              <UserPlus className="w-3.5 h-3.5" />
-              <span>
-                {showAddForm
-                  ? tr('إغلاق النموذج', 'Close Form')
-                  : tr('إضافة حساب جديد', 'Add User')}
-              </span>
-            </GoldChip>
+            <>
+              <button
+                type="button"
+                disabled={busyId === '__revoke_non_admins__'}
+                onClick={() => setConfirmAction({ type: 'revoke_non_admins' })}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold border bg-amber-950/40 border-amber-500/40 text-amber-200 hover:bg-amber-600 hover:text-white transition-colors cursor-pointer whitespace-nowrap shrink-0 disabled:opacity-50"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>{tr('إنهاء جلسات المسجلين (عدا الأدمن)', 'End Non-Admin Sessions')}</span>
+              </button>
+
+              <GoldChip
+                active={showAddForm}
+                onClick={() => setShowAddForm((p) => !p)}
+                className="text-xs px-3.5 py-2"
+              >
+                <UserPlus className="w-3.5 h-3.5" />
+                <span>
+                  {showAddForm
+                    ? tr('إغلاق النموذج', 'Close Form')
+                    : tr('إضافة حساب جديد', 'Add User')}
+                </span>
+              </GoldChip>
+            </>
           )}
         </div>
       </div>
@@ -1188,7 +1239,7 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
         </div>
       </div>
 
-      {/* Confirmation Modal (Suspend / Activate / Delete) */}
+      {/* Confirmation Modal (Suspend / Activate / Delete / Revoke Non-Admins) */}
       {confirmAction && (
         <div
           role="dialog"
@@ -1203,7 +1254,7 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
                   className={`w-5 h-5 shrink-0 ${
                     confirmAction.type === 'delete'
                       ? 'text-red-400'
-                      : confirmAction.type === 'suspend'
+                      : confirmAction.type === 'suspend' || confirmAction.type === 'revoke_non_admins'
                       ? 'text-amber-400'
                       : 'text-emerald-400'
                   }`}
@@ -1212,7 +1263,9 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
                   id="admin-confirm-title"
                   className="font-display text-base font-bold text-[#F5F0E6]"
                 >
-                  {confirmAction.type === 'delete'
+                  {confirmAction.type === 'revoke_non_admins'
+                    ? tr('تأكيد إنهاء جلسات جميع المسجلين', 'Confirm Revoking All Non-Admin Sessions')
+                    : confirmAction.type === 'delete'
                     ? tr('تأكيد حذف الحساب نهائياً', 'Confirm Permanent Account Deletion')
                     : confirmAction.type === 'suspend'
                     ? tr('تأكيد تعليق الحساب مؤقتاً', 'Confirm Account Suspension')
@@ -1229,20 +1282,39 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
               </button>
             </div>
 
-            <div className="p-3 rounded-xl bg-[#09090B] border border-white/10 text-xs space-y-1">
-              <div className="font-semibold text-[#F5F0E6]">
-                {confirmAction.user.name} ·{' '}
-                <span className="text-[#E5C158]">
-                  {roleLabel(confirmAction.user.role)}
-                </span>
+            {confirmAction.type === 'revoke_non_admins' ? (
+              <div className="p-3 rounded-xl bg-amber-950/30 border border-amber-500/30 text-xs text-amber-100 space-y-1">
+                <div className="font-semibold">
+                  {tr('نطاق التنفيذ: الطلاب والمعلمون فقط', 'Scope: Students & Teachers Only')}
+                </div>
+                <div className="text-[#C8C2B8]">
+                  {tr(
+                    'ستظل جلسة الأدمن الحالية وجميع جلسات المديرين الآخرين نشطة دون أي تسجيل خروج.',
+                    'Your current admin session and all other administrator sessions will stay active.'
+                  )}
+                </div>
               </div>
-              <div className="font-mono text-[#A8A29E]">
-                {confirmAction.user.email || confirmAction.user.phone}
+            ) : (
+              <div className="p-3 rounded-xl bg-[#09090B] border border-white/10 text-xs space-y-1">
+                <div className="font-semibold text-[#F5F0E6]">
+                  {confirmAction.user.name} ·{' '}
+                  <span className="text-[#E5C158]">
+                    {roleLabel(confirmAction.user.role)}
+                  </span>
+                </div>
+                <div className="font-mono text-[#A8A29E]">
+                  {confirmAction.user.email || confirmAction.user.phone}
+                </div>
               </div>
-            </div>
+            )}
 
             <p className="text-xs text-[#C8C2B8] leading-relaxed">
-              {confirmAction.type === 'delete'
+              {confirmAction.type === 'revoke_non_admins'
+                ? tr(
+                    'سيتم تسجيل خروج كل الطلاب والمعلمين المسجلين في المنصة فوراً وإلزامهم بتسجيل الدخول مرة أخرى من جديد، ولن يتم إنهاء جلسات الأدمن.',
+                    'All registered students and teachers will be signed out immediately and required to log in again. Admin sessions will remain untouched.'
+                  )
+                : confirmAction.type === 'delete'
                 ? tr(
                     'سيتم حذف هذا الحساب نهائياً مع كافة جلساته وتقدمه الدراسي ونتائج اختباراته. لا يمكن التراجع عن هذا الإجراء.',
                     'This will permanently remove the account, active sessions, learning progress, and quiz submissions. This action cannot be undone.'
@@ -1287,18 +1359,26 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
               </button>
               <button
                 type="button"
-                disabled={busyId === confirmAction.user.id}
+                disabled={
+                  confirmAction.type === 'revoke_non_admins'
+                    ? busyId === '__revoke_non_admins__'
+                    : busyId === confirmAction.user.id
+                }
                 onClick={executeConfirmedAction}
                 className={`px-4 py-2 rounded-lg text-xs font-semibold cursor-pointer disabled:opacity-50 ${
                   confirmAction.type === 'delete'
                     ? 'bg-red-600 hover:bg-red-500 text-white'
-                    : confirmAction.type === 'suspend'
+                    : confirmAction.type === 'suspend' || confirmAction.type === 'revoke_non_admins'
                     ? 'bg-amber-600 hover:bg-amber-500 text-white'
                     : 'bg-emerald-600 hover:bg-emerald-500 text-white'
                 }`}
               >
-                {busyId === confirmAction.user.id
+                {(confirmAction.type === 'revoke_non_admins'
+                  ? busyId === '__revoke_non_admins__'
+                  : busyId === confirmAction.user.id)
                   ? tr('جاري التنفيذ...', 'Processing...')
+                  : confirmAction.type === 'revoke_non_admins'
+                  ? tr('تأكيد إنهاء الجلسات', 'End Sessions Now')
                   : confirmAction.type === 'delete'
                   ? tr('تأكيد الحذف النهائي', 'Delete Permanently')
                   : confirmAction.type === 'suspend'

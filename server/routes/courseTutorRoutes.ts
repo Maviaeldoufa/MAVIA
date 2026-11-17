@@ -1,12 +1,11 @@
 import { GoogleGenAI } from '@google/genai';
 import type { Part } from '@google/genai';
 import { Router } from 'express';
-import fs from 'fs';
-import path from 'path';
 import { requireAuth } from '../auth.ts';
 import type { AuthenticatedRequest } from '../auth.ts';
-import { db, recordAppError, UPLOADS_DIR } from '../db.ts';
+import { db, recordAppError } from '../db.ts';
 import { aiRateLimiter } from '../rateLimit.ts';
+import { readStoredFileBuffer } from '../storage.ts';
 
 const router = Router();
 
@@ -73,20 +72,16 @@ router.post('/courses/:courseId/tutor', requireAuth, aiRateLimiter, async (req: 
 
   for (const summary of courseSummaries) {
     if (summary.fileUrl) {
-      const filePath = path.join(UPLOADS_DIR, path.basename(summary.fileUrl));
-      if (fs.existsSync(filePath)) {
-        const stat = fs.statSync(filePath);
-        if (accumulatedPdfBytes + stat.size <= MAX_TOTAL_PDF_BYTES) {
-          const pdfBuffer = fs.readFileSync(filePath);
-          parts.push({
-            inlineData: {
-              mimeType: 'application/pdf',
-              data: pdfBuffer.toString('base64'),
-            },
-          });
-          accumulatedPdfBytes += stat.size;
-          usedSources.push(summary.fileName || summary.title);
-        }
+      const pdfBuffer = await readStoredFileBuffer(summary.fileUrl);
+      if (pdfBuffer && accumulatedPdfBytes + pdfBuffer.length <= MAX_TOTAL_PDF_BYTES) {
+        parts.push({
+          inlineData: {
+            mimeType: 'application/pdf',
+            data: pdfBuffer.toString('base64'),
+          },
+        });
+        accumulatedPdfBytes += pdfBuffer.length;
+        usedSources.push(summary.fileName || summary.title);
       }
     } else {
       usedSources.push(summary.title);
@@ -95,20 +90,16 @@ router.post('/courses/:courseId/tutor', requireAuth, aiRateLimiter, async (req: 
 
   for (const assign of folderAssignments) {
     if (assign.fileUrl && (assign.type === 'pdf' || assign.type === 'image')) {
-      const filePath = path.join(UPLOADS_DIR, path.basename(assign.fileUrl));
-      if (fs.existsSync(filePath)) {
-        const stat = fs.statSync(filePath);
-        if (accumulatedPdfBytes + stat.size <= MAX_TOTAL_PDF_BYTES) {
-          const buf = fs.readFileSync(filePath);
-          parts.push({
-            inlineData: {
-              mimeType: assign.mimeType || (assign.type === 'pdf' ? 'application/pdf' : 'image/jpeg'),
-              data: buf.toString('base64'),
-            },
-          });
-          accumulatedPdfBytes += stat.size;
-          usedSources.push(assign.fileName || assign.title);
-        }
+      const buf = await readStoredFileBuffer(assign.fileUrl);
+      if (buf && accumulatedPdfBytes + buf.length <= MAX_TOTAL_PDF_BYTES) {
+        parts.push({
+          inlineData: {
+            mimeType: assign.mimeType || (assign.type === 'pdf' ? 'application/pdf' : 'image/jpeg'),
+            data: buf.toString('base64'),
+          },
+        });
+        accumulatedPdfBytes += buf.length;
+        usedSources.push(assign.fileName || assign.title);
       }
     } else if (assign.contentText) {
       usedSources.push(assign.title);

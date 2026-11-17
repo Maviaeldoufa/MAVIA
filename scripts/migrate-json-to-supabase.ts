@@ -14,6 +14,7 @@ export interface MigrationBundle {
   courses: Array<Record<string, unknown>>;
   course_folders: Array<Record<string, unknown>>;
   summaries: Array<Record<string, unknown>>;
+  course_assignments: Array<Record<string, unknown>>;
   quizzes: Array<Record<string, unknown>>;
   quiz_questions: Array<Record<string, unknown>>;
   quiz_submissions: Array<Record<string, unknown>>;
@@ -28,12 +29,15 @@ export interface MigrationBundle {
   student_progress: Array<Record<string, unknown>>;
   student_tasks: Array<Record<string, unknown>>;
   support_tickets: Array<Record<string, unknown>>;
+  support_team: Array<Record<string, unknown>>;
+  user_profile_notes: Array<Record<string, unknown>>;
   error_logs: Array<Record<string, unknown>>;
   admin_audit_logs: Array<Record<string, unknown>>;
   platform_config: Array<Record<string, unknown>>;
   maintenance_state: Array<Record<string, unknown>>;
   platform_analytics_summary: Array<Record<string, unknown>>;
   platform_visitors: Array<Record<string, unknown>>;
+  app_state_snapshot: Array<Record<string, unknown>>;
 }
 
 export interface IntegrityReport {
@@ -86,6 +90,7 @@ const UPSERT_PLAN: Array<{
   { table: 'courses', onConflict: 'id' },
   { table: 'course_folders', onConflict: 'id' },
   { table: 'summaries', onConflict: 'id' },
+  { table: 'course_assignments', onConflict: 'id' },
   { table: 'quizzes', onConflict: 'id' },
   { table: 'quiz_questions', onConflict: 'quiz_id,id' },
   { table: 'quiz_submissions', onConflict: 'id' },
@@ -100,12 +105,15 @@ const UPSERT_PLAN: Array<{
   { table: 'student_progress', onConflict: 'user_id' },
   { table: 'student_tasks', onConflict: 'id' },
   { table: 'support_tickets', onConflict: 'id' },
+  { table: 'support_team', onConflict: 'id' },
+  { table: 'user_profile_notes', onConflict: 'id' },
   { table: 'error_logs', onConflict: 'id' },
   { table: 'admin_audit_logs', onConflict: 'id' },
   { table: 'platform_config', onConflict: 'id' },
   { table: 'maintenance_state', onConflict: 'id' },
   { table: 'platform_analytics_summary', onConflict: 'id' },
   { table: 'platform_visitors', onConflict: 'visitor_key' },
+  { table: 'app_state_snapshot', onConflict: 'id' },
 ];
 
 function cleanOptionalText(val?: string | null): string | null {
@@ -251,6 +259,7 @@ export function buildMigrationBundle(store: DatabaseSchema): MigrationBundle {
       description: cleanOptionalText(f.description),
       cover_url: cleanOptionalText(f.coverUrl),
       release_at: cleanOptionalIso(f.releaseAt),
+      viewed_by: Array.isArray(f.viewedBy) ? f.viewedBy : [],
       created_at: cleanOptionalIso(f.createdAt) || now,
     }));
 
@@ -260,6 +269,7 @@ export function buildMigrationBundle(store: DatabaseSchema): MigrationBundle {
       id: s.id,
       course_id: s.courseId,
       folder_id: s.folderId && folderIds.has(s.folderId) ? s.folderId : null,
+      category: s.category === 'book' ? 'book' : 'summary',
       title: s.title,
       description: s.description || '',
       file_url: cleanOptionalText(s.fileUrl),
@@ -271,6 +281,25 @@ export function buildMigrationBundle(store: DatabaseSchema): MigrationBundle {
       created_at: cleanOptionalIso(s.createdAt) || now,
     }));
 
+  const course_assignments = (store.assignments || [])
+    .filter((a) => courseIds.has(a.courseId))
+    .map((a) => ({
+      id: a.id,
+      course_id: a.courseId,
+      folder_id: a.folderId && folderIds.has(a.folderId) ? a.folderId : null,
+      title: a.title,
+      type: a.type,
+      content_text: cleanOptionalText(a.contentText),
+      file_url: cleanOptionalText(a.fileUrl),
+      file_name: cleanOptionalText(a.fileName),
+      file_size: typeof a.fileSize === 'number' ? a.fileSize : null,
+      mime_type: cleanOptionalText(a.mimeType),
+      role_tag: cleanOptionalText(a.roleTag),
+      created_by: a.createdBy,
+      created_by_id: a.createdById,
+      created_at: cleanOptionalIso(a.createdAt) || now,
+    }));
+
   const quizzes = (store.quizzes || [])
     .filter((q) => courseIds.has(q.courseId))
     .map((q) => ({
@@ -278,6 +307,8 @@ export function buildMigrationBundle(store: DatabaseSchema): MigrationBundle {
       course_id: q.courseId,
       folder_id: q.folderId && folderIds.has(q.folderId) ? q.folderId : null,
       title: q.title,
+      difficulty: cleanOptionalText(q.difficulty),
+      generated_by_ai: Boolean(q.generatedByAi),
       duration_minutes: q.durationMinutes,
       points_per_question: q.pointsPerQuestion,
       randomize_questions: Boolean(q.randomizeQuestions),
@@ -494,12 +525,49 @@ export function buildMigrationBundle(store: DatabaseSchema): MigrationBundle {
     created_at: cleanOptionalIso(log.createdAt) || now,
   }));
 
+  const support_team = (store.supportTeam || [])
+    .filter((m) => userIds.has(m.userId))
+    .map((m) => ({
+      id: m.id,
+      slot_number: m.slotNumber,
+      user_id: m.userId,
+      display_name: m.displayName,
+      specialty: cleanOptionalText(m.specialty),
+      whatsapp_number: m.whatsappNumber || '',
+      is_active: m.isActive !== false,
+      assigned_by: m.assignedBy,
+      created_at: cleanOptionalIso(m.createdAt) || now,
+      updated_at: cleanOptionalIso(m.updatedAt) || now,
+    }));
+
+  const user_profile_notes = (store.userProfileNotes || [])
+    .filter((n) => userIds.has(n.targetUserId))
+    .map((n) => ({
+      id: n.id,
+      target_user_id: n.targetUserId,
+      author_id: n.authorId,
+      author_name: n.authorName,
+      content: n.content,
+      reactions: Array.isArray(n.reactions) ? n.reactions : [],
+      created_at: cleanOptionalIso(n.createdAt) || now,
+      updated_at: cleanOptionalIso(n.updatedAt) || now,
+    }));
+
   const platform_config = store.platformConfig
     ? [
         {
           id: 'default',
           whatsapp_number: store.platformConfig.whatsappNumber || '',
           telegram_url: store.platformConfig.telegramUrl || '',
+          admin_activation_password_hash: cleanOptionalText(
+            store.platformConfig.adminActivationPasswordHash
+          ),
+          admin_activation_password_updated_at: cleanOptionalIso(
+            store.platformConfig.adminActivationPasswordUpdatedAt
+          ),
+          admin_activation_default_rank_id: cleanOptionalText(
+            store.platformConfig.adminActivationDefaultRankId
+          ),
           updated_at: now,
         },
       ]
@@ -537,6 +605,15 @@ export function buildMigrationBundle(store: DatabaseSchema): MigrationBundle {
     visit_count: Number(v.visitCount || 1),
   }));
 
+  const app_state_snapshot = [
+    {
+      id: 'default',
+      payload: store,
+      version: 1,
+      updated_at: now,
+    },
+  ];
+
   return {
     admin_ranks,
     users,
@@ -546,6 +623,7 @@ export function buildMigrationBundle(store: DatabaseSchema): MigrationBundle {
     courses,
     course_folders,
     summaries,
+    course_assignments,
     quizzes,
     quiz_questions,
     quiz_submissions,
@@ -560,12 +638,15 @@ export function buildMigrationBundle(store: DatabaseSchema): MigrationBundle {
     student_progress,
     student_tasks,
     support_tickets,
+    support_team,
+    user_profile_notes,
     error_logs,
     admin_audit_logs,
     platform_config,
     maintenance_state,
     platform_analytics_summary,
     platform_visitors,
+    app_state_snapshot,
   };
 }
 
@@ -655,12 +736,16 @@ export function verifyJsonIntegrity(store: DatabaseSchema): IntegrityReport {
 }
 
 function createServerSupabaseClient(): SupabaseClient {
-  const url = process.env.SUPABASE_URL?.trim();
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+  const url = (process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '').trim();
+  const serviceRoleKey = (
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.SUPABASE_SECRET_KEY ||
+    ''
+  ).trim();
 
   if (!url || !serviceRoleKey) {
     throw new Error(
-      'Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in server environment.'
+      'Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY (Secret Key) in server environment.'
     );
   }
 

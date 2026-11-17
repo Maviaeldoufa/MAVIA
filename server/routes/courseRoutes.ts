@@ -3,13 +3,13 @@ import type { Part } from '@google/genai';
 import crypto from 'crypto';
 import { Router } from 'express';
 import type { NextFunction, Request, Response } from 'express';
-import fs from 'fs';
 import multer from 'multer';
 import path from 'path';
 import { requireAuth, requirePermission } from '../auth.ts';
 import type { AuthenticatedRequest } from '../auth.ts';
-import { db, hasUserPermission, pushNotification, recordAppError, toSafeUser, UPLOADS_DIR } from '../db.ts';
+import { db, hasUserPermission, pushNotification, recordAppError, toSafeUser } from '../db.ts';
 import { aiRateLimiter } from '../rateLimit.ts';
+import { readStoredFileBuffer, removeStoredFile, saveUploadedBuffer } from '../storage.ts';
 import type {
   AcademicYear,
   Course,
@@ -25,22 +25,10 @@ import { getOrInitStudentProgress } from './dashboardRoutes.ts';
 
 const router = Router();
 
-const diskStorage = multer.diskStorage({
-  destination: (_req, _file, cb) => {
-    if (!fs.existsSync(UPLOADS_DIR)) {
-      fs.mkdirSync(UPLOADS_DIR, { recursive: true });
-    }
-    cb(null, UPLOADS_DIR);
-  },
-  filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase() || '.bin';
-    const safeName = `${Date.now()}-${crypto.randomBytes(6).toString('hex')}${ext}`;
-    cb(null, safeName);
-  },
-});
+const memStorage = multer.memoryStorage();
 
 const uploadPdf = multer({
-  storage: diskStorage,
+  storage: memStorage,
   limits: { fileSize: 25 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     if (
@@ -57,7 +45,7 @@ const uploadPdf = multer({
 const ALLOWED_IMAGE_EXTS = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
 
 const uploadImage = multer({
-  storage: diskStorage,
+  storage: memStorage,
   limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
@@ -70,7 +58,7 @@ const uploadImage = multer({
 });
 
 const uploadAssignmentFile = multer({
-  storage: diskStorage,
+  storage: memStorage,
   limits: { fileSize: 25 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
@@ -114,18 +102,6 @@ function optionalAssignmentUpload(fieldName: string) {
       next();
     });
   };
-}
-
-function removeUploadedFile(fileUrl?: string) {
-  if (!fileUrl) return;
-  const filePath = path.join(UPLOADS_DIR, path.basename(fileUrl));
-  if (fs.existsSync(filePath)) {
-    try {
-      fs.unlinkSync(filePath);
-    } catch {
-      // Ignore cleanup error
-    }
-  }
 }
 
 function enrichFolder(folder: CourseFolder, store: DatabaseSchema) {
@@ -202,28 +178,22 @@ async function generateAiQuestionsFromFolder(params: {
 
   for (const item of folderMaterials) {
     if (!item.fileUrl) continue;
-    const filePath = path.join(UPLOADS_DIR, path.basename(item.fileUrl));
-    if (!fs.existsSync(filePath)) continue;
-    const stat = fs.statSync(filePath);
-    if (accumulatedBytes + stat.size <= MAX_AI_INLINE_BYTES) {
-      const buf = fs.readFileSync(filePath);
+    const buf = await readStoredFileBuffer(item.fileUrl);
+    if (buf && accumulatedBytes + buf.length <= MAX_AI_INLINE_BYTES) {
       parts.push({
         inlineData: {
           mimeType: 'application/pdf',
           data: buf.toString('base64'),
         },
       });
-      accumulatedBytes += stat.size;
+      accumulatedBytes += buf.length;
     }
   }
 
   for (const assign of folderAssignments) {
     if (!assign.fileUrl || (assign.type !== 'pdf' && assign.type !== 'image')) continue;
-    const filePath = path.join(UPLOADS_DIR, path.basename(assign.fileUrl));
-    if (!fs.existsSync(filePath)) continue;
-    const stat = fs.statSync(filePath);
-    if (accumulatedBytes + stat.size <= MAX_AI_INLINE_BYTES) {
-      const buf = fs.readFileSync(filePath);
+    const buf = await readStoredFileBuffer(assign.fileUrl);
+    if (buf && accumulatedBytes + buf.length <= MAX_AI_INLINE_BYTES) {
       const mimeType =
         assign.mimeType ||
         (assign.type === 'pdf' ? 'application/pdf' : 'image/jpeg');
@@ -233,7 +203,7 @@ async function generateAiQuestionsFromFolder(params: {
           data: buf.toString('base64'),
         },
       });
-      accumulatedBytes += stat.size;
+      accumulatedBytes += buf.length;
     }
   }
 
@@ -403,76 +373,90 @@ router.post(
   requireAuth,
   requirePermission('manage_courses'),
   optionalSingleImage('cover'),
-  (req, res) => {
-    const {
-      title,
-      code,
-      year,
-      track,
-      description,
-      instructor,
-      releaseAt,
-      releaseLabel,
-    } = req.body as {
-      title?: string;
-      code?: string;
-      year?: number | string;
-      track?: 'GIS' | 'Programming' | 'General';
-      description?: string;
-      instructor?: string;
-      releaseAt?: string;
-      releaseLabel?: string;
-    };
+  async (req, res, next) => {
+    try {
+      const {
+        title,
+        code,
+        year,
+        track,
+        description,
+        instructor,
+        releaseAt,
+        releaseLabel,
+      } = req.body as {
+        title?: string;
+        code?: string;
+        year?: number | string;
+        track?: 'GIS' | 'Programming' | 'General';
+        description?: string;
+        instructor?: string;
+        releaseAt?: string;
+        releaseLabel?: string;
+      };
 
-    if (!title?.trim() || !year) {
-      res.status(400).json({ error: 'يرجى إدخال اسم المادة والسنة الدراسية.' });
-      return;
+      if (!title?.trim() || !year) {
+        res.status(400).json({ error: 'يرجى إدخال اسم المادة والسنة الدراسية.' });
+        return;
+      }
+
+      const parsedYear = Number(year) as AcademicYear;
+      if (![1, 2, 3, 4].includes(parsedYear)) {
+        res.status(400).json({ error: 'السنة الدراسية غير صالحة.' });
+        return;
+      }
+
+      const store = db.get();
+      let coverUrl: string | undefined;
+      if (req.file) {
+        const stored = await saveUploadedBuffer({
+          buffer: req.file.buffer,
+          originalName: req.file.originalname,
+          mimeType: req.file.mimetype,
+          folderPrefix: 'course-covers',
+        });
+        coverUrl = stored.fileUrl;
+      }
+
+      const newCourse = {
+        id: `course-${crypto.randomUUID()}`,
+        title: title.trim(),
+        code: code?.trim() || `MV-${parsedYear}0${store.courses.length + 1}`,
+        year: parsedYear,
+        track: track || 'GIS',
+        description:
+          description?.trim() ||
+          'مادة دراسية شاملة بالملخصات والاختبارات على منصة MAVIA.',
+        instructor: instructor?.trim() || 'هيئة التدريس — MAVIA',
+        coverUrl,
+        releaseAt: releaseAt?.trim() || undefined,
+        releaseLabel: releaseLabel?.trim() || undefined,
+        createdAt: new Date().toISOString(),
+      };
+
+      store.courses.unshift(newCourse);
+      db.save();
+
+      pushNotification({
+        title: `مادة جديدة: ${newCourse.title}`,
+        message: `تمت إضافة مادة ${newCourse.code} في قسم الكورسات.`,
+        type: 'course',
+        targetSection: 'courses',
+        year: newCourse.year,
+        createdBy: newCourse.instructor,
+      });
+
+      res.status(201).json({
+        course: {
+          ...newCourse,
+          summariesCount: 0,
+          quizzesCount: 0,
+          foldersCount: 0,
+        },
+      });
+    } catch (err) {
+      next(err);
     }
-
-    const parsedYear = Number(year) as AcademicYear;
-    if (![1, 2, 3, 4].includes(parsedYear)) {
-      res.status(400).json({ error: 'السنة الدراسية غير صالحة.' });
-      return;
-    }
-
-    const store = db.get();
-    const file = req.file;
-    const newCourse = {
-      id: `course-${crypto.randomUUID()}`,
-      title: title.trim(),
-      code: code?.trim() || `MV-${parsedYear}0${store.courses.length + 1}`,
-      year: parsedYear,
-      track: track || 'GIS',
-      description:
-        description?.trim() ||
-        'مادة دراسية شاملة بالملخصات والاختبارات على منصة MAVIA.',
-      instructor: instructor?.trim() || 'هيئة التدريس — MAVIA',
-      coverUrl: file ? `/uploads/${file.filename}` : undefined,
-      releaseAt: releaseAt?.trim() || undefined,
-      releaseLabel: releaseLabel?.trim() || undefined,
-      createdAt: new Date().toISOString(),
-    };
-
-    store.courses.unshift(newCourse);
-    db.save();
-
-    pushNotification({
-      title: `مادة جديدة: ${newCourse.title}`,
-      message: `تمت إضافة مادة ${newCourse.code} في قسم الكورسات.`,
-      type: 'course',
-      targetSection: 'courses',
-      year: newCourse.year,
-      createdBy: newCourse.instructor,
-    });
-
-    res.status(201).json({
-      course: {
-        ...newCourse,
-        summariesCount: 0,
-        quizzesCount: 0,
-        foldersCount: 0,
-      },
-    });
   }
 );
 
@@ -481,7 +465,37 @@ router.post(
   requireAuth,
   requirePermission('manage_courses'),
   optionalSingleImage('cover'),
-  (req, res) => {
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const store = db.get();
+      const course = store.courses.find((c) => c.id === id);
+      if (!course) {
+        res.status(404).json({ error: 'المادة غير موجودة.' });
+        return;
+      }
+      if (!req.file) {
+        res.status(400).json({ error: 'يرجى اختيار صورة غلاف صالحة.' });
+        return;
+      }
+      await removeStoredFile(course.coverUrl);
+      const stored = await saveUploadedBuffer({
+        buffer: req.file.buffer,
+        originalName: req.file.originalname,
+        mimeType: req.file.mimetype,
+        folderPrefix: 'course-covers',
+      });
+      course.coverUrl = stored.fileUrl;
+      db.save();
+      res.json({ coverUrl: course.coverUrl });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+router.delete('/courses/:id/cover', requireAuth, requirePermission('manage_courses'), async (req, res, next) => {
+  try {
     const { id } = req.params;
     const store = db.get();
     const course = store.courses.find((c) => c.id === id);
@@ -489,29 +503,13 @@ router.post(
       res.status(404).json({ error: 'المادة غير موجودة.' });
       return;
     }
-    if (!req.file) {
-      res.status(400).json({ error: 'يرجى اختيار صورة غلاف صالحة.' });
-      return;
-    }
-    removeUploadedFile(course.coverUrl);
-    course.coverUrl = `/uploads/${req.file.filename}`;
+    await removeStoredFile(course.coverUrl);
+    course.coverUrl = undefined;
     db.save();
-    res.json({ coverUrl: course.coverUrl });
+    res.json({ ok: true });
+  } catch (err) {
+    next(err);
   }
-);
-
-router.delete('/courses/:id/cover', requireAuth, requirePermission('manage_courses'), (req, res) => {
-  const { id } = req.params;
-  const store = db.get();
-  const course = store.courses.find((c) => c.id === id);
-  if (!course) {
-    res.status(404).json({ error: 'المادة غير موجودة.' });
-    return;
-  }
-  removeUploadedFile(course.coverUrl);
-  course.coverUrl = undefined;
-  db.save();
-  res.json({ ok: true });
 });
 
 router.patch('/courses/:id/timer', requireAuth, requirePermission('manage_courses'), (req, res) => {
@@ -532,34 +530,36 @@ router.patch('/courses/:id/timer', requireAuth, requirePermission('manage_course
   res.json({ course });
 });
 
-router.delete('/courses/:id', requireAuth, requirePermission('manage_courses'), (req, res) => {
-  const { id } = req.params;
-  const store = db.get();
-  const target = store.courses.find((c) => c.id === id);
-  if (!target) {
-    res.status(404).json({ error: 'المادة غير موجودة.' });
-    return;
+router.delete('/courses/:id', requireAuth, requirePermission('manage_courses'), async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const store = db.get();
+    const target = store.courses.find((c) => c.id === id);
+    if (!target) {
+      res.status(404).json({ error: 'المادة غير موجودة.' });
+      return;
+    }
+
+    const courseFolders = (store.folders || []).filter((f) => f.courseId === id);
+    await Promise.all([
+      removeStoredFile(target.coverUrl),
+      ...courseFolders.map((f) => removeStoredFile(f.coverUrl)),
+      ...store.summaries.filter((s) => s.courseId === id).map((s) => removeStoredFile(s.fileUrl)),
+      ...(store.assignments || []).filter((a) => a.courseId === id).map((a) => removeStoredFile(a.fileUrl)),
+    ]);
+
+    store.courses = store.courses.filter((c) => c.id !== id);
+    store.folders = (store.folders || []).filter((f) => f.courseId !== id);
+    store.summaries = store.summaries.filter((s) => s.courseId !== id);
+    store.assignments = (store.assignments || []).filter((a) => a.courseId !== id);
+    store.quizzes = store.quizzes.filter((q) => q.courseId !== id);
+    store.quizSubmissions = store.quizSubmissions.filter((s) => s.courseId !== id);
+    db.save();
+
+    res.json({ ok: true });
+  } catch (err) {
+    next(err);
   }
-
-  removeUploadedFile(target.coverUrl);
-  const courseFolders = (store.folders || []).filter((f) => f.courseId === id);
-  courseFolders.forEach((f) => removeUploadedFile(f.coverUrl));
-  store.summaries
-    .filter((s) => s.courseId === id)
-    .forEach((s) => removeUploadedFile(s.fileUrl));
-  (store.assignments || [])
-    .filter((a) => a.courseId === id)
-    .forEach((a) => removeUploadedFile(a.fileUrl));
-
-  store.courses = store.courses.filter((c) => c.id !== id);
-  store.folders = (store.folders || []).filter((f) => f.courseId !== id);
-  store.summaries = store.summaries.filter((s) => s.courseId !== id);
-  store.assignments = (store.assignments || []).filter((a) => a.courseId !== id);
-  store.quizzes = store.quizzes.filter((q) => q.courseId !== id);
-  store.quizSubmissions = store.quizSubmissions.filter((s) => s.courseId !== id);
-  db.save();
-
-  res.json({ ok: true });
 });
 
 router.get('/courses/:courseId/details', requireAuth, (req: AuthenticatedRequest, res) => {
@@ -627,56 +627,71 @@ router.post(
   requireAuth,
   requirePermission('manage_courses'),
   optionalSingleImage('cover'),
-  (req, res) => {
-    const { courseId } = req.params;
-    const { name, description, releaseAt } = req.body as {
-      name?: string;
-      description?: string;
-      releaseAt?: string;
-    };
+  async (req, res, next) => {
+    try {
+      const { courseId } = req.params;
+      const { name, description, releaseAt } = req.body as {
+        name?: string;
+        description?: string;
+        releaseAt?: string;
+      };
 
-    const store = db.get();
-    if (!store.courses.some((c) => c.id === courseId)) {
-      res.status(404).json({ error: 'المادة غير موجودة.' });
-      return;
+      const store = db.get();
+      if (!store.courses.some((c) => c.id === courseId)) {
+        res.status(404).json({ error: 'المادة غير موجودة.' });
+        return;
+      }
+
+      if (!name?.trim()) {
+        res.status(400).json({ error: 'يرجى كتابة اسم المجلد.' });
+        return;
+      }
+
+      if (!store.folders) {
+        store.folders = [];
+      }
+
+      let coverUrl: string | undefined;
+      if (req.file) {
+        const stored = await saveUploadedBuffer({
+          buffer: req.file.buffer,
+          originalName: req.file.originalname,
+          mimeType: req.file.mimetype,
+          folderPrefix: 'folder-covers',
+        });
+        coverUrl = stored.fileUrl;
+      }
+
+      const folder: CourseFolder = {
+        id: `folder-${crypto.randomUUID()}`,
+        courseId,
+        name: name.trim(),
+        description: description?.trim() || undefined,
+        coverUrl,
+        releaseAt: releaseAt?.trim() || undefined,
+        viewedBy: [],
+        createdAt: new Date().toISOString(),
+      };
+
+      store.folders.unshift(folder);
+      db.save();
+
+      const parentCourse = store.courses.find((c) => c.id === courseId);
+      if (parentCourse) {
+        pushNotification({
+          title: `مجلد جديد في ${parentCourse.title}`,
+          message: `تم إنشاء مجلد "${folder.name}" وتجهيزه بالكتب والملخصات والتكليفات والاختبارات.`,
+          type: 'course',
+          targetSection: 'courses',
+          year: parentCourse.year,
+          createdBy: 'إدارة MAVIA',
+        });
+      }
+
+      res.status(201).json({ folder: enrichFolder(folder, store) });
+    } catch (err) {
+      next(err);
     }
-
-    if (!name?.trim()) {
-      res.status(400).json({ error: 'يرجى كتابة اسم المجلد.' });
-      return;
-    }
-
-    if (!store.folders) {
-      store.folders = [];
-    }
-
-    const folder: CourseFolder = {
-      id: `folder-${crypto.randomUUID()}`,
-      courseId,
-      name: name.trim(),
-      description: description?.trim() || undefined,
-      coverUrl: req.file ? `/uploads/${req.file.filename}` : undefined,
-      releaseAt: releaseAt?.trim() || undefined,
-      viewedBy: [],
-      createdAt: new Date().toISOString(),
-    };
-
-    store.folders.unshift(folder);
-    db.save();
-
-    const parentCourse = store.courses.find((c) => c.id === courseId);
-    if (parentCourse) {
-      pushNotification({
-        title: `مجلد جديد في ${parentCourse.title}`,
-        message: `تم إنشاء مجلد "${folder.name}" وتجهيزه بالكتب والملخصات والتكليفات والاختبارات.`,
-        type: 'course',
-        targetSection: 'courses',
-        year: parentCourse.year,
-        createdBy: 'إدارة MAVIA',
-      });
-    }
-
-    res.status(201).json({ folder: enrichFolder(folder, store) });
   }
 );
 
@@ -709,7 +724,37 @@ router.post(
   requireAuth,
   requirePermission('manage_courses'),
   optionalSingleImage('cover'),
-  (req, res) => {
+  async (req, res, next) => {
+    try {
+      const { folderId } = req.params;
+      const store = db.get();
+      const folder = (store.folders || []).find((f) => f.id === folderId);
+      if (!folder) {
+        res.status(404).json({ error: 'المجلد غير موجود.' });
+        return;
+      }
+      if (!req.file) {
+        res.status(400).json({ error: 'يرجى اختيار صورة غلاف صالحة.' });
+        return;
+      }
+      await removeStoredFile(folder.coverUrl);
+      const stored = await saveUploadedBuffer({
+        buffer: req.file.buffer,
+        originalName: req.file.originalname,
+        mimeType: req.file.mimetype,
+        folderPrefix: 'folder-covers',
+      });
+      folder.coverUrl = stored.fileUrl;
+      db.save();
+      res.json({ coverUrl: folder.coverUrl });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+router.delete('/folders/:folderId/cover', requireAuth, requirePermission('manage_courses'), async (req, res, next) => {
+  try {
     const { folderId } = req.params;
     const store = db.get();
     const folder = (store.folders || []).find((f) => f.id === folderId);
@@ -717,55 +762,41 @@ router.post(
       res.status(404).json({ error: 'المجلد غير موجود.' });
       return;
     }
-    if (!req.file) {
-      res.status(400).json({ error: 'يرجى اختيار صورة غلاف صالحة.' });
-      return;
-    }
-    removeUploadedFile(folder.coverUrl);
-    folder.coverUrl = `/uploads/${req.file.filename}`;
+    await removeStoredFile(folder.coverUrl);
+    folder.coverUrl = undefined;
     db.save();
-    res.json({ coverUrl: folder.coverUrl });
+    res.json({ ok: true });
+  } catch (err) {
+    next(err);
   }
-);
-
-router.delete('/folders/:folderId/cover', requireAuth, requirePermission('manage_courses'), (req, res) => {
-  const { folderId } = req.params;
-  const store = db.get();
-  const folder = (store.folders || []).find((f) => f.id === folderId);
-  if (!folder) {
-    res.status(404).json({ error: 'المجلد غير موجود.' });
-    return;
-  }
-  removeUploadedFile(folder.coverUrl);
-  folder.coverUrl = undefined;
-  db.save();
-  res.json({ ok: true });
 });
 
-router.delete('/folders/:folderId', requireAuth, requirePermission('manage_courses'), (req, res) => {
-  const { folderId } = req.params;
-  const store = db.get();
-  const folder = (store.folders || []).find((f) => f.id === folderId);
-  if (!folder) {
-    res.status(404).json({ error: 'المجلد غير موجود.' });
-    return;
+router.delete('/folders/:folderId', requireAuth, requirePermission('manage_courses'), async (req, res, next) => {
+  try {
+    const { folderId } = req.params;
+    const store = db.get();
+    const folder = (store.folders || []).find((f) => f.id === folderId);
+    if (!folder) {
+      res.status(404).json({ error: 'المجلد غير موجود.' });
+      return;
+    }
+
+    await Promise.all([
+      removeStoredFile(folder.coverUrl),
+      ...store.summaries.filter((s) => s.folderId === folderId).map((s) => removeStoredFile(s.fileUrl)),
+      ...(store.assignments || []).filter((a) => a.folderId === folderId).map((a) => removeStoredFile(a.fileUrl)),
+    ]);
+
+    store.folders = (store.folders || []).filter((f) => f.id !== folderId);
+    store.summaries = store.summaries.filter((s) => s.folderId !== folderId);
+    store.assignments = (store.assignments || []).filter((a) => a.folderId !== folderId);
+    store.quizzes = store.quizzes.filter((q) => q.folderId !== folderId);
+    db.save();
+
+    res.json({ ok: true });
+  } catch (err) {
+    next(err);
   }
-
-  removeUploadedFile(folder.coverUrl);
-  store.summaries
-    .filter((s) => s.folderId === folderId)
-    .forEach((s) => removeUploadedFile(s.fileUrl));
-  (store.assignments || [])
-    .filter((a) => a.folderId === folderId)
-    .forEach((a) => removeUploadedFile(a.fileUrl));
-
-  store.folders = (store.folders || []).filter((f) => f.id !== folderId);
-  store.summaries = store.summaries.filter((s) => s.folderId !== folderId);
-  store.assignments = (store.assignments || []).filter((a) => a.folderId !== folderId);
-  store.quizzes = store.quizzes.filter((q) => q.folderId !== folderId);
-  db.save();
-
-  res.json({ ok: true });
 });
 
 // Summaries & Course Books + PDF Upload + View Counter
@@ -782,63 +813,78 @@ router.post(
       next();
     });
   },
-  (req: AuthenticatedRequest, res) => {
-    const { courseId } = req.params;
-    const { title, description, folderId, releaseAt, category } = req.body as {
-      title?: string;
-      description?: string;
-      folderId?: string;
-      releaseAt?: string;
-      category?: string;
-    };
+  async (req: AuthenticatedRequest, res, next) => {
+    try {
+      const { courseId } = req.params;
+      const { title, description, folderId, releaseAt, category } = req.body as {
+        title?: string;
+        description?: string;
+        folderId?: string;
+        releaseAt?: string;
+        category?: string;
+      };
 
-    const store = db.get();
-    const course = store.courses.find((c) => c.id === courseId);
-    if (!course) {
-      res.status(404).json({ error: 'المادة غير موجودة.' });
-      return;
+      const store = db.get();
+      const course = store.courses.find((c) => c.id === courseId);
+      if (!course) {
+        res.status(404).json({ error: 'المادة غير موجودة.' });
+        return;
+      }
+
+      if (!title?.trim()) {
+        res.status(400).json({ error: 'يرجى إدخال عنوان الملف.' });
+        return;
+      }
+
+      const resolvedCategory: SummaryCategory = category === 'book' ? 'book' : 'summary';
+      const file = req.file;
+      let fileUrl: string | undefined;
+      if (file) {
+        const stored = await saveUploadedBuffer({
+          buffer: file.buffer,
+          originalName: file.originalname || 'document.pdf',
+          mimeType: file.mimetype || 'application/pdf',
+          folderPrefix: resolvedCategory === 'book' ? 'books' : 'summaries',
+        });
+        fileUrl = stored.fileUrl;
+      }
+
+      const newSummary = {
+        id: `sum-${crypto.randomUUID()}`,
+        courseId,
+        folderId: folderId?.trim() || undefined,
+        category: resolvedCategory,
+        title: title.trim(),
+        description:
+          description?.trim() ||
+          (resolvedCategory === 'book'
+            ? 'كتاب المادة المرفوع عبر منصة MAVIA.'
+            : 'ملخص مرفوع عبر منصة MAVIA.'),
+        fileUrl,
+        fileName: file ? Buffer.from(file.originalname, 'latin1').toString('utf8') : undefined,
+        fileSize: file ? file.size : undefined,
+        releaseAt: releaseAt?.trim() || undefined,
+        viewedBy: [],
+        createdBy: req.currentUser!.name,
+        createdAt: new Date().toISOString(),
+      };
+
+      store.summaries.unshift(newSummary);
+      db.save();
+
+      pushNotification({
+        title: `${resolvedCategory === 'book' ? 'كتاب مادة جديد' : 'ملخص جديد'} في ${course.title}`,
+        message: `تم رفع "${newSummary.title}" — متاح الآن للمعاينة والتحميل.`,
+        type: 'course',
+        targetSection: 'courses',
+        year: course.year,
+        createdBy: req.currentUser!.name,
+      });
+
+      res.status(201).json({ summary: { ...newSummary, viewsCount: 0 } });
+    } catch (err) {
+      next(err);
     }
-
-    if (!title?.trim()) {
-      res.status(400).json({ error: 'يرجى إدخال عنوان الملف.' });
-      return;
-    }
-
-    const resolvedCategory: SummaryCategory = category === 'book' ? 'book' : 'summary';
-    const file = req.file;
-    const newSummary = {
-      id: `sum-${crypto.randomUUID()}`,
-      courseId,
-      folderId: folderId?.trim() || undefined,
-      category: resolvedCategory,
-      title: title.trim(),
-      description:
-        description?.trim() ||
-        (resolvedCategory === 'book'
-          ? 'كتاب المادة المرفوع عبر منصة MAVIA.'
-          : 'ملخص مرفوع عبر منصة MAVIA.'),
-      fileUrl: file ? `/uploads/${file.filename}` : undefined,
-      fileName: file ? Buffer.from(file.originalname, 'latin1').toString('utf8') : undefined,
-      fileSize: file ? file.size : undefined,
-      releaseAt: releaseAt?.trim() || undefined,
-      viewedBy: [],
-      createdBy: req.currentUser!.name,
-      createdAt: new Date().toISOString(),
-    };
-
-    store.summaries.unshift(newSummary);
-    db.save();
-
-    pushNotification({
-      title: `${resolvedCategory === 'book' ? 'كتاب مادة جديد' : 'ملخص جديد'} في ${course.title}`,
-      message: `تم رفع "${newSummary.title}" — متاح الآن للمعاينة والتحميل.`,
-      type: 'course',
-      targetSection: 'courses',
-      year: course.year,
-      createdBy: req.currentUser!.name,
-    });
-
-    res.status(201).json({ summary: { ...newSummary, viewsCount: 0 } });
   }
 );
 
@@ -847,96 +893,113 @@ router.post(
   '/courses/:courseId/assignments',
   requireAuth,
   optionalAssignmentUpload('file'),
-  (req: AuthenticatedRequest, res) => {
-    const { courseId } = req.params;
-    const { title, folderId, contentText, type } = req.body as {
-      title?: string;
-      folderId?: string;
-      contentText?: string;
-      type?: 'image' | 'pdf' | 'text';
-    };
+  async (req: AuthenticatedRequest, res, next) => {
+    try {
+      const { courseId } = req.params;
+      const { title, folderId, contentText, type } = req.body as {
+        title?: string;
+        folderId?: string;
+        contentText?: string;
+        type?: 'image' | 'pdf' | 'text';
+      };
 
-    const store = db.get();
-    const course = store.courses.find((c) => c.id === courseId);
-    if (!course) {
-      if (req.file) removeUploadedFile(`/uploads/${req.file.filename}`);
-      res.status(404).json({ error: 'المادة غير موجودة.' });
-      return;
+      const store = db.get();
+      const course = store.courses.find((c) => c.id === courseId);
+      if (!course) {
+        res.status(404).json({ error: 'المادة غير موجودة.' });
+        return;
+      }
+
+      const file = req.file;
+      const cleanText = contentText?.trim() || '';
+      if (!file && !cleanText) {
+        res.status(400).json({ error: 'يرجى رفع صورة أو ملف PDF أو كتابة نص التكليف.' });
+        return;
+      }
+
+      if (!title?.trim()) {
+        res.status(400).json({ error: 'يرجى إدخال عنوان التكليف.' });
+        return;
+      }
+
+      let resolvedType: 'pdf' | 'image' | 'text' = 'text';
+      if (file) {
+        const isPdf =
+          file.mimetype === 'application/pdf' ||
+          file.originalname.toLowerCase().endsWith('.pdf');
+        resolvedType = isPdf ? 'pdf' : 'image';
+      } else if (type === 'image' || type === 'pdf') {
+        resolvedType = 'text';
+      }
+
+      let fileUrl: string | undefined;
+      if (file) {
+        const stored = await saveUploadedBuffer({
+          buffer: file.buffer,
+          originalName: file.originalname,
+          mimeType: file.mimetype,
+          folderPrefix: 'assignments',
+        });
+        fileUrl = stored.fileUrl;
+      }
+
+      if (!Array.isArray(store.assignments)) {
+        store.assignments = [];
+      }
+
+      const isStaff = hasUserPermission(req.currentUser, 'manage_courses');
+      const assignment: CourseAssignment = {
+        id: `assign-${crypto.randomUUID()}`,
+        courseId,
+        folderId: folderId?.trim() || undefined,
+        title: title.trim(),
+        type: resolvedType,
+        contentText: cleanText || undefined,
+        fileUrl,
+        fileName: file ? Buffer.from(file.originalname, 'latin1').toString('utf8') : undefined,
+        fileSize: file ? file.size : undefined,
+        mimeType: file ? file.mimetype : undefined,
+        roleTag: isStaff ? 'assignment' : 'submission',
+        createdBy: req.currentUser!.name,
+        createdById: req.currentUser!.id,
+        createdAt: new Date().toISOString(),
+      };
+
+      store.assignments.unshift(assignment);
+      db.save();
+
+      res.status(201).json({ assignment });
+    } catch (err) {
+      next(err);
     }
-
-    const file = req.file;
-    const cleanText = contentText?.trim() || '';
-    if (!file && !cleanText) {
-      res.status(400).json({ error: 'يرجى رفع صورة أو ملف PDF أو كتابة نص التكليف.' });
-      return;
-    }
-
-    if (!title?.trim()) {
-      if (file) removeUploadedFile(`/uploads/${file.filename}`);
-      res.status(400).json({ error: 'يرجى إدخال عنوان التكليف.' });
-      return;
-    }
-
-    let resolvedType: 'pdf' | 'image' | 'text' = 'text';
-    if (file) {
-      const isPdf =
-        file.mimetype === 'application/pdf' ||
-        file.originalname.toLowerCase().endsWith('.pdf');
-      resolvedType = isPdf ? 'pdf' : 'image';
-    } else if (type === 'image' || type === 'pdf') {
-      resolvedType = 'text';
-    }
-
-    if (!Array.isArray(store.assignments)) {
-      store.assignments = [];
-    }
-
-    const isStaff = hasUserPermission(req.currentUser, 'manage_courses');
-    const assignment: CourseAssignment = {
-      id: `assign-${crypto.randomUUID()}`,
-      courseId,
-      folderId: folderId?.trim() || undefined,
-      title: title.trim(),
-      type: resolvedType,
-      contentText: cleanText || undefined,
-      fileUrl: file ? `/uploads/${file.filename}` : undefined,
-      fileName: file ? Buffer.from(file.originalname, 'latin1').toString('utf8') : undefined,
-      fileSize: file ? file.size : undefined,
-      mimeType: file ? file.mimetype : undefined,
-      roleTag: isStaff ? 'assignment' : 'submission',
-      createdBy: req.currentUser!.name,
-      createdById: req.currentUser!.id,
-      createdAt: new Date().toISOString(),
-    };
-
-    store.assignments.unshift(assignment);
-    db.save();
-
-    res.status(201).json({ assignment });
   }
 );
 
-router.delete('/assignments/:id', requireAuth, (req: AuthenticatedRequest, res) => {
-  const { id } = req.params;
-  const store = db.get();
-  const target = (store.assignments || []).find((a) => a.id === id);
-  if (!target) {
-    res.status(404).json({ error: 'التكليف غير موجود.' });
-    return;
-  }
+router.delete('/assignments/:id', requireAuth, async (req: AuthenticatedRequest, res, next) => {
+  try {
+    const { id } = req.params;
+    const store = db.get();
+    const target = (store.assignments || []).find((a) => a.id === id);
+    if (!target) {
+      res.status(404).json({ error: 'التكليف غير موجود.' });
+      return;
+    }
 
-  const canDelete =
-    target.createdById === req.currentUser!.id ||
-    hasUserPermission(req.currentUser, 'manage_courses');
-  if (!canDelete) {
-    res.status(403).json({ error: 'غير مصرح لك بحذف هذا التكليف.' });
-    return;
-  }
+    const canDelete =
+      target.createdById === req.currentUser!.id ||
+      hasUserPermission(req.currentUser, 'manage_courses');
+    if (!canDelete) {
+      res.status(403).json({ error: 'غير مصرح لك بحذف هذا التكليف.' });
+      return;
+    }
 
-  removeUploadedFile(target.fileUrl);
-  store.assignments = (store.assignments || []).filter((a) => a.id !== id);
-  db.save();
-  res.json({ ok: true });
+    await removeStoredFile(target.fileUrl);
+    store.assignments = (store.assignments || []).filter((a) => a.id !== id);
+    db.save();
+    res.json({ ok: true });
+  } catch (err) {
+    next(err);
+  }
 });
 
 // AI Interactive Exam Generator from Folder Content (Official Save for Admin / Practice for Students)
@@ -1115,19 +1178,23 @@ router.post('/summaries/:id/view', requireAuth, (req: AuthenticatedRequest, res)
   res.json({ viewsCount: summary.viewedBy.length });
 });
 
-router.delete('/summaries/:id', requireAuth, requirePermission('manage_courses'), (req, res) => {
-  const { id } = req.params;
-  const store = db.get();
-  const target = store.summaries.find((s) => s.id === id);
-  if (!target) {
-    res.status(404).json({ error: 'الملخص غير موجود.' });
-    return;
-  }
+router.delete('/summaries/:id', requireAuth, requirePermission('manage_courses'), async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const store = db.get();
+    const target = store.summaries.find((s) => s.id === id);
+    if (!target) {
+      res.status(404).json({ error: 'الملخص غير موجود.' });
+      return;
+    }
 
-  removeUploadedFile(target.fileUrl);
-  store.summaries = store.summaries.filter((s) => s.id !== id);
-  db.save();
-  res.json({ ok: true });
+    await removeStoredFile(target.fileUrl);
+    store.summaries = store.summaries.filter((s) => s.id !== id);
+    db.save();
+    res.json({ ok: true });
+  } catch (err) {
+    next(err);
+  }
 });
 
 router.post('/courses/:courseId/quizzes', requireAuth, requirePermission('manage_quizzes'), (req: AuthenticatedRequest, res) => {

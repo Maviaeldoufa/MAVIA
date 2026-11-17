@@ -468,7 +468,8 @@ export type AdminAuditAction =
   | 'official.remove'
   | 'support_team.assign'
   | 'support_team.update'
-  | 'support_team.remove';
+  | 'support_team.remove'
+  | 'sessions.revoke_non_admins';
 
 export interface AdminAuditLog {
   id: string;

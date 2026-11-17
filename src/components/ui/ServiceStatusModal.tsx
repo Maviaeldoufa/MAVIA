@@ -121,13 +121,29 @@ export function ServiceStatusModal({ open, onClose }: ServiceStatusModalProps) {
                 <span className="text-[#C8C2B8]">{tr('واجهة البرمجة (API)', 'API Server')}</span>
                 <span className="text-emerald-400 font-semibold">{tr('يعمل', 'Operational')}</span>
               </div>
-              <div className="p-3 rounded-xl bg-[#0D0D10] border border-white/10 flex items-center justify-between">
-                <span className="text-[#C8C2B8]">{tr('قاعدة البيانات', 'Database Store')}</span>
-                <span className="text-emerald-400 font-semibold">{tr('متصل', 'Healthy')}</span>
+              <div className="p-3 rounded-xl bg-[#0D0D10] border border-white/10 flex items-center justify-between gap-2">
+                <span className="text-[#C8C2B8]">
+                  {tr('قاعدة البيانات والتخزين', 'Database & Storage')}
+                </span>
+                <span
+                  className={
+                    status.services.supabaseConfigured && status.services.storageMode === 'supabase'
+                      ? 'text-emerald-400 font-semibold'
+                      : 'text-amber-300 font-semibold'
+                  }
+                >
+                  {status.services.supabaseConfigured && status.services.storageMode === 'supabase'
+                    ? tr('متصل (Supabase)', 'Connected (Supabase)')
+                    : tr('محلي (بانتظار مفاتيح Supabase)', 'Local (Supabase Keys Needed)')}
+                </span>
               </div>
               <div className="p-3 rounded-xl bg-[#0D0D10] border border-white/10 flex items-center justify-between">
-                <span className="text-[#C8C2B8]">{tr('شات البث المباشر (WS)', 'WebSocket Hub')}</span>
-                <span className="text-emerald-400 font-semibold">{tr('نشط', 'Online')}</span>
+                <span className="text-[#C8C2B8]">{tr('شات الدفعة والمزامنة', 'Batch Chat Sync')}</span>
+                <span className="text-emerald-400 font-semibold">
+                  {status.services.websocket === 'polling'
+                    ? tr('مزامنة REST', 'REST Polling')
+                    : tr('مباشر (WS)', 'Live (WS)')}
+                </span>
               </div>
               <div className="p-3 rounded-xl bg-[#0D0D10] border border-white/10 flex items-center justify-between">
                 <span className="text-[#C8C2B8]">{tr('المساعد الذكي (AI)', 'AI Assistant')}</span>

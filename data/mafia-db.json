@@ -8,15 +8,39 @@
       "year": 4,
       "role": "admin",
       "isProtected": true,
+      "points": 980,
+      "quizzesCompleted": 12,
+      "createdAt": "2026-11-15T20:08:10.408Z",
+      "adminRankId": "rank-super-admin"
+    },
+    {
+      "id": "user-8cee58d4-9e53-469a-b948-ab1b7c6fbb2f",
+      "name": "Mahmoud Haider Youseif",
+      "email": "fmha1994@gmail.com",
+      "phone": "01159637247",
+      "passwordHash": "eea04d692619586757a1247618bee8ef:af0c669f58c1d0f695e74337105d2a128f8aba300071403610ff15248591ad35f5d7c949a49ce39f116c80f32aab87418efcb995f48a262332bfd451985d763f",
+      "year": 2,
+      "role": "student",
+      "isProtected": false,
       "points": 0,
       "quizzesCompleted": 0,
-      "createdAt": "2026-11-15T20:08:10.408Z",
-      "adminRankId": "rank-super-admin",
-      "email": "admin@mvia.edu",
-      "emailVerified": false
+      "emailVerified": false,
+      "lastLoginAt": "2026-11-16T17:42:04.859Z",
+      "createdAt": "2026-11-16T17:42:04.859Z"
     }
   ],
-  "sessions": [],
+  "sessions": [
+    {
+      "token": "d8bc0013ee277589a9ffb02067b9088c1617a1d85bd3833ebe3e9d31f3213093",
+      "userId": "user-founder-admin",
+      "createdAt": "2026-11-15T21:22:04.542Z"
+    },
+    {
+      "token": "83e4446f73e5a6f1202c58295b8ac52a044e60b237c0d35866f9620d821cb072",
+      "userId": "user-8cee58d4-9e53-469a-b948-ab1b7c6fbb2f",
+      "createdAt": "2026-11-16T17:42:04.939Z"
+    }
+  ],
   "courses": [
     {
       "id": "course-gis-101",
@@ -115,8 +139,7 @@
       "title": "ملخص هياكل البيانات في Python (Lists, Dicts, Sets)",
       "description": "أمثلة عملية مختصرة على الحلقات التكرارية والدوال وهياكل البيانات مع مسائل محلولة للامتحان.",
       "createdBy": "القائد — أدمن ماڤيا",
-      "createdAt": "2026-11-15T20:08:10.408Z",
-      "viewedBy": []
+      "createdAt": "2026-11-15T20:08:10.408Z"
     },
     {
       "id": "sum-3",
@@ -124,8 +147,7 @@
       "title": "دليل مشروع التخرج: إعداد GeoServer وربط الطبقات بـ Web GIS",
       "description": "خطوات عملية كاملة لرفع طبقات Shapefile و GeoJSON ونشر خدمات WMS / WFS.",
       "createdBy": "القائد — أدمن ماڤيا",
-      "createdAt": "2026-11-15T20:08:10.408Z",
-      "viewedBy": []
+      "createdAt": "2026-11-15T20:08:10.408Z"
     }
   ],
   "quizzes": [
@@ -390,32 +412,120 @@
       "createdAt": "2026-11-15T20:08:10.408Z"
     }
   ],
-  "chatMessages": [],
+  "chatMessages": [
+    {
+      "id": "msg-1",
+      "room": "general",
+      "userId": "user-founder-admin",
+      "userName": "القائد — أدمن ماڤيا",
+      "userRole": "admin",
+      "userYear": 4,
+      "text": "أهلاً بكم في منصة ماڤيا! هذه الساحة مخصصة للتواصل الفوري بين طلاب جميع الدفعات في GIS والبرمجة.",
+      "createdAt": "2026-11-15T20:08:10.408Z"
+    }
+  ],
   "gpaTables": {},
-  "studentProgress": {},
+  "studentProgress": {
+    "user-founder-admin": {
+      "enrolledCourseIds": [
+        "course-gis-401",
+        "course-prog-402"
+      ],
+      "completedSummaryIds": [],
+      "lastLesson": {
+        "courseId": "course-gis-401",
+        "courseTitle": "نظم المعلومات الجغرافية على الويب (Web GIS) والتحليل الشبكي",
+        "lessonTitle": "دليل مشروع التخرج: إعداد GeoServer وربط الطبقات بـ Web GIS",
+        "summaryId": "sum-3",
+        "updatedAt": "2026-11-15T20:35:15.765Z"
+      },
+      "studyMinutes": 559,
+      "tasks": [
+        {
+          "id": "task-6b78b37a-af45-4b6b-9635-49ad6ddb0a91",
+          "title": "مراجعة ملخصات مادة نظم المعلومات الجغرافية على الويب (Web GIS) والتحليل الشبكي",
+          "dueDate": "2026-11-18",
+          "courseTitle": "نظم المعلومات الجغرافية على الويب (Web GIS) والتحليل الشبكي",
+          "type": "task",
+          "completed": false,
+          "createdAt": "2026-11-15T20:35:15.765Z"
+        },
+        {
+          "id": "task-c4f689a9-5af2-44a1-9c17-679f99afa7bc",
+          "title": "الاستعداد للاختبار الشامل القادم",
+          "dueDate": "2026-11-21",
+          "courseTitle": "نظم المعلومات الجغرافية على الويب (Web GIS) والتحليل الشبكي",
+          "type": "exam",
+          "completed": false,
+          "createdAt": "2026-11-15T20:35:15.765Z"
+        }
+      ]
+    },
+    "user-8cee58d4-9e53-469a-b948-ab1b7c6fbb2f": {
+      "enrolledCourseIds": [
+        "course-gis-201",
+        "course-prog-202"
+      ],
+      "completedSummaryIds": [],
+      "studyMinutes": 0,
+      "tasks": [
+        {
+          "id": "task-70b31633-8c0b-4fa5-8b60-99b1b7a9cca8",
+          "title": "مراجعة ملخصات مادة الاستشعار عن بُعد وتحليل المرئيات الفضائية",
+          "dueDate": "2026-11-19",
+          "courseTitle": "الاستشعار عن بُعد وتحليل المرئيات الفضائية",
+          "type": "task",
+          "completed": false,
+          "createdAt": "2026-11-16T17:42:08.980Z"
+        },
+        {
+          "id": "task-23008f99-ff47-4ff7-86b3-ef7f84569f9c",
+          "title": "الاستعداد للاختبار الشامل القادم",
+          "dueDate": "2026-11-22",
+          "courseTitle": "الاستشعار عن بُعد وتحليل المرئيات الفضائية",
+          "type": "exam",
+          "completed": false,
+          "createdAt": "2026-11-16T17:42:08.980Z"
+        }
+      ]
+    }
+  },
   "folders": [],
   "announcements": [],
   "analytics": {
-    "totalVisits": 0,
-    "dailyCounts": {},
-    "visitors": {}
+    "totalVisits": 1,
+    "dailyCounts": {
+      "2026-11-16": 1
+    },
+    "visitors": {
+      "user-founder-admin": {
+        "visitorKey": "user-founder-admin",
+        "userId": "user-founder-admin",
+        "userName": "القائد — أدمن ماڤيا",
+        "userYear": 4,
+        "lastVisitAt": "2026-11-15T21:05:31.905Z",
+        "visitCount": 0
+      },
+      "v-23a8845b-8d2b-4314-b4f8-cf0092408262": {
+        "visitorKey": "v-23a8845b-8d2b-4314-b4f8-cf0092408262",
+        "lastVisitAt": "2026-11-16T17:40:45.067Z",
+        "visitCount": 1
+      },
+      "user-8cee58d4-9e53-469a-b948-ab1b7c6fbb2f": {
+        "visitorKey": "user-8cee58d4-9e53-469a-b948-ab1b7c6fbb2f",
+        "userId": "user-8cee58d4-9e53-469a-b948-ab1b7c6fbb2f",
+        "userName": "Mahmoud Haider Youseif",
+        "userYear": 2,
+        "lastVisitAt": "2026-11-16T17:42:05.047Z",
+        "visitCount": 0
+      }
+    }
   },
   "platformConfig": {
     "whatsappNumber": "01159637247",
     "telegramUrl": "https://t.me/+201159637247"
   },
   "notifications": [
-    {
-      "id": "notif-f85bbb8e-4025-4440-9c86-46f139827a8e",
-      "title": "اختبار جديد في مقدمة في نظم المعلومات الجغرافية (GIS)",
-      "message": "Automated Bank Quiz (10 دقيقة · 3 سؤال في البنك).",
-      "type": "exam",
-      "targetSection": "courses",
-      "year": 1,
-      "readBy": [],
-      "createdBy": "القائد — أدمن ماڤيا",
-      "createdAt": "2026-11-15T21:08:42.434Z"
-    },
     {
       "id": "notif-welcome-mvia",
       "title": "أهلاً بكم في التحديث الجديد لمنصة MVIA",
@@ -577,7 +687,5 @@
       "updatedAt": "2026-11-16T17:39:50.272Z"
     }
   ],
-  "adminOfficials": [],
-  "supportTeam": [],
-  "userProfileNotes": []
+  "adminOfficials": []
 }

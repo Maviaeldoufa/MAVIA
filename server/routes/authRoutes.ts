@@ -29,6 +29,7 @@ import {
   registerRateLimiter,
 } from '../rateLimit.ts';
 import type { AcademicYear, User, UserProfileNote, UserRole } from '../types.ts';
+import { closeNonAdminWsClients } from '../wsHub.ts';
 
 const router = Router();
 
@@ -1049,5 +1050,43 @@ router.post('/admin/users/:id/unsuspend', requireAuth, requirePermission('manage
 
   res.json({ user: toSafeUser(target) });
 });
+
+router.post(
+  '/admin/sessions/revoke-non-admins',
+  requireAuth,
+  requirePermission('manage_students'),
+  (req: AuthenticatedRequest, res) => {
+    const store = db.get();
+    const adminUserIds = new Set(
+      store.users.filter((u) => u.role === 'admin').map((u) => u.id)
+    );
+
+    const revokedSessions = store.sessions.filter(
+      (s) => !adminUserIds.has(s.userId)
+    );
+    const affectedUsersCount = new Set(revokedSessions.map((s) => s.userId)).size;
+
+    store.sessions = store.sessions.filter((s) => adminUserIds.has(s.userId));
+    db.save();
+
+    const closedWsCount = closeNonAdminWsClients(adminUserIds);
+
+    recordAdminAudit({
+      actorId: req.currentUser!.id,
+      actorName: req.currentUser!.name,
+      action: 'sessions.revoke_non_admins',
+      details: `Ended ${revokedSessions.length} non-admin session(s) across ${affectedUsersCount} account(s); kept ${store.sessions.length} admin session(s)`,
+      ip: getClientIp(req),
+    });
+
+    res.json({
+      ok: true,
+      revokedSessionsCount: revokedSessions.length,
+      affectedUsersCount,
+      keptAdminSessionsCount: store.sessions.length,
+      closedWsCount,
+    });
+  }
+);
 
 export default router;

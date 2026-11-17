@@ -433,7 +433,8 @@ export type AdminAuditAction =
   | 'official.remove'
   | 'support_team.assign'
   | 'support_team.update'
-  | 'support_team.remove';
+  | 'support_team.remove'
+  | 'sessions.revoke_non_admins';
 
 export interface AdminAuditLog {
   id: string;
@@ -556,9 +557,17 @@ export interface SystemStatusData {
   services: {
     api: 'up';
     database: 'up';
-    websocket: 'up';
+    websocket: 'up' | 'polling';
     aiConfigured: boolean;
     emailConfigured: boolean;
+    supabaseConfigured?: boolean;
+    supabaseDetails?: {
+      urlConfigured: boolean;
+      publishableKeyConfigured: boolean;
+      serviceRoleConfigured: boolean;
+      dbEnabled: boolean;
+    };
+    storageMode?: 'supabase' | 'local';
   };
 }
 
