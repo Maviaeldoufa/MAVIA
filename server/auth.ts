@@ -9,8 +9,8 @@ import {
   requirePermission,
   requireSuperAdmin,
   setSessionCookie,
-} from '../auth.ts';
-import type { AuthenticatedRequest } from '../auth.ts';
+} from '../auth.js';
+import type { AuthenticatedRequest } from '../auth.js';
 import {
   db,
   getEmailDeliveryConfig,
@@ -22,15 +22,15 @@ import {
   toLeaderboardUser,
   toSafeUser,
   verifyPassword,
-} from '../db.ts';
+} from '../db.js';
 import {
   checkLoginLockout,
   clearLoginFailures,
   loginRateLimiter,
   recordFailedLogin,
   registerRateLimiter,
-} from '../rateLimit.ts';
-import type { AcademicYear, User, UserProfileNote, UserRole } from '../types.ts';
+} from '../rateLimit.js';
+import type { AcademicYear, User, UserProfileNote, UserRole } from '../types.js';
 
 const router = Router();
 
@@ -304,7 +304,6 @@ router.post('/auth/login', loginRateLimiter, (req, res) => {
     return;
   }
 
-  // ترقية الحساب تلقائياً لمدير عام عند تسجيل الدخول إذا كان هو نفس الإيميل المحدد
   if ((user.email || '').toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) {
     user.role = 'admin';
     user.isProtected = true;
