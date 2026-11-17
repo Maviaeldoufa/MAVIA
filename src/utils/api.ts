@@ -105,3 +105,16 @@ export async function apiRequest<T>(
 export function hasRegisteredBefore() {
   return false;
 }
+export function clearAuthHistory(): void {
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("last_identifier");
+    localStorage.removeItem("has_registered_before");
+  }
+}
+
+export function getLastIdentifier(): string {
+  if (typeof window !== "undefined") {
+    return localStorage.getItem("last_identifier") || "";
+  }
+  return "";
+}
