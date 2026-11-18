@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "fix-imports": "node -e \"const fs=require('fs');const path=require('path');function walk(dir){fs.readdirSync(dir).forEach(f=>{const p=path.join(dir,f);if(fs.statSync(p).isDirectory())walk(p);else if(p.endsWith('.ts')||p.endsWith('.js')){let c=fs.readFileSync(p,'utf8');c=c.replace(/from '(\.[^']+)(?<!\.js)'/g,\"from '$1.js'\").replace(/from \"(\.[^\"]+)(?<!\.js)\"/g,'from \"$1.js\"');fs.writeFileSync(p,c,'utf8');}});}walk('./server');console.log('Imports fixed successfully!');\"",
+    "fix-imports": "node --input-type=module -e \"import fs from 'fs';import path from 'path';function walk(dir){for(const f of fs.readdirSync(dir)){const p=path.join(dir,f);if(fs.statSync(p).isDirectory()){if(!['node_modules','dist','.git','.vercel'].includes(f))walk(p);}else if(p.endsWith('.ts')||p.endsWith('.js')){let c=fs.readFileSync(p,'utf8');c=c.replace(/(from\\s+['\\\"])(\\.[^'\\\"]+?)(\\.ts|\\.js)?(['\\\"])/g,'$1$2.js$4');fs.writeFileSync(p,c,'utf8');}}}walk('.');console.log('All imports fixed cleanly!');\"",
     "build": "npm run fix-imports && tsc && vite build",
     "dev": "tsx server.ts",
     "start": "tsx server.ts",
