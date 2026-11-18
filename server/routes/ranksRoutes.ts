@@ -546,4 +546,524 @@ router.patch(
       return;
     }
 
-    const callerIsSuperAdmin =
+    const callerIsSuperAdmin = isUserSuperAdmin(req.currentUser);
+    const targetUser = store.users.find((u) => u.id === official.userId);
+
+    if (official.userId === req.currentUser!.id && !callerIsSuperAdmin) {
+      res.status(403).json({
+        error: 'لا يمكنك تعديل بيانات رتبتك أو صلاحياتك بنفسك.',
+      });
+      return;
+    }
+
+    if (!callerIsSuperAdmin) {
+      if (
+        official.rankId === 'rank-super-admin' ||
+        official.rankId === 'rank-deputy-director' ||
+        targetUser?.isProtected
+      ) {
+        res.status(403).json({
+          error: 'لا تملك صلاحية تعديل بيانات المدير العام أو نائبه.',
+        });
+        return;
+      }
+    }
+
+    if (typeof rankId === 'string' && rankId.trim() && rankId.trim() !== official.rankId) {
+      const nextRank = (store.adminRanks || []).find((r) => r.id === rankId.trim());
+      if (!nextRank) {
+        res.status(404).json({ error: 'الرتبة المنقول إليها غير موجودة.' });
+        return;
+      }
+      if (
+        official.userId === req.currentUser!.id ||
+        (!callerIsSuperAdmin &&
+          (nextRank.isSuperAdminRank ||
+            nextRank.id === 'rank-super-admin' ||
+            nextRank.id === 'rank-deputy-director'))
+      ) {
+        res.status(403).json({
+          error: 'لا تملك صلاحية النقل إلى هذه الرتبة.',
+        });
+        return;
+      }
+      if (targetUser?.isProtected && nextRank.id !== 'rank-super-admin') {
+        res.status(403).json({
+          error: 'لا يمكن خفض رتبة المدير المؤسس المحمي.',
+        });
+        return;
+      }
+      official.rankId = nextRank.id;
+      if (targetUser) {
+        targetUser.adminRankId = nextRank.id;
+        targetUser.role = 'admin';
+      }
+    }
+
+    if (typeof displayName === 'string' && displayName.trim().length >= 2) {
+      official.displayName = displayName.trim().slice(0, 80);
+    }
+
+    if (typeof whatsappNumber === 'string' && whatsappNumber.trim()) {
+      if (!isValidWhatsappNumber(whatsappNumber)) {
+        res.status(400).json({ error: 'رقم الواتساب غير صالح.' });
+        return;
+      }
+      official.whatsappNumber = normalizeWhatsappNumber(whatsappNumber);
+    }
+
+    if (typeof titleNote === 'string') {
+      official.titleNote = titleNote.trim().slice(0, 120) || undefined;
+    }
+
+    if (typeof showInSupport === 'boolean') {
+      official.showInSupport = showInSupport;
+    }
+
+    if (typeof isActive === 'boolean') {
+      official.isActive = isActive;
+    }
+
+    official.updatedAt = new Date().toISOString();
+    db.save();
+
+    recordAdminAudit({
+      actorId: req.currentUser!.id,
+      actorName: req.currentUser!.name,
+      action: 'official.update',
+      targetUserId: official.userId,
+      targetUserName: official.displayName,
+      details: `Updated official in rank ${official.rankId} (active=${official.isActive}, support=${official.showInSupport})`,
+      ip: getClientIp(req),
+    });
+
+    res.json({ official });
+  }
+);
+
+router.delete(
+  '/admin/officials/:id',
+  requireAuth,
+  requirePermission('manage_officials'),
+  (req: AuthenticatedRequest, res) => {
+    const { id } = req.params;
+    const store = db.get();
+    const official = (store.adminOfficials || []).find((o) => o.id === id);
+    if (!official) {
+      res.status(404).json({ error: 'المسؤول غير موجود.' });
+      return;
+    }
+
+    const callerIsSuperAdmin = isUserSuperAdmin(req.currentUser);
+    const targetUser = store.users.find((u) => u.id === official.userId);
+
+    if (official.userId === req.currentUser!.id) {
+      res.status(403).json({ error: 'لا يمكنك إزالة نفسك من الإدارة.' });
+      return;
+    }
+
+    if (
+      !callerIsSuperAdmin &&
+      (official.rankId === 'rank-super-admin' ||
+        official.rankId === 'rank-deputy-director' ||
+        targetUser?.isProtected)
+    ) {
+      res.status(403).json({
+        error: 'لا تملك صلاحية إزالة المدير العام أو نائبه.',
+      });
+      return;
+    }
+
+    if (targetUser?.isProtected && official.rankId === 'rank-super-admin') {
+      res.status(403).json({
+        error: 'لا يمكن إزالة رتبة المدير العام عن الحساب المؤسس المحمي.',
+      });
+      return;
+    }
+
+    store.adminOfficials = (store.adminOfficials || []).filter((o) => o.id !== id);
+    if (targetUser && !targetUser.isProtected) {
+      delete targetUser.adminRankId;
+      targetUser.role = 'student';
+    }
+    db.save();
+
+    recordAdminAudit({
+      actorId: req.currentUser!.id,
+      actorName: req.currentUser!.name,
+      action: 'official.remove',
+      targetUserId: official.userId,
+      targetUserName: official.displayName,
+      details: `Removed official from rank ${official.rankId}`,
+      ip: getClientIp(req),
+    });
+
+    res.json({ ok: true });
+  }
+);
+
+router.post(
+  '/admin/support-team',
+  requireAuth,
+  requireAnyPermission('manage_officials', 'manage_support'),
+  (req: AuthenticatedRequest, res) => {
+    const {
+      userId,
+      slotNumber,
+      displayName,
+      specialty,
+      whatsappNumber,
+      isActive,
+    } = req.body as {
+      userId?: string;
+      slotNumber?: number;
+      displayName?: string;
+      specialty?: string;
+      whatsappNumber?: string;
+      isActive?: boolean;
+    };
+
+    if (!userId?.trim()) {
+      res.status(400).json({
+        error: 'يرجى اختيار العضو أولاً.',
+      });
+      return;
+    }
+
+    const hasRawWhatsapp = Boolean(whatsappNumber?.trim());
+    if (hasRawWhatsapp && !isValidWhatsappNumber(whatsappNumber!)) {
+      res.status(400).json({
+        error: 'رقم الواتساب غير صالح (يجب أن يكون من 8 إلى 16 رقماً).',
+      });
+      return;
+    }
+
+    const store = db.get();
+    if (!Array.isArray(store.supportTeam)) {
+      store.supportTeam = [];
+    }
+
+    const targetUser = store.users.find((u) => u.id === userId.trim());
+    if (!targetUser) {
+      res.status(404).json({ error: 'المستخدم المحدد غير موجود في قاعدة البيانات.' });
+      return;
+    }
+
+    let resolvedSlot = slotNumber !== undefined ? Number(slotNumber) : 0;
+    if (resolvedSlot !== 0) {
+      if (!Number.isInteger(resolvedSlot) || resolvedSlot < 1 || resolvedSlot > MAX_SUPPORT_TEAM_SIZE) {
+        res.status(400).json({
+          error: `رقم المقعد يجب أن يكون بين 1 و ${MAX_SUPPORT_TEAM_SIZE}.`,
+        });
+        return;
+      }
+    } else {
+      const existingForUser = store.supportTeam.find((m) => m.userId === targetUser.id);
+      if (existingForUser) {
+        resolvedSlot = existingForUser.slotNumber;
+      } else {
+        const usedSlots = new Set(store.supportTeam.map((m) => m.slotNumber));
+        for (let i = 1; i <= MAX_SUPPORT_TEAM_SIZE; i++) {
+          if (!usedSlots.has(i)) {
+            resolvedSlot = i;
+            break;
+          }
+        }
+        if (resolvedSlot === 0) {
+          res.status(400).json({
+            error: `فريق الدعم الفني مكتمل (${MAX_SUPPORT_TEAM_SIZE} أعضاء كحد أقصى). حدد رقم مقعد لاستبداله أو أزل أحد الأعضاء أولاً.`,
+          });
+          return;
+        }
+      }
+    }
+
+    const now = new Date().toISOString();
+    const cleanName = (displayName?.trim() || targetUser.name).slice(0, 80);
+    const cleanSpecialty = specialty?.trim().slice(0, 120) || undefined;
+    const cleanWhatsapp = hasRawWhatsapp ? normalizeWhatsappNumber(whatsappNumber!) : '';
+
+    store.supportTeam = store.supportTeam.filter(
+      (m) => m.slotNumber !== resolvedSlot && m.userId !== targetUser.id
+    );
+
+    const savedMember: SupportTeamMember = {
+      id: `support-${crypto.randomUUID()}`,
+      slotNumber: resolvedSlot,
+      userId: targetUser.id,
+      displayName: cleanName,
+      specialty: cleanSpecialty,
+      whatsappNumber: cleanWhatsapp,
+      isActive: typeof isActive === 'boolean' ? isActive : true,
+      assignedBy: req.currentUser!.id,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    store.supportTeam.push(savedMember);
+    store.supportTeam.sort((a, b) => a.slotNumber - b.slotNumber);
+    db.save();
+
+    recordAdminAudit({
+      actorId: req.currentUser!.id,
+      actorName: req.currentUser!.name,
+      action: 'support_team.assign',
+      targetUserId: targetUser.id,
+      targetUserName: cleanName,
+      details: `Assigned to Support Team Slot #${resolvedSlot}`,
+      ip: getClientIp(req),
+    });
+
+    res.status(201).json({ member: savedMember });
+  }
+);
+
+router.patch(
+  '/admin/support-team/:id',
+  requireAuth,
+  requireAnyPermission('manage_officials', 'manage_support'),
+  (req: AuthenticatedRequest, res) => {
+    const { id } = req.params;
+    const { slotNumber, displayName, specialty, whatsappNumber, isActive } = req.body as {
+      slotNumber?: number;
+      displayName?: string;
+      specialty?: string;
+      whatsappNumber?: string;
+      isActive?: boolean;
+    };
+
+    const store = db.get();
+    if (!Array.isArray(store.supportTeam)) {
+      store.supportTeam = [];
+    }
+
+    const member = store.supportTeam.find((m) => m.id === id);
+    if (!member) {
+      res.status(404).json({ error: 'عضو الدعم الفني غير موجود.' });
+      return;
+    }
+
+    if (slotNumber !== undefined) {
+      const nextSlot = Number(slotNumber);
+      if (!Number.isInteger(nextSlot) || nextSlot < 1 || nextSlot > MAX_SUPPORT_TEAM_SIZE) {
+        res.status(400).json({ error: `رقم المقعد يجب أن يكون بين 1 و ${MAX_SUPPORT_TEAM_SIZE}.` });
+        return;
+      }
+      if (nextSlot !== member.slotNumber) {
+        const occupant = store.supportTeam.find(
+          (m) => m.id !== member.id && m.slotNumber === nextSlot
+        );
+        if (occupant) {
+          occupant.slotNumber = member.slotNumber;
+          occupant.updatedAt = new Date().toISOString();
+        }
+        member.slotNumber = nextSlot;
+      }
+    }
+
+    if (typeof displayName === 'string' && displayName.trim().length >= 2) {
+      member.displayName = displayName.trim().slice(0, 80);
+    }
+
+    if (typeof specialty === 'string') {
+      member.specialty = specialty.trim().slice(0, 120) || undefined;
+    }
+
+    if (typeof whatsappNumber === 'string' && whatsappNumber.trim()) {
+      if (!isValidWhatsappNumber(whatsappNumber)) {
+        res.status(400).json({ error: 'رقم الواتساب غير صالح.' });
+        return;
+      }
+      member.whatsappNumber = normalizeWhatsappNumber(whatsappNumber);
+    }
+
+    if (typeof isActive === 'boolean') {
+      member.isActive = isActive;
+    }
+
+    member.updatedAt = new Date().toISOString();
+    store.supportTeam.sort((a, b) => a.slotNumber - b.slotNumber);
+    db.save();
+
+    recordAdminAudit({
+      actorId: req.currentUser!.id,
+      actorName: req.currentUser!.name,
+      action: 'support_team.update',
+      targetUserId: member.userId,
+      targetUserName: member.displayName,
+      details: `Updated Support Team Slot #${member.slotNumber} (active=${member.isActive})`,
+      ip: getClientIp(req),
+    });
+
+    res.json({ member });
+  }
+);
+
+router.delete(
+  '/admin/support-team/:id',
+  requireAuth,
+  requireAnyPermission('manage_officials', 'manage_support'),
+  (req: AuthenticatedRequest, res) => {
+    const { id } = req.params;
+    const store = db.get();
+    const member = (store.supportTeam || []).find((m) => m.id === id);
+    if (!member) {
+      res.status(404).json({ error: 'عضو الدعم الفني غير موجود.' });
+      return;
+    }
+
+    store.supportTeam = (store.supportTeam || []).filter((m) => m.id !== id);
+    db.save();
+
+    recordAdminAudit({
+      actorId: req.currentUser!.id,
+      actorName: req.currentUser!.name,
+      action: 'support_team.remove',
+      targetUserId: member.userId,
+      targetUserName: member.displayName,
+      details: `Removed from Support Team Slot #${member.slotNumber}`,
+      ip: getClientIp(req),
+    });
+
+    res.json({ ok: true });
+  }
+);
+
+router.patch(
+  '/admin/support/leader-whatsapp',
+  requireAuth,
+  requireAnyPermission('manage_officials', 'manage_support'),
+  (req: AuthenticatedRequest, res) => {
+    const { whatsappNumber } = req.body as { whatsappNumber?: string };
+    if (!whatsappNumber?.trim() || !isValidWhatsappNumber(whatsappNumber)) {
+      res.status(400).json({
+        error: 'رقم الواتساب غير صالح (يجب أن يكون من 8 إلى 16 رقماً).',
+      });
+      return;
+    }
+
+    const cleanWhatsapp = normalizeWhatsappNumber(whatsappNumber);
+    const store = db.get();
+    if (!store.platformConfig) {
+      store.platformConfig = {
+        whatsappNumber: cleanWhatsapp,
+        telegramUrl: 'https://t.me/+201159637247',
+      };
+    } else {
+      store.platformConfig.whatsappNumber = cleanWhatsapp;
+    }
+
+    const leaderOfficial = (store.adminOfficials || []).find(
+      (o) => o.rankId === 'rank-super-admin' && o.isActive
+    );
+    if (leaderOfficial) {
+      leaderOfficial.whatsappNumber = cleanWhatsapp;
+      leaderOfficial.updatedAt = new Date().toISOString();
+    }
+
+    db.save();
+
+    recordAdminAudit({
+      actorId: req.currentUser!.id,
+      actorName: req.currentUser!.name,
+      action: 'official.update',
+      targetUserId: leaderOfficial?.userId,
+      targetUserName: leaderOfficial?.displayName || 'ليدر المنصة',
+      details: 'Updated Platform Leader WhatsApp number',
+      ip: getClientIp(req),
+    });
+
+    res.json({
+      ok: true,
+      hasWhatsapp: true,
+      whatsappUrl: formatWhatsappLink(cleanWhatsapp),
+    });
+  }
+);
+
+router.get(
+  '/admin/activation-password',
+  requireAuth,
+  requireSuperAdmin,
+  (_req: AuthenticatedRequest, res) => {
+    const store = db.get();
+    const cfg = store.platformConfig;
+    res.json({
+      configured: Boolean(cfg?.adminActivationPasswordHash),
+      updatedAt: cfg?.adminActivationPasswordUpdatedAt || null,
+      defaultRankId: cfg?.adminActivationDefaultRankId || 'rank-deputy-director',
+    });
+  }
+);
+
+router.put(
+  '/admin/activation-password',
+  requireAuth,
+  requireSuperAdmin,
+  (req: AuthenticatedRequest, res) => {
+    const { password, defaultRankId, clear } = req.body as {
+      password?: string;
+      defaultRankId?: string;
+      clear?: boolean;
+    };
+
+    const store = db.get();
+    if (!store.platformConfig) {
+      store.platformConfig = {
+        whatsappNumber: '01159637247',
+        telegramUrl: 'https://t.me/+201159637247',
+      };
+    }
+
+    if (typeof defaultRankId === 'string' && defaultRankId.trim()) {
+      const targetRank = (store.adminRanks || []).find((r) => r.id === defaultRankId.trim());
+      if (!targetRank || targetRank.isSuperAdminRank || targetRank.id === 'rank-super-admin') {
+        res.status(400).json({
+          error: 'يرجى اختيار رتبة إدارية صالحة للتفعيل.',
+        });
+        return;
+      }
+      store.platformConfig.adminActivationDefaultRankId = targetRank.id;
+    }
+
+    if (clear) {
+      store.platformConfig.adminActivationPasswordHash = undefined;
+      store.platformConfig.adminActivationPasswordUpdatedAt = undefined;
+      db.save();
+
+      recordAdminAudit({
+        actorId: req.currentUser!.id,
+        actorName: req.currentUser!.name,
+        action: 'rank.update',
+        details: 'Cleared custom Admin Activation Password',
+        ip: getClientIp(req),
+      });
+
+      res.json({ ok: true, message: 'تم إزالة كلمة سر تفعيل الأدمن بنجاح.' });
+      return;
+    }
+
+    if (!password?.trim() || password.trim().length < 4) {
+      res.status(400).json({
+        error: 'كلمة سر تفعيل الأدمن الجديدة يجب أن تكون 4 أحرف على الأقل.',
+      });
+      return;
+    }
+
+    store.platformConfig.adminActivationPasswordHash = hashPassword(password.trim());
+    store.platformConfig.adminActivationPasswordUpdatedAt = new Date().toISOString();
+    db.save();
+
+    recordAdminAudit({
+      actorId: req.currentUser!.id,
+      actorName: req.currentUser!.name,
+      action: 'rank.update',
+      details: 'Updated custom Admin Activation Password',
+      ip: getClientIp(req),
+    });
+
+    res.json({ ok: true, message: 'تم حفظ كلمة سر تفعيل الأدمن بنجاح.' });
+  }
+);
+
+export default router;
