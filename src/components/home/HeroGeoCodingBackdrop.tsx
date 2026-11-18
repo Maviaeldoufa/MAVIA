@@ -67,7 +67,7 @@ export function HeroGeoCodingBackdrop() {
           <div
             key={slide.id}
             className={`absolute inset-0 transition-opacity duration-[1500ms] ease-in-out ${
-              isActive ? 'opacity-70' : 'opacity-0'
+              isActive ? 'opacity-90' : 'opacity-0'
             }`}
           >
             <img
@@ -81,7 +81,7 @@ export function HeroGeoCodingBackdrop() {
                   [slide.id]: true,
                 }))
               }
-              className={`h-full w-full object-cover ${slide.motionClass}`}
+              className={`h-full w-full object-cover brightness-110 contrast-105 ${slide.motionClass}`}
               style={{ objectPosition: slide.objectPosition }}
             />
           </div>
@@ -130,9 +130,9 @@ export function HeroGeoCodingBackdrop() {
         </g>
       </svg>
 
-      {/* Measured contrast scrim so Arabic & English typography stays crisp (>= 7:1 contrast) */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#121216]/90 via-[#121216]/58 to-[#121216]/70" />
-      <div className="absolute inset-0 bg-gradient-to-l from-[#121216]/85 via-[#121216]/52 to-[#121216]/30" />
+      {/* Measured contrast scrim so background stays vivid and typography remains crisp */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#09090B]/75 via-[#09090B]/30 to-[#09090B]/40" />
+      <div className="absolute inset-0 bg-gradient-to-l from-[#09090B]/65 via-[#09090B]/25 to-transparent" />
     </div>
   );
 }

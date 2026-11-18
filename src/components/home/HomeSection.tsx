@@ -3,8 +3,6 @@ import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import type { NavSection } from '../../types';
-import { FloatingLogo } from '../ui/FloatingLogo';
-import { GeoEngineeringBackground } from '../ui/GeoEngineeringBackground';
 import { GoldChip } from '../ui/GoldChip';
 import { AdminAnalyticsPanel } from './AdminAnalyticsPanel';
 import { AdminComprehensiveExamPanel } from './AdminComprehensiveExamPanel';
@@ -30,60 +28,50 @@ export function HomeSection({ onNavigate, onOpenCourse }: HomeSectionProps) {
     <div className="space-y-8">
       {/* Editorial Hero Introduction */}
       <section className="relative overflow-hidden rounded-2xl border border-[#D4AF37]/25 bg-[#121216]">
-        <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
-          <div className="relative overflow-hidden lg:col-span-7 p-6 sm:p-10 flex flex-col justify-between space-y-6">
-            <HeroGeoCodingBackdrop />
+        <div className="relative overflow-hidden p-7 sm:p-10 lg:p-12 min-h-[300px] sm:min-h-[340px] flex flex-col justify-between space-y-6">
+          <HeroGeoCodingBackdrop />
 
-            <div className="relative z-10 space-y-4">
-              <div className="flex flex-wrap items-center gap-2 text-xs text-[#D4AF37]">
-                <span>{tr('منصة MAVIA التعليمية', 'MAVIA Educational Platform')}</span>
-                <span aria-hidden="true">·</span>
-                <span>{user ? formatYear(user.year) : tr('جميع الدفعات', 'All Years')}</span>
-                <span aria-hidden="true">·</span>
-                <span>{tr('الأقمار الصناعية · GIS والبرمجة', 'Satellites · GIS & Programming')}</span>
-              </div>
-
-              <h1 className="font-display text-3xl sm:text-4xl font-bold text-[#F5F0E6] leading-tight text-balance">
-                {tr(
-                  'بيتك الأكاديمي المتكامل لجميع الدفعات من الأولى للرابعة',
-                  'Your Complete Academic Hub for Academic Years 1–4'
-                )}
-              </h1>
-
-              <p className="text-sm sm:text-[15.5px] text-[#C8C2B8] leading-relaxed max-w-2xl">
-                {tr(
-                  'منصة MAVIA صُممت خصيصاً لطلاب الفرق الأربع لتجمع مواد ومجلدات كل دفعة على حدة، مع ملخصات PDF منظمة، اختبارات شاملة تمنحك نقاطاً على لوحة التصدر، وكورسات احترافية في نظم المعلومات الجغرافية (GIS) والبرمجة.',
-                  'MAVIA is built specifically for students across all 4 years—organizing course folders, PDF summaries, interactive quizzes for the leaderboard, and professional GIS & Programming tracks.'
-                )}
-              </p>
+          <div className="relative z-10 space-y-4 max-w-4xl">
+            <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-[#F5D061] drop-shadow-[0_1px_6px_rgba(0,0,0,0.9)]">
+              <span>{tr('منصة MAVIA التعليمية', 'MAVIA Educational Platform')}</span>
+              <span aria-hidden="true">·</span>
+              <span>{user ? formatYear(user.year) : tr('جميع الدفعات', 'All Years')}</span>
+              <span aria-hidden="true">·</span>
+              <span>{tr('الأقمار الصناعية · GIS والبرمجة', 'Satellites · GIS & Programming')}</span>
             </div>
 
-            <div className="relative z-10 flex flex-wrap items-center gap-2.5 pt-2">
-              <GoldChip active={true} onClick={() => onNavigate('courses')}>
-                <BookOpen className="w-4 h-4" />
-                <span>{tr('استكشاف الكورسات والمواد', 'Explore Courses & Folders')}</span>
-              </GoldChip>
-              <GoldChip onClick={() => onNavigate('learning')}>
-                <GraduationCap className="w-4 h-4" />
-                <span>{tr('مسارات Learning', 'Learning Tracks')}</span>
-              </GoldChip>
-              <GoldChip onClick={() => onNavigate('gpa')}>
-                <Calculator className="w-4 h-4" />
-                <span>{tr('حاسبة GPA', 'GPA Calculator')}</span>
-              </GoldChip>
-              <GoldChip onClick={() => onNavigate('community')}>
-                <MessageSquare className="w-4 h-4" />
-                <span>Community</span>
-              </GoldChip>
-            </div>
+            <h1 className="font-display text-3xl sm:text-4xl lg:text-[2.65rem] font-bold text-[#F7F3EB] leading-tight text-balance drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
+              {tr(
+                'بيتك الأكاديمي المتكامل لجميع الدفعات من الأولى للرابعة',
+                'Your Complete Academic Hub for Academic Years 1–4'
+              )}
+            </h1>
+
+            <p className="text-sm sm:text-base text-[#EFE9DF] leading-relaxed max-w-3xl drop-shadow-[0_2px_10px_rgba(0,0,0,0.92)]">
+              {tr(
+                'منصة MAVIA صُممت خصيصاً لطلاب الفرق الأربع لتجمع مواد ومجلدات كل دفعة على حدة، مع ملخصات PDF منظمة، اختبارات شاملة تمنحك نقاطاً على لوحة التصدر، وكورسات احترافية في نظم المعلومات الجغرافية (GIS) والبرمجة.',
+                'MAVIA is built specifically for students across all 4 years—organizing course folders, PDF summaries, interactive quizzes for the leaderboard, and professional GIS & Programming tracks.'
+              )}
+            </p>
           </div>
 
-          <div className="lg:col-span-5 relative min-h-[280px] lg:min-h-full bg-[#09090B] border-t lg:border-t-0 lg:border-s border-[#D4AF37]/20 flex items-center justify-center p-8 overflow-hidden">
-            <GeoEngineeringBackground variant="hero" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#121216]/90 via-[#09090B]/35 to-transparent lg:bg-gradient-to-l" />
-            <div className="relative z-10 flex items-center justify-center">
-              <FloatingLogo size="lg" />
-            </div>
+          <div className="relative z-10 flex flex-wrap items-center gap-2.5 pt-2">
+            <GoldChip active={true} onClick={() => onNavigate('courses')}>
+              <BookOpen className="w-4 h-4" />
+              <span>{tr('استكشاف الكورسات والمواد', 'Explore Courses & Folders')}</span>
+            </GoldChip>
+            <GoldChip onClick={() => onNavigate('learning')}>
+              <GraduationCap className="w-4 h-4" />
+              <span>{tr('مسارات Learning', 'Learning Tracks')}</span>
+            </GoldChip>
+            <GoldChip onClick={() => onNavigate('gpa')}>
+              <Calculator className="w-4 h-4" />
+              <span>{tr('حاسبة GPA', 'GPA Calculator')}</span>
+            </GoldChip>
+            <GoldChip onClick={() => onNavigate('community')}>
+              <MessageSquare className="w-4 h-4" />
+              <span>Community</span>
+            </GoldChip>
           </div>
         </div>
 

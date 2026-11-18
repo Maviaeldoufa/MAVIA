@@ -155,3 +155,55 @@
   }
 }
 
+@keyframes mviaHeroPanA {
+  0% {
+    transform: scale(1.03) translate3d(0, 0, 0);
+  }
+  100% {
+    transform: scale(1.09) translate3d(-1.5%, -1%, 0);
+  }
+}
+
+@keyframes mviaHeroPanB {
+  0% {
+    transform: scale(1.04) translate3d(-1%, 0, 0);
+  }
+  100% {
+    transform: scale(1.1) translate3d(1.2%, -1%, 0);
+  }
+}
+
+@keyframes mviaHeroPanC {
+  0% {
+    transform: scale(1.03) translate3d(0, -1%, 0);
+  }
+  100% {
+    transform: scale(1.09) translate3d(-1%, 1%, 0);
+  }
+}
+
+@keyframes mviaOrbitSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.mvia-hero-pan-a {
+  animation: mviaHeroPanA 14s ease-in-out infinite alternate;
+}
+
+.mvia-hero-pan-b {
+  animation: mviaHeroPanB 16s ease-in-out infinite alternate;
+}
+
+.mvia-hero-pan-c {
+  animation: mviaHeroPanC 15s ease-in-out infinite alternate;
+}
+
+.mvia-orbit-spin {
+  animation: mviaOrbitSpin 48s linear infinite;
+}
+
