@@ -76,9 +76,6 @@ function getClientIp(req: AuthenticatedRequest): string {
   return req.ip || 'unknown';
 }
 
-/**
-- Student Support Directory (Zero raw phone numbers leaked; provides direct WhatsApp redirect links when configured)
- */
 router.get('/support/directory', requireAuth, (_req: AuthenticatedRequest, res) => {
   const store = db.get();
   const ranks = [...(store.adminRanks || [])].sort(
@@ -160,9 +157,6 @@ router.get('/support/directory', requireAuth, (_req: AuthenticatedRequest, res) 
   res.json({ leader, supportTeam: publicSupportTeam, ranks: publicRanks });
 });
 
-/**
-- Server-verified contact link retrieval for Platform Leader (Urgent Only / للضرورة)
- */
 router.post('/support/leader/whatsapp-link', requireAuth, (_req: AuthenticatedRequest, res) => {
   const store = db.get();
   const leaderOfficial = (store.adminOfficials || []).find(
@@ -185,9 +179,6 @@ router.post('/support/leader/whatsapp-link', requireAuth, (_req: AuthenticatedRe
   });
 });
 
-/**
-- Server-verified contact link retrieval for one of the 7 Admin-chosen Support Team members
- */
 router.post(
   '/support/team/:id/whatsapp-link',
   requireAuth,
@@ -215,10 +206,6 @@ router.post(
   }
 );
 
-/**
-- Server-verified contact link retrieval for a single clicked active official.
-- Never returns raw phone numbers in directory queries.
- */
 router.post(
   '/support/officials/:id/whatsapp-link',
   requireAuth,
@@ -252,9 +239,6 @@ router.post(
   }
 );
 
-/**
-- Admin Directory: View ranks, permissions catalog, officials & assignable users
- */
 router.get(
   '/admin/ranks',
   requireAuth,
@@ -305,9 +289,6 @@ router.get(
   }
 );
 
-/**
-- Super Admin ONLY: Update a rank's name, icon, support visibility, and permissions
- */
 router.patch(
   '/admin/ranks/:rankId',
   requireAuth,
@@ -389,10 +370,6 @@ router.patch(
   }
 );
 
-/**
-- Super Admin (or explicitly delegated Deputy for non-sovereign ranks):
-- Assign an existing user into an administrative rank + WhatsApp contact
- */
 router.post(
   '/admin/officials',
   requireAuth,
@@ -459,4 +436,17 @@ router.post(
         targetRank.id === 'rank-deputy-director'
       ) {
         res.status(403).json({
-          error: 'تعيين أو تعديل منصب المدير العام أو نائبه محصور بالمدير العام فقط
+          error: 'تعيين أو تعديل منصب المدير العام أو نائبه محصور بالمدير العام فقط.',
+        });
+        return;
+      }
+      if (targetUser.isProtected || targetUser.adminRankId === 'rank-super-admin') {
+        res.status(403).json({
+          error: 'لا تملك صلاحية تعديل منصب المدير العام.',
+        });
+        return;
+      }
+    }
+
+    if (
+      (targetRank.isSuper
