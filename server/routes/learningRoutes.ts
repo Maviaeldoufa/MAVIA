@@ -22,7 +22,7 @@ function convertSrtBufferToVtt(buffer: Buffer): Buffer {
   const raw = buffer.toString('utf-8');
   const vttBody = raw
     .replace(/\r\n/g, '\n')
-    .replace(/(\d{2}:\d{2}:\d{2}),(\d{3})/g, '\$1.\$2');
+    .replace(/(\d{2}:\d{2}:\d{2}),(\d{3})/g, '$1.$2');
   const vttContent = vttBody.trimStart().startsWith('WEBVTT')
     ? vttBody
     : `WEBVTT\n\n${vttBody}`;
@@ -215,7 +215,7 @@ router.post(
         const storedSub = await saveUploadedBuffer({
           buffer: subBuffer,
           originalName: isSrt
-            ? subtitleFile.originalname.replace(/\.srt\$/i, '.vtt')
+            ? subtitleFile.originalname.replace(/\.srt$/i, '.vtt')
             : subtitleFile.originalname || 'subtitles.vtt',
           mimeType: 'text/vtt; charset=utf-8',
           folderPrefix: 'subtitles',
@@ -341,3 +341,117 @@ router.delete('/lectures/:id', requireAuth, requirePermission('manage_learning')
     ]);
     store.lectures = (store.lectures || []).filter((l) => l.id !== id);
     db.save();
+    res.json({ ok: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Save auto-resume position and playback rate
+router.put('/lectures/:id/progress', requireAuth, (req: AuthenticatedRequest, res) => {
+  const { id } = req.params;
+  const { lastPositionSeconds, playbackRate } = req.body as {
+    lastPositionSeconds?: number;
+    playbackRate?: number;
+  };
+  const store = db.get();
+  const exists = (store.lectures || []).some((l) => l.id === id);
+  if (!exists) {
+    res.status(404).json({ error: 'المحاضرة غير موجودة.' });
+    return;
+  }
+
+  if (!store.lectureProgress) {
+    store.lectureProgress = {};
+  }
+  if (!store.lectureProgress[req.currentUser!.id]) {
+    store.lectureProgress[req.currentUser!.id] = {};
+  }
+
+  const current = store.lectureProgress[req.currentUser!.id][id] || {
+    lastPositionSeconds: 0,
+    playbackRate: 1,
+    updatedAt: new Date().toISOString(),
+    notes: [],
+  };
+
+  if (typeof lastPositionSeconds === 'number' && lastPositionSeconds >= 0) {
+    current.lastPositionSeconds = Math.floor(lastPositionSeconds);
+  }
+  if (typeof playbackRate === 'number' && playbackRate >= 0.25 && playbackRate <= 3) {
+    current.playbackRate = playbackRate;
+  }
+  current.updatedAt = new Date().toISOString();
+
+  store.lectureProgress[req.currentUser!.id][id] = current;
+  db.save();
+
+  res.json({ progress: current });
+});
+
+// Add personal timestamped lecture note
+router.post('/lectures/:id/notes', requireAuth, (req: AuthenticatedRequest, res) => {
+  const { id } = req.params;
+  const { timestampSeconds, text } = req.body as {
+    timestampSeconds?: number;
+    text?: string;
+  };
+
+  if (!text?.trim()) {
+    res.status(400).json({ error: 'يرجى كتابة نص الملاحظة.' });
+    return;
+  }
+
+  const store = db.get();
+  if (!(store.lectures || []).some((l) => l.id === id)) {
+    res.status(404).json({ error: 'المحاضرة غير موجودة.' });
+    return;
+  }
+
+  if (!store.lectureProgress) {
+    store.lectureProgress = {};
+  }
+  if (!store.lectureProgress[req.currentUser!.id]) {
+    store.lectureProgress[req.currentUser!.id] = {};
+  }
+
+  const current = store.lectureProgress[req.currentUser!.id][id] || {
+    lastPositionSeconds: 0,
+    playbackRate: 1,
+    updatedAt: new Date().toISOString(),
+    notes: [],
+  };
+
+  const note: LectureNote = {
+    id: `note-${crypto.randomUUID()}`,
+    timestampSeconds: Math.max(0, Math.floor(Number(timestampSeconds) || 0)),
+    text: text.trim(),
+    createdAt: new Date().toISOString(),
+  };
+
+  current.notes.unshift(note);
+  current.updatedAt = new Date().toISOString();
+  store.lectureProgress[req.currentUser!.id][id] = current;
+  db.save();
+
+  res.status(201).json({ note, notes: current.notes });
+});
+
+router.delete(
+  '/lectures/:id/notes/:noteId',
+  requireAuth,
+  (req: AuthenticatedRequest, res) => {
+    const { id, noteId } = req.params;
+    const store = db.get();
+    const current = store.lectureProgress?.[req.currentUser!.id]?.[id];
+    if (!current) {
+      res.json({ notes: [] });
+      return;
+    }
+    current.notes = current.notes.filter((n) => n.id !== noteId);
+    db.save();
+    res.json({ notes: current.notes });
+  }
+);
+
+export default router;
