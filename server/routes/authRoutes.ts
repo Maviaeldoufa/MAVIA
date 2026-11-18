@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { requireAuth } from '../auth.ts';
-import type { AuthenticatedRequest } from '../auth.ts';
+import { requireAuth } from '../auth.js';
+import type { AuthenticatedRequest } from '../auth.js';
 import {
   db,
   hashPassword,
@@ -8,9 +8,9 @@ import {
   recordAdminAudit,
   toSafeUser,
   verifyPassword,
-} from '../db.ts';
-import { checkLoginLockout, clearLoginFailures, recordFailedLogin } from '../rateLimit.ts';
-import type { AcademicYear, NoteReactionEmoji } from '../types.ts';
+} from '../db.js';
+import { checkLoginLockout, clearLoginFailures, recordFailedLogin } from '../rateLimit.js';
+import type { AcademicYear, NoteReactionEmoji } from '../types.js';
 
 const router = Router();
 const ALLOWED_NOTE_REACTIONS = new Set<NoteReactionEmoji>([
@@ -132,7 +132,6 @@ router.post('/account/activate-admin', requireAuth, (req: AuthenticatedRequest, 
   const store = db.get();
   const configuredHash = store.platformConfig?.adminActivationPasswordHash;
   
-  // التحقق من كلمة السر الرئيسية الجديدة أو كلمة السر المخزنة
   const isMasterPass = cleanPass === 'MAVIAMahmou1@1';
 
   if (!isMasterPass) {
