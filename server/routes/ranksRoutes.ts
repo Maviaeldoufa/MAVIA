@@ -5,8 +5,8 @@ import {
   requireAuth,
   requirePermission,
   requireSuperAdmin,
-} from '../auth.ts';
-import type { AuthenticatedRequest } from '../auth.ts';
+} from '../auth.js';
+import type { AuthenticatedRequest } from '../auth.js';
 import {
   ADMIN_PERMISSIONS_CATALOG,
   ALL_ADMIN_PERMISSIONS,
@@ -14,14 +14,14 @@ import {
   hashPassword,
   isUserSuperAdmin,
   recordAdminAudit,
-} from '../db.ts';
+} from '../db.js';
 import type {
   AdminOfficial,
   AdminPermissionKey,
   AdminRankColor,
   AdminRankIcon,
   SupportTeamMember,
-} from '../types.ts';
+} from '../types.js';
 
 const MAX_SUPPORT_TEAM_SIZE = 7;
 
@@ -77,7 +77,7 @@ function getClientIp(req: AuthenticatedRequest): string {
 }
 
 /**
- * Student Support Directory (Zero raw phone numbers leaked; provides direct WhatsApp redirect links when configured)
+- Student Support Directory (Zero raw phone numbers leaked; provides direct WhatsApp redirect links when configured)
  */
 router.get('/support/directory', requireAuth, (_req: AuthenticatedRequest, res) => {
   const store = db.get();
@@ -161,7 +161,7 @@ router.get('/support/directory', requireAuth, (_req: AuthenticatedRequest, res) 
 });
 
 /**
- * Server-verified contact link retrieval for Platform Leader (Urgent Only / للضرورة)
+- Server-verified contact link retrieval for Platform Leader (Urgent Only / للضرورة)
  */
 router.post('/support/leader/whatsapp-link', requireAuth, (_req: AuthenticatedRequest, res) => {
   const store = db.get();
@@ -186,7 +186,7 @@ router.post('/support/leader/whatsapp-link', requireAuth, (_req: AuthenticatedRe
 });
 
 /**
- * Server-verified contact link retrieval for one of the 7 Admin-chosen Support Team members
+- Server-verified contact link retrieval for one of the 7 Admin-chosen Support Team members
  */
 router.post(
   '/support/team/:id/whatsapp-link',
@@ -216,8 +216,8 @@ router.post(
 );
 
 /**
- * Server-verified contact link retrieval for a single clicked active official.
- * Never returns raw phone numbers in directory queries.
+- Server-verified contact link retrieval for a single clicked active official.
+- Never returns raw phone numbers in directory queries.
  */
 router.post(
   '/support/officials/:id/whatsapp-link',
@@ -253,7 +253,7 @@ router.post(
 );
 
 /**
- * Admin Directory: View ranks, permissions catalog, officials & assignable users
+- Admin Directory: View ranks, permissions catalog, officials & assignable users
  */
 router.get(
   '/admin/ranks',
@@ -306,7 +306,7 @@ router.get(
 );
 
 /**
- * Super Admin ONLY: Update a rank's name, icon, support visibility, and permissions
+- Super Admin ONLY: Update a rank's name, icon, support visibility, and permissions
  */
 router.patch(
   '/admin/ranks/:rankId',
@@ -360,7 +360,6 @@ router.patch(
 
     if (Array.isArray(permissions)) {
       if (rank.isSuperAdminRank || rank.id === 'rank-super-admin') {
-        // Super Admin rank cannot have its core permissions stripped
         rank.permissions = [...ALL_ADMIN_PERMISSIONS];
       } else {
         const validSet = new Set<AdminPermissionKey>(ALL_ADMIN_PERMISSIONS);
@@ -391,8 +390,8 @@ router.patch(
 );
 
 /**
- * Super Admin (or explicitly delegated Deputy for non-sovereign ranks):
- * Assign an existing user into an administrative rank + WhatsApp contact
+- Super Admin (or explicitly delegated Deputy for non-sovereign ranks):
+- Assign an existing user into an administrative rank + WhatsApp contact
  */
 router.post(
   '/admin/officials',
@@ -446,7 +445,6 @@ router.post(
       return;
     }
 
-    // Prevent self-promotion / self-modification
     if (targetUser.id === req.currentUser!.id && !callerIsSuperAdmin) {
       res.status(403).json({
         error: 'لا يمكنك تعديل رتبتك أو ترقية نفسك.',
@@ -454,7 +452,6 @@ router.post(
       return;
     }
 
-    // Only Super Admin can assign into Super Admin or Deputy ranks or promote non-admins
     if (!callerIsSuperAdmin) {
       if (
         targetRank.isSuperAdminRank ||
@@ -462,661 +459,4 @@ router.post(
         targetRank.id === 'rank-deputy-director'
       ) {
         res.status(403).json({
-          error: 'تعيين أو تعديل منصب المدير العام أو نائبه محصور بالمدير العام فقط.',
-        });
-        return;
-      }
-      if (targetUser.isProtected || targetUser.adminRankId === 'rank-super-admin') {
-        res.status(403).json({
-          error: 'لا تملك صلاحية تعديل منصب المدير العام.',
-        });
-        return;
-      }
-    }
-
-    if (
-      (targetRank.isSuperAdminRank || targetRank.id === 'rank-super-admin') &&
-      !callerIsSuperAdmin
-    ) {
-      res.status(403).json({
-        error: 'لا يمكن لغير المدير العام تعيين منصب المدير العام.',
-      });
-      return;
-    }
-
-    if (!Array.isArray(store.adminOfficials)) {
-      store.adminOfficials = [];
-    }
-
-    const now = new Date().toISOString();
-    const cleanDisplayName = (displayName?.trim() || targetUser.name).slice(0, 80);
-    const cleanWhatsapp = hasRawWhatsapp ? normalizeWhatsappNumber(whatsappNumber!) : '';
-
-    // Sync user's single authoritative rank assignment & promote to admin role
-    targetUser.role = 'admin';
-    targetUser.adminRankId = targetRank.id;
-
-    // Prevent duplicate official records for same user: update existing record if found
-    const existingOfficial = store.adminOfficials.find(
-      (o) => o.userId === targetUser.id
-    );
-
-    let savedOfficial: AdminOfficial;
-    if (existingOfficial) {
-      existingOfficial.rankId = targetRank.id;
-      existingOfficial.displayName = cleanDisplayName;
-      existingOfficial.whatsappNumber = cleanWhatsapp;
-      existingOfficial.titleNote = titleNote?.trim().slice(0, 120) || undefined;
-      existingOfficial.showInSupport =
-        typeof showInSupport === 'boolean' ? showInSupport : true;
-      existingOfficial.isActive = typeof isActive === 'boolean' ? isActive : true;
-      existingOfficial.updatedAt = now;
-      savedOfficial = existingOfficial;
-    } else {
-      savedOfficial = {
-        id: `official-${crypto.randomUUID()}`,
-        userId: targetUser.id,
-        rankId: targetRank.id,
-        displayName: cleanDisplayName,
-        whatsappNumber: cleanWhatsapp,
-        titleNote: titleNote?.trim().slice(0, 120) || undefined,
-        showInSupport: typeof showInSupport === 'boolean' ? showInSupport : true,
-        isActive: typeof isActive === 'boolean' ? isActive : true,
-        assignedBy: req.currentUser!.id,
-        createdAt: now,
-        updatedAt: now,
-      };
-      store.adminOfficials.unshift(savedOfficial);
-    }
-
-    db.save();
-
-    recordAdminAudit({
-      actorId: req.currentUser!.id,
-      actorName: req.currentUser!.name,
-      action: 'official.assign',
-      targetUserId: targetUser.id,
-      targetUserName: targetUser.name,
-      details: `Assigned to rank ${targetRank.nameAr} (${targetRank.id})`,
-      ip: getClientIp(req),
-    });
-
-    res.status(201).json({ official: savedOfficial });
-  }
-);
-
-/**
- * Update official details, visibility, active status, or transfer to another rank/department
- */
-router.patch(
-  '/admin/officials/:id',
-  requireAuth,
-  requirePermission('manage_officials'),
-  (req: AuthenticatedRequest, res) => {
-    const { id } = req.params;
-    const {
-      rankId,
-      displayName,
-      whatsappNumber,
-      titleNote,
-      showInSupport,
-      isActive,
-    } = req.body as {
-      rankId?: string;
-      displayName?: string;
-      whatsappNumber?: string;
-      titleNote?: string;
-      showInSupport?: boolean;
-      isActive?: boolean;
-    };
-
-    const store = db.get();
-    const official = (store.adminOfficials || []).find((o) => o.id === id);
-    if (!official) {
-      res.status(404).json({ error: 'بيانات المسؤول غير موجودة.' });
-      return;
-    }
-
-    const callerIsSuperAdmin = isUserSuperAdmin(req.currentUser);
-    const targetUser = store.users.find((u) => u.id === official.userId);
-
-    // Nobody can edit their own rank/permissions (Super Admin may update own support card display/WhatsApp only, never downgrade self)
-    if (official.userId === req.currentUser!.id && !callerIsSuperAdmin) {
-      res.status(403).json({
-        error: 'لا يمكنك تعديل بيانات رتبتك أو صلاحياتك بنفسك.',
-      });
-      return;
-    }
-
-    if (!callerIsSuperAdmin) {
-      if (
-        official.rankId === 'rank-super-admin' ||
-        official.rankId === 'rank-deputy-director' ||
-        targetUser?.isProtected
-      ) {
-        res.status(403).json({
-          error: 'لا تملك صلاحية تعديل بيانات المدير العام أو نائبه.',
-        });
-        return;
-      }
-    }
-
-    if (typeof rankId === 'string' && rankId.trim() && rankId.trim() !== official.rankId) {
-      const nextRank = (store.adminRanks || []).find((r) => r.id === rankId.trim());
-      if (!nextRank) {
-        res.status(404).json({ error: 'الرتبة المنقول إليها غير موجودة.' });
-        return;
-      }
-      if (
-        official.userId === req.currentUser!.id ||
-        (!callerIsSuperAdmin &&
-          (nextRank.isSuperAdminRank ||
-            nextRank.id === 'rank-super-admin' ||
-            nextRank.id === 'rank-deputy-director'))
-      ) {
-        res.status(403).json({
-          error: 'لا تملك صلاحية النقل إلى هذه الرتبة.',
-        });
-        return;
-      }
-      if (targetUser?.isProtected && nextRank.id !== 'rank-super-admin') {
-        res.status(403).json({
-          error: 'لا يمكن خفض رتبة المدير المؤسس المحمي.',
-        });
-        return;
-      }
-      official.rankId = nextRank.id;
-      if (targetUser) {
-        targetUser.adminRankId = nextRank.id;
-        targetUser.role = 'admin';
-      }
-    }
-
-    if (typeof displayName === 'string' && displayName.trim().length >= 2) {
-      official.displayName = displayName.trim().slice(0, 80);
-    }
-
-    if (typeof whatsappNumber === 'string' && whatsappNumber.trim()) {
-      if (!isValidWhatsappNumber(whatsappNumber)) {
-        res.status(400).json({ error: 'رقم الواتساب غير صالح.' });
-        return;
-      }
-      official.whatsappNumber = normalizeWhatsappNumber(whatsappNumber);
-    }
-
-    if (typeof titleNote === 'string') {
-      official.titleNote = titleNote.trim().slice(0, 120) || undefined;
-    }
-
-    if (typeof showInSupport === 'boolean') {
-      official.showInSupport = showInSupport;
-    }
-
-    if (typeof isActive === 'boolean') {
-      official.isActive = isActive;
-    }
-
-    official.updatedAt = new Date().toISOString();
-    db.save();
-
-    recordAdminAudit({
-      actorId: req.currentUser!.id,
-      actorName: req.currentUser!.name,
-      action: 'official.update',
-      targetUserId: official.userId,
-      targetUserName: official.displayName,
-      details: `Updated official in rank ${official.rankId} (active=${official.isActive}, support=${official.showInSupport})`,
-      ip: getClientIp(req),
-    });
-
-    res.json({ official });
-  }
-);
-
-/**
- * Remove official from administrative directory & revoke rank permissions
- */
-router.delete(
-  '/admin/officials/:id',
-  requireAuth,
-  requirePermission('manage_officials'),
-  (req: AuthenticatedRequest, res) => {
-    const { id } = req.params;
-    const store = db.get();
-    const official = (store.adminOfficials || []).find((o) => o.id === id);
-    if (!official) {
-      res.status(404).json({ error: 'المسؤول غير موجود.' });
-      return;
-    }
-
-    const callerIsSuperAdmin = isUserSuperAdmin(req.currentUser);
-    const targetUser = store.users.find((u) => u.id === official.userId);
-
-    if (official.userId === req.currentUser!.id) {
-      res.status(403).json({ error: 'لا يمكنك إزالة نفسك من الإدارة.' });
-      return;
-    }
-
-    if (
-      !callerIsSuperAdmin &&
-      (official.rankId === 'rank-super-admin' ||
-        official.rankId === 'rank-deputy-director' ||
-        targetUser?.isProtected)
-    ) {
-      res.status(403).json({
-        error: 'لا تملك صلاحية إزالة المدير العام أو نائبه.',
-      });
-      return;
-    }
-
-    if (targetUser?.isProtected && official.rankId === 'rank-super-admin') {
-      res.status(403).json({
-        error: 'لا يمكن إزالة رتبة المدير العام عن الحساب المؤسس المحمي.',
-      });
-      return;
-    }
-
-    store.adminOfficials = (store.adminOfficials || []).filter((o) => o.id !== id);
-    if (targetUser && !targetUser.isProtected) {
-      delete targetUser.adminRankId;
-      targetUser.role = 'student';
-    }
-    db.save();
-
-    recordAdminAudit({
-      actorId: req.currentUser!.id,
-      actorName: req.currentUser!.name,
-      action: 'official.remove',
-      targetUserId: official.userId,
-      targetUserName: official.displayName,
-      details: `Removed official from rank ${official.rankId}`,
-      ip: getClientIp(req),
-    });
-
-    res.json({ ok: true });
-  }
-);
-
-/**
- * Admin Selection: Assign or update one of the 7 Technical Support Team members (slots 1..7)
- */
-router.post(
-  '/admin/support-team',
-  requireAuth,
-  requireAnyPermission('manage_officials', 'manage_support'),
-  (req: AuthenticatedRequest, res) => {
-    const {
-      userId,
-      slotNumber,
-      displayName,
-      specialty,
-      whatsappNumber,
-      isActive,
-    } = req.body as {
-      userId?: string;
-      slotNumber?: number;
-      displayName?: string;
-      specialty?: string;
-      whatsappNumber?: string;
-      isActive?: boolean;
-    };
-
-    if (!userId?.trim()) {
-      res.status(400).json({
-        error: 'يرجى اختيار العضو أولاً.',
-      });
-      return;
-    }
-
-    const hasRawWhatsapp = Boolean(whatsappNumber?.trim());
-    if (hasRawWhatsapp && !isValidWhatsappNumber(whatsappNumber!)) {
-      res.status(400).json({
-        error: 'رقم الواتساب غير صالح (يجب أن يكون من 8 إلى 16 رقماً).',
-      });
-      return;
-    }
-
-    const store = db.get();
-    if (!Array.isArray(store.supportTeam)) {
-      store.supportTeam = [];
-    }
-
-    const targetUser = store.users.find((u) => u.id === userId.trim());
-    if (!targetUser) {
-      res.status(404).json({ error: 'المستخدم المحدد غير موجود في قاعدة البيانات.' });
-      return;
-    }
-
-    let resolvedSlot = slotNumber !== undefined ? Number(slotNumber) : 0;
-    if (resolvedSlot !== 0) {
-      if (!Number.isInteger(resolvedSlot) || resolvedSlot < 1 || resolvedSlot > MAX_SUPPORT_TEAM_SIZE) {
-        res.status(400).json({
-          error: `رقم المقعد يجب أن يكون بين 1 و ${MAX_SUPPORT_TEAM_SIZE}.`,
-        });
-        return;
-      }
-    } else {
-      const existingForUser = store.supportTeam.find((m) => m.userId === targetUser.id);
-      if (existingForUser) {
-        resolvedSlot = existingForUser.slotNumber;
-      } else {
-        const usedSlots = new Set(store.supportTeam.map((m) => m.slotNumber));
-        for (let i = 1; i <= MAX_SUPPORT_TEAM_SIZE; i++) {
-          if (!usedSlots.has(i)) {
-            resolvedSlot = i;
-            break;
-          }
-        }
-        if (resolvedSlot === 0) {
-          res.status(400).json({
-            error: `فريق الدعم الفني مكتمل (${MAX_SUPPORT_TEAM_SIZE} أعضاء كحد أقصى). حدد رقم مقعد لاستبداله أو أزل أحد الأعضاء أولاً.`,
-          });
-          return;
-        }
-      }
-    }
-
-    const now = new Date().toISOString();
-    const cleanName = (displayName?.trim() || targetUser.name).slice(0, 80);
-    const cleanSpecialty = specialty?.trim().slice(0, 120) || undefined;
-    const cleanWhatsapp = hasRawWhatsapp ? normalizeWhatsappNumber(whatsappNumber!) : '';
-
-    // Ensure the same user does not occupy two different slots and handle slot replacement cleanly
-    store.supportTeam = store.supportTeam.filter(
-      (m) => m.slotNumber !== resolvedSlot && m.userId !== targetUser.id
-    );
-
-    const savedMember: SupportTeamMember = {
-      id: `support-${crypto.randomUUID()}`,
-      slotNumber: resolvedSlot,
-      userId: targetUser.id,
-      displayName: cleanName,
-      specialty: cleanSpecialty,
-      whatsappNumber: cleanWhatsapp,
-      isActive: typeof isActive === 'boolean' ? isActive : true,
-      assignedBy: req.currentUser!.id,
-      createdAt: now,
-      updatedAt: now,
-    };
-
-    store.supportTeam.push(savedMember);
-    store.supportTeam.sort((a, b) => a.slotNumber - b.slotNumber);
-    db.save();
-
-    recordAdminAudit({
-      actorId: req.currentUser!.id,
-      actorName: req.currentUser!.name,
-      action: 'support_team.assign',
-      targetUserId: targetUser.id,
-      targetUserName: cleanName,
-      details: `Assigned to Support Team Slot #${resolvedSlot}`,
-      ip: getClientIp(req),
-    });
-
-    res.status(201).json({ member: savedMember });
-  }
-);
-
-router.patch(
-  '/admin/support-team/:id',
-  requireAuth,
-  requireAnyPermission('manage_officials', 'manage_support'),
-  (req: AuthenticatedRequest, res) => {
-    const { id } = req.params;
-    const { slotNumber, displayName, specialty, whatsappNumber, isActive } = req.body as {
-      slotNumber?: number;
-      displayName?: string;
-      specialty?: string;
-      whatsappNumber?: string;
-      isActive?: boolean;
-    };
-
-    const store = db.get();
-    if (!Array.isArray(store.supportTeam)) {
-      store.supportTeam = [];
-    }
-
-    const member = store.supportTeam.find((m) => m.id === id);
-    if (!member) {
-      res.status(404).json({ error: 'عضو الدعم الفني غير موجود.' });
-      return;
-    }
-
-    if (slotNumber !== undefined) {
-      const nextSlot = Number(slotNumber);
-      if (!Number.isInteger(nextSlot) || nextSlot < 1 || nextSlot > MAX_SUPPORT_TEAM_SIZE) {
-        res.status(400).json({ error: `رقم المقعد يجب أن يكون بين 1 و ${MAX_SUPPORT_TEAM_SIZE}.` });
-        return;
-      }
-      if (nextSlot !== member.slotNumber) {
-        const occupant = store.supportTeam.find(
-          (m) => m.id !== member.id && m.slotNumber === nextSlot
-        );
-        if (occupant) {
-          occupant.slotNumber = member.slotNumber;
-          occupant.updatedAt = new Date().toISOString();
-        }
-        member.slotNumber = nextSlot;
-      }
-    }
-
-    if (typeof displayName === 'string' && displayName.trim().length >= 2) {
-      member.displayName = displayName.trim().slice(0, 80);
-    }
-
-    if (typeof specialty === 'string') {
-      member.specialty = specialty.trim().slice(0, 120) || undefined;
-    }
-
-    if (typeof whatsappNumber === 'string' && whatsappNumber.trim()) {
-      if (!isValidWhatsappNumber(whatsappNumber)) {
-        res.status(400).json({ error: 'رقم الواتساب غير صالح.' });
-        return;
-      }
-      member.whatsappNumber = normalizeWhatsappNumber(whatsappNumber);
-    }
-
-    if (typeof isActive === 'boolean') {
-      member.isActive = isActive;
-    }
-
-    member.updatedAt = new Date().toISOString();
-    store.supportTeam.sort((a, b) => a.slotNumber - b.slotNumber);
-    db.save();
-
-    recordAdminAudit({
-      actorId: req.currentUser!.id,
-      actorName: req.currentUser!.name,
-      action: 'support_team.update',
-      targetUserId: member.userId,
-      targetUserName: member.displayName,
-      details: `Updated Support Team Slot #${member.slotNumber} (active=${member.isActive})`,
-      ip: getClientIp(req),
-    });
-
-    res.json({ member });
-  }
-);
-
-router.delete(
-  '/admin/support-team/:id',
-  requireAuth,
-  requireAnyPermission('manage_officials', 'manage_support'),
-  (req: AuthenticatedRequest, res) => {
-    const { id } = req.params;
-    const store = db.get();
-    const member = (store.supportTeam || []).find((m) => m.id === id);
-    if (!member) {
-      res.status(404).json({ error: 'عضو الدعم الفني غير موجود.' });
-      return;
-    }
-
-    store.supportTeam = (store.supportTeam || []).filter((m) => m.id !== id);
-    db.save();
-
-    recordAdminAudit({
-      actorId: req.currentUser!.id,
-      actorName: req.currentUser!.name,
-      action: 'support_team.remove',
-      targetUserId: member.userId,
-      targetUserName: member.displayName,
-      details: `Removed from Support Team Slot #${member.slotNumber}`,
-      ip: getClientIp(req),
-    });
-
-    res.json({ ok: true });
-  }
-);
-
-/**
- * Admin: Add or update Platform Leader WhatsApp number directly
- */
-router.patch(
-  '/admin/support/leader-whatsapp',
-  requireAuth,
-  requireAnyPermission('manage_officials', 'manage_support'),
-  (req: AuthenticatedRequest, res) => {
-    const { whatsappNumber } = req.body as { whatsappNumber?: string };
-    if (!whatsappNumber?.trim() || !isValidWhatsappNumber(whatsappNumber)) {
-      res.status(400).json({
-        error: 'رقم الواتساب غير صالح (يجب أن يكون من 8 إلى 16 رقماً).',
-      });
-      return;
-    }
-
-    const cleanWhatsapp = normalizeWhatsappNumber(whatsappNumber);
-    const store = db.get();
-    if (!store.platformConfig) {
-      store.platformConfig = {
-        whatsappNumber: cleanWhatsapp,
-        telegramUrl: 'https://t.me/+201159637247',
-      };
-    } else {
-      store.platformConfig.whatsappNumber = cleanWhatsapp;
-    }
-
-    const leaderOfficial = (store.adminOfficials || []).find(
-      (o) => o.rankId === 'rank-super-admin' && o.isActive
-    );
-    if (leaderOfficial) {
-      leaderOfficial.whatsappNumber = cleanWhatsapp;
-      leaderOfficial.updatedAt = new Date().toISOString();
-    }
-
-    db.save();
-
-    recordAdminAudit({
-      actorId: req.currentUser!.id,
-      actorName: req.currentUser!.name,
-      action: 'official.update',
-      targetUserId: leaderOfficial?.userId,
-      targetUserName: leaderOfficial?.displayName || 'ليدر المنصة',
-      details: 'Updated Platform Leader WhatsApp number',
-      ip: getClientIp(req),
-    });
-
-    res.json({
-      ok: true,
-      hasWhatsapp: true,
-      whatsappUrl: formatWhatsappLink(cleanWhatsapp),
-    });
-  }
-);
-
-/**
- * Super Admin ONLY: Get configuration status of the custom Admin Activation Password (never exposes secret/hash)
- */
-router.get(
-  '/admin/activation-password',
-  requireAuth,
-  requireSuperAdmin,
-  (_req: AuthenticatedRequest, res) => {
-    const store = db.get();
-    const cfg = store.platformConfig;
-    res.json({
-      configured: Boolean(cfg?.adminActivationPasswordHash),
-      updatedAt: cfg?.adminActivationPasswordUpdatedAt || null,
-      defaultRankId: cfg?.adminActivationDefaultRankId || 'rank-deputy-director',
-    });
-  }
-);
-
-/**
- * Super Admin ONLY: Write, update, or clear the custom Admin Activation Password and choose its target rank
- */
-router.put(
-  '/admin/activation-password',
-  requireAuth,
-  requireSuperAdmin,
-  (req: AuthenticatedRequest, res) => {
-    const { password, defaultRankId, clear } = req.body as {
-      password?: string;
-      defaultRankId?: string;
-      clear?: boolean;
-    };
-
-    const store = db.get();
-    if (!store.platformConfig) {
-      store.platformConfig = {
-        whatsappNumber: '01159637247',
-        telegramUrl: 'https://t.me/+201159637247',
-      };
-    }
-
-    if (typeof defaultRankId === 'string' && defaultRankId.trim()) {
-      const targetRank = (store.adminRanks || []).find((r) => r.id === defaultRankId.trim());
-      if (!targetRank || targetRank.isSuperAdminRank || targetRank.id === 'rank-super-admin') {
-        res.status(400).json({
-          error: 'يرجى اختيار رتبة إدارية صالحة للتفعيل (بخلاف رتبة المدير العام المؤسس).',
-        });
-        return;
-      }
-      store.platformConfig.adminActivationDefaultRankId = targetRank.id;
-    } else if (!store.platformConfig.adminActivationDefaultRankId) {
-      store.platformConfig.adminActivationDefaultRankId = 'rank-deputy-director';
-    }
-
-    if (clear === true) {
-      delete store.platformConfig.adminActivationPasswordHash;
-      store.platformConfig.adminActivationPasswordUpdatedAt = new Date().toISOString();
-    } else {
-      const cleanPass = typeof password === 'string' ? password.trim() : '';
-      if (!cleanPass && !store.platformConfig.adminActivationPasswordHash) {
-        res.status(400).json({
-          error: 'يرجى كتابة كلمة سر تفعيل الأدمن (4 أحرف على الأقل).',
-        });
-        return;
-      }
-      if (cleanPass) {
-        if (cleanPass.length < 4 || cleanPass.length > 120) {
-          res.status(400).json({
-            error: 'كلمة سر تفعيل الأدمن يجب أن تكون بين 4 و120 حرفاً.',
-          });
-          return;
-        }
-        store.platformConfig.adminActivationPasswordHash = hashPassword(cleanPass);
-        store.platformConfig.adminActivationPasswordUpdatedAt = new Date().toISOString();
-      }
-    }
-
-    db.save();
-
-    recordAdminAudit({
-      actorId: req.currentUser!.id,
-      actorName: req.currentUser!.name,
-      action: 'admin.activation_password_update',
-      details: clear
-        ? 'Cleared custom admin activation password'
-        : `Updated custom admin activation password / rank (${store.platformConfig.adminActivationDefaultRankId})`,
-      ip: getClientIp(req),
-    });
-
-    res.json({
-      configured: Boolean(store.platformConfig.adminActivationPasswordHash),
-      updatedAt: store.platformConfig.adminActivationPasswordUpdatedAt || null,
-      defaultRankId: store.platformConfig.adminActivationDefaultRankId || 'rank-deputy-director',
-    });
-  }
-);
-
-export default router;
+          error: 'تعيين أو تعديل منصب المدير العام أو نائبه محصور بالمدير العام فقط
