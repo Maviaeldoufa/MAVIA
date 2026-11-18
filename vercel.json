@@ -5,7 +5,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/server.ts"
+      "destination": "/api/index.ts"
     },
     {
       "source": "/((?!api/|assets/|src/assets/|uploads/|favicon\\.ico).*)",
