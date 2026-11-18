@@ -1,9 +1,9 @@
 import crypto from 'crypto';
 import { Router } from 'express';
-import { requireAuth, requirePermission } from '../auth.ts';
-import type { AuthenticatedRequest } from '../auth.ts';
-import { db, pushNotification } from '../db.ts';
-import type { AcademicYear, NotificationItem } from '../types.ts';
+import { requireAuth, requirePermission } from '../auth.js';
+import type { AuthenticatedRequest } from '../auth.js';
+import { db, pushNotification } from '../db.js';
+import type { AcademicYear, NotificationItem } from '../types.js';
 
 const router = Router();
 
