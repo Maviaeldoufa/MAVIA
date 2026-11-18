@@ -33,6 +33,12 @@
     font-weight: 500;
   }
 
+  input::placeholder,
+  textarea::placeholder {
+    color: #b8b1a7;
+    opacity: 1;
+  }
+
   /* Custom subtle obsidian scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
@@ -48,6 +54,36 @@
   ::-webkit-scrollbar-thumb:hover {
     background: #D4AF37;
   }
+}
+
+/* Clearer, slightly larger secondary & sub-texts across all sections */
+.text-\[10px\] {
+  font-size: 0.775rem;
+  line-height: 1.45;
+  font-weight: 600;
+}
+
+.text-\[11px\] {
+  font-size: 0.84rem;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.text-\[12px\] {
+  font-size: 0.885rem;
+  line-height: 1.55;
+}
+
+.text-\[\#A8A29E\] {
+  color: #c9c2b8;
+}
+
+.text-\[\#C8C2B8\] {
+  color: #dfd9cf;
+}
+
+.text-\[\#71717A\] {
+  color: #a8a8b3;
 }
 
 .tabular-nums {

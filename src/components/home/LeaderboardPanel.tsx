@@ -30,10 +30,14 @@ export function LeaderboardPanel({ refreshTrigger }: { refreshTrigger?: number }
     { value: 4, label: tr('الفرقة الرابعة', 'Year 4') },
   ];
 
+  const isAdmin = currentUser?.role === 'admin';
+
   useEffect(() => {
     let active = true;
     setLoading(true);
-    apiRequest<{ users: User[] }>(`/api/users?year=${selectedYear}`)
+    const targetYear = isAdmin ? selectedYear : currentUser?.year || 0;
+    const scopeParam = isAdmin ? '' : '&scope=honor';
+    apiRequest<{ users: User[] }>(`/api/users?year=${targetYear}${scopeParam}`)
       .then((res) => {
         if (active) setUsers(res.users);
       })
@@ -44,7 +48,7 @@ export function LeaderboardPanel({ refreshTrigger }: { refreshTrigger?: number }
     return () => {
       active = false;
     };
-  }, [selectedYear, refreshTrigger]);
+  }, [isAdmin, selectedYear, currentUser?.year, refreshTrigger]);
 
   return (
     <section className="rounded-2xl bg-[#121216] border border-white/10 p-6 space-y-6">
@@ -64,19 +68,27 @@ export function LeaderboardPanel({ refreshTrigger }: { refreshTrigger?: number }
           </p>
         </div>
 
-        <div className="flex items-center gap-2 overflow-x-auto pb-1">
-          {yearFilters.map((f) => (
-            <GoldChip
-              key={f.value}
-              active={selectedYear === f.value}
-              layoutId="leaderboard-year-filter"
-              onClick={() => setSelectedYear(f.value)}
-              className="text-xs px-3 py-1.5"
-            >
-              {f.label}
-            </GoldChip>
-          ))}
-        </div>
+        {isAdmin ? (
+          <div className="flex items-center gap-2 overflow-x-auto pb-1">
+            {yearFilters.map((f) => (
+              <GoldChip
+                key={f.value}
+                active={selectedYear === f.value}
+                layoutId="leaderboard-year-filter"
+                onClick={() => setSelectedYear(f.value)}
+                className="text-xs px-3 py-1.5"
+              >
+                {f.label}
+              </GoldChip>
+            ))}
+          </div>
+        ) : (
+          currentUser?.year && (
+            <span className="px-3 py-1.5 rounded-lg bg-[#D4AF37]/15 border border-[#D4AF37]/35 text-xs font-semibold text-[#F5D061] whitespace-nowrap self-start lg:self-auto">
+              {formatYear(currentUser.year)}
+            </span>
+          )
+        )}
       </div>
 
       {loading ? (

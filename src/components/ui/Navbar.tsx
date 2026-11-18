@@ -1,15 +1,15 @@
-import { Languages, LayoutDashboard, LogOut, Scale, ShieldCheck, UserCog } from 'lucide-react';
+import { Languages, LayoutDashboard, LogOut, ShieldCheck, Trophy, UserCog } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import type { NavSection } from '../../types';
 import { AccountModal } from './AccountModal';
+import { HonorBoardModal } from './HonorBoardModal';
 import { MviaBrandMark } from './MviaBrandMark';
 import { NotificationsBell } from './NotificationsBell';
 import { RankIconGlyph } from './RankBadge';
 import { StudentProfileLevelModal } from './StudentProfileLevelModal';
-import { TermsModal } from './TermsModal';
 
 interface NavbarProps {
   activeSection: NavSection;
@@ -19,7 +19,7 @@ interface NavbarProps {
 export function Navbar({ activeSection, onChangeSection }: NavbarProps) {
   const { user, logout } = useAuth();
   const { lang, toggleLang, tr } = useLanguage();
-  const [termsOpen, setTermsOpen] = useState(false);
+  const [honorBoardOpen, setHonorBoardOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [profileDashboardOpen, setProfileDashboardOpen] = useState(false);
   const [brandLit, setBrandLit] = useState(false);
@@ -115,13 +115,13 @@ export function Navbar({ activeSection, onChangeSection }: NavbarProps) {
 
           <button
             type="button"
-            onClick={() => setTermsOpen(true)}
-            title={tr('الشروط والأحكام', 'Terms & Conditions')}
-            aria-label={tr('الشروط والأحكام', 'Terms & Conditions')}
-            className="inline-flex items-center gap-1 px-2.5 py-2 rounded-lg text-xs font-semibold border border-[#D4AF37]/35 bg-[#151519] text-[#E5C158] hover:bg-[#D4AF37] hover:text-[#09090B] transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+            onClick={() => setHonorBoardOpen(true)}
+            title={tr('لوحة الشرف — ترتيب جميع المسجلين', 'Honor Board — All Rankings')}
+            aria-label={tr('لوحة الشرف', 'Honor Board')}
+            className="inline-flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-xs font-semibold border border-[#D4AF37]/35 bg-[#151519] text-[#E5C158] hover:bg-[#D4AF37] hover:text-[#09090B] transition-colors whitespace-nowrap shrink-0 cursor-pointer"
           >
-            <Scale className="w-3.5 h-3.5 shrink-0" />
-            <span className="hidden md:inline">{tr('الشروط والأحكام', 'Terms')}</span>
+            <Trophy className="w-3.5 h-3.5 shrink-0" />
+            <span className="hidden md:inline">{tr('لوحة الشرف', 'Honor Board')}</span>
           </button>
 
           <motion.button
@@ -207,7 +207,7 @@ export function Navbar({ activeSection, onChangeSection }: NavbarProps) {
         })}
       </nav>
     </header>
-    <TermsModal open={termsOpen} onClose={() => setTermsOpen(false)} />
+    <HonorBoardModal open={honorBoardOpen} onClose={() => setHonorBoardOpen(false)} />
     <AccountModal open={accountOpen} onClose={() => setAccountOpen(false)} />
     <StudentProfileLevelModal
       open={profileDashboardOpen}

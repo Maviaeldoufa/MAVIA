@@ -433,14 +433,21 @@ router.post('/auth/verify-email', requireAuth, (req: AuthenticatedRequest, res) 
 });
 
 router.get('/users', requireAuth, (req: AuthenticatedRequest, res) => {
-  const yearParam = req.query.year ? Number(req.query.year) : 0;
+  const isAdmin = req.currentUser?.role === 'admin';
+  const scope = typeof req.query.scope === 'string' ? req.query.scope : '';
+  const requestedYear = req.query.year ? Number(req.query.year) : 0;
+  const effectiveYear =
+    !isAdmin && scope === 'honor' && req.currentUser?.year
+      ? req.currentUser.year
+      : requestedYear;
+
   const store = db.get();
   const canViewSensitive = hasUserPermission(req.currentUser, 'view_sensitive_data');
   let users = store.users.map((u) =>
     canViewSensitive ? toSafeUser(u) : toLeaderboardUser(u)
   );
-  if (yearParam >= 1 && yearParam <= 4) {
-    users = users.filter((u) => u.year === yearParam);
+  if (effectiveYear >= 1 && effectiveYear <= 4) {
+    users = users.filter((u) => u.year === effectiveYear);
   }
   users.sort((a, b) => b.points - a.points);
   res.json({ users });
