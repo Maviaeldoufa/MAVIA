@@ -46,8 +46,13 @@ export function NotificationsBell({ onNavigate }: NotificationsBellProps) {
 
   useEffect(() => {
     loadNotifications();
-    const interval = window.setInterval(loadNotifications, 30000);
-    return () => window.clearInterval(interval);
+    const interval = window.setInterval(loadNotifications, 12000);
+    const onChanged = () => loadNotifications();
+    window.addEventListener('mvia:comprehensive-exam-changed', onChanged);
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener('mvia:comprehensive-exam-changed', onChanged);
+    };
   }, [user?.id]);
 
   useEffect(() => {
@@ -86,11 +91,15 @@ export function NotificationsBell({ onNavigate }: NotificationsBellProps) {
     }
     onNavigate(item.targetSection);
     if (item.comprehensiveExamId) {
-      window.dispatchEvent(
-        new CustomEvent('mvia:open-comprehensive-results', {
-          detail: { examId: item.comprehensiveExamId },
-        })
-      );
+      if (isAdmin && item.title.includes('تسليم امتحان شامل')) {
+        window.dispatchEvent(new CustomEvent('mvia:open-admin-comprehensive-exams'));
+      } else {
+        window.dispatchEvent(
+          new CustomEvent('mvia:open-comprehensive-results', {
+            detail: { examId: item.comprehensiveExamId },
+          })
+        );
+      }
     }
     setOpen(false);
   };

@@ -43,7 +43,11 @@ interface DraftGradeItem {
   adminFeedback: string;
 }
 
-export function AdminComprehensiveExamPanel() {
+export function AdminComprehensiveExamPanel({
+  embeddedInModal = false,
+}: {
+  embeddedInModal?: boolean;
+}) {
   const { user } = useAuth();
   const { tr, formatYear, isEn } = useLanguage();
 
@@ -359,7 +363,13 @@ export function AdminComprehensiveExamPanel() {
     : 0;
 
   return (
-    <section className="rounded-2xl border border-[#D4AF37]/35 bg-white dark:bg-[#121216] p-5 sm:p-6 space-y-5">
+    <section
+      className={
+        embeddedInModal
+          ? 'space-y-5'
+          : 'rounded-2xl border border-[#D4AF37]/35 bg-white dark:bg-[#121216] p-5 sm:p-6 space-y-5'
+      }
+    >
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-black/10 dark:border-white/10 pb-4">
         <div className="flex items-start gap-3">
@@ -854,7 +864,7 @@ export function AdminComprehensiveExamPanel() {
       {/* MANUAL GRADING MODAL */}
       {gradingContext && (
         <div
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 overflow-y-auto"
+          className="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 overflow-y-auto"
           role="dialog"
           aria-modal="true"
         >
@@ -1095,7 +1105,7 @@ export function AdminComprehensiveExamPanel() {
                 <button
                   type="button"
                   onClick={() => setGradingContext(null)}
-                  className="px-4 py-2 rounded-lg bg-[#ECE8DE] dark:bg-[#18181D] text-xs text-[#3F3D38] dark:text-[#C8C2B8] hover:text-white cursor-pointer"
+                  className="px-4 py-2 rounded-lg bg-[#ECE8DE] dark:bg-[#18181D] text-xs text-[#3F3D38] dark:text-[#C8C2B8] hover:text-[#141418] dark:hover:text-white cursor-pointer"
                 >
                   {tr('إلغاء', 'Cancel')}
                 </button>

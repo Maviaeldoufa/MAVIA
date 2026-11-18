@@ -3,9 +3,12 @@ import {
   Award,
   BookOpen,
   CheckCircle2,
+  ClipboardCheck,
   Clock,
   Crown,
+  Eye,
   Flag,
+  Hourglass,
   LayoutDashboard,
   Lock,
   Mail,
@@ -22,7 +25,11 @@ import {
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
-import type { StudentAchievement, StudentDashboardData } from '../../types';
+import type {
+  ComprehensiveSubmission,
+  StudentAchievement,
+  StudentDashboardData,
+} from '../../types';
 import { apiRequest } from '../../utils/api';
 import { RankBadge } from './RankBadge';
 import { UserAdminNotesCard } from './UserAdminNotesCard';
@@ -39,6 +46,7 @@ export function StudentProfileLevelModal({
   const { user } = useAuth();
   const { tr, formatYear } = useLanguage();
   const [data, setData] = useState<StudentDashboardData | null>(null);
+  const [compSubmissions, setCompSubmissions] = useState<ComprehensiveSubmission[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -46,8 +54,14 @@ export function StudentProfileLevelModal({
     setLoading(true);
     setError(null);
     try {
-      const res = await apiRequest<StudentDashboardData>('/api/student/dashboard');
+      const [res, subsRes] = await Promise.all([
+        apiRequest<StudentDashboardData>('/api/student/dashboard'),
+        apiRequest<{ submissions: ComprehensiveSubmission[] }>(
+          '/api/comprehensive-exams/my-submissions'
+        ).catch(() => ({ submissions: [] })),
+      ]);
       setData(res);
+      setCompSubmissions(subsRes.submissions || []);
     } catch (err) {
       setError(
         err instanceof Error
@@ -62,11 +76,16 @@ export function StudentProfileLevelModal({
   useEffect(() => {
     if (!open) return;
     loadData();
+    const onChanged = () => loadData();
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
     window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
+    window.addEventListener('mvia:comprehensive-exam-changed', onChanged);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('mvia:comprehensive-exam-changed', onChanged);
+    };
   }, [open, onClose]);
 
   if (!open || !user) return null;
@@ -225,6 +244,104 @@ export function StudentProfileLevelModal({
 
               {/* Admin Notes on User Profile (when present) */}
               <UserAdminNotesCard hideWhenEmpty={true} />
+
+              {/* Published Comprehensive Exam Grades in Student Personal Profile */}
+              {compSubmissions.length > 0 && (
+                <div className="p-4 sm:p-5 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-[#D4AF37]/35 space-y-3.5">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <h3 className="font-display text-base font-bold text-[#141418] dark:text-[#F5F0E6] flex items-center gap-2">
+                      <ClipboardCheck className="w-4 h-4 text-[#9A7209] dark:text-[#D4AF37]" />
+                      <span>
+                        {tr(
+                          'درجات الامتحانات الشاملة المنشورة',
+                          'Published Comprehensive Exam Grades'
+                        )}
+                      </span>
+                    </h3>
+                    <span className="text-xs font-mono font-bold text-[#856104] dark:text-[#E5C158] tabular-nums">
+                      {compSubmissions.filter((s) => s.status === 'graded').length} /{' '}
+                      {compSubmissions.length} {tr('مُصحح', 'graded')}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {compSubmissions.map((sub) => {
+                      const isGraded = sub.status === 'graded';
+                      const pct =
+                        isGraded && sub.maxScore > 0
+                          ? Math.round((sub.totalScore / sub.maxScore) * 100)
+                          : 0;
+                      return (
+                        <div
+                          key={sub.id}
+                          className="p-3.5 rounded-xl bg-white dark:bg-[#151519] border border-black/10 dark:border-white/10 space-y-2.5"
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0">
+                              <div className="text-sm font-bold text-[#141418] dark:text-[#F5F0E6] truncate">
+                                {sub.subjectName}
+                              </div>
+                              <div className="text-[11px] text-[#5C5850] dark:text-[#A8A29E] font-mono tabular-nums">
+                                {new Date(sub.gradedAt || sub.submittedAt).toLocaleString()}
+                              </div>
+                            </div>
+
+                            {isGraded ? (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/75 border border-emerald-500/40 text-emerald-700 dark:text-emerald-300 text-xs font-mono font-bold tabular-nums shrink-0">
+                                <CheckCircle2 className="w-3.5 h-3.5" />
+                                <span>
+                                  {sub.totalScore}/{sub.maxScore} ({pct}%)
+                                </span>
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/75 border border-amber-500/40 text-amber-800 dark:text-amber-200 text-xs font-semibold shrink-0">
+                                <Hourglass className="w-3.5 h-3.5" />
+                                <span>{tr('بانتظار التصحيح', 'Pending')}</span>
+                              </span>
+                            )}
+                          </div>
+
+                          {sub.adminNote && (
+                            <p className="text-[11px] text-[#3F3D38] dark:text-[#C8C2B8] bg-[#F6F4EF] dark:bg-[#0D0D10] border border-[#D4AF37]/25 rounded-lg px-2.5 py-1.5 line-clamp-2">
+                              <strong className="text-[#856104] dark:text-[#E5C158]">
+                                {tr('ملاحظة المصحح:', 'Note:')}
+                              </strong>{' '}
+                              {sub.adminNote}
+                            </p>
+                          )}
+
+                          <div className="flex items-center justify-between gap-2 pt-1">
+                            <span className="text-[11px] text-[#5C5850] dark:text-[#A8A29E]">
+                              {isGraded && sub.gradedBy
+                                ? `${tr('المصحح:', 'By:')} ${sub.gradedBy}`
+                                : tr('قيد المراجعة من الأدمن', 'Under review by Admin')}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                onClose();
+                                window.dispatchEvent(
+                                  new CustomEvent('mvia:open-comprehensive-results', {
+                                    detail: { submissionId: sub.id },
+                                  })
+                                );
+                              }}
+                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[11px] font-semibold text-[#735303] dark:text-[#F5D061] hover:bg-[#D4AF37] hover:text-[#09090B] transition-colors cursor-pointer"
+                            >
+                              <Eye className="w-3 h-3" />
+                              <span>
+                                {isGraded
+                                  ? tr('التفاصيل والأخطاء', 'Review Details')
+                                  : tr('عرض الحالة', 'Status')}
+                              </span>
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               {/* Personal Data + Strength & Weakness Analysis */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">

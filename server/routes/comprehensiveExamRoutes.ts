@@ -201,6 +201,31 @@ router.post('/comprehensive-exams/:id/submit', requireAuth, (req: AuthenticatedR
   store.comprehensiveSubmissions.unshift(submission);
   db.save();
 
+  const yearLabel =
+    user.year === 1
+      ? 'الفرقة الأولى'
+      : user.year === 2
+      ? 'الفرقة الثانية'
+      : user.year === 3
+      ? 'الفرقة الثالثة'
+      : 'الفرقة الرابعة';
+
+  const activeAdmins = (store.users || []).filter(
+    (u) => u.role === 'admin' && !u.isSuspended
+  );
+  for (const adminUser of activeAdmins) {
+    pushNotification({
+      title: `تسليم امتحان شامل: ${exam.subjectName}`,
+      message: `قام الطالب ${user.name} (${yearLabel}) بتسليم الامتحان الشامل لمادة ${exam.subjectName} — في انتظار التصحيح اليدوي.`,
+      type: 'exam',
+      targetSection: 'home',
+      year: 0,
+      userId: adminUser.id,
+      comprehensiveExamId: exam.id,
+      createdBy: user.name,
+    });
+  }
+
   res.status(201).json({ submission });
 });
 
@@ -359,9 +384,20 @@ router.post(
     store.comprehensiveExams.unshift(exam);
     db.save();
 
+    const yearLabel =
+      validYear === 1
+        ? 'الفرقة الأولى'
+        : validYear === 2
+        ? 'الفرقة الثانية'
+        : validYear === 3
+        ? 'الفرقة الثالثة'
+        : validYear === 4
+        ? 'الفرقة الرابعة'
+        : 'جميع الدفعات';
+
     pushNotification({
-      title: `امتحان شامل جديد: ${exam.subjectName}`,
-      message: `تمت إضافة امتحان شامل في مادة ${exam.subjectName} لمدة ${exam.durationMinutes} دقيقة. اضغط على الشريط العلوي للدخول.`,
+      title: `الامتحان الشامل لمادة ${exam.subjectName}`,
+      message: `تم نشر الامتحان الشامل لمادة ${exam.subjectName} (${yearLabel}) — مدة الامتحان ${exam.durationMinutes} دقيقة. اضغط هنا للدخول وبدء الحل الآن.`,
       type: 'exam',
       targetSection: 'home',
       year: validYear,
@@ -535,8 +571,8 @@ router.post(
     db.save();
 
     pushNotification({
-      title: `تم تصحيح امتحانك الشامل: ${exam.subjectName}`,
-      message: `حصلت على ${submission.totalScore} من ${submission.maxScore}. اضغط لعرض الدرجة ومراجعة أخطائك وتوضيحات المصحح.`,
+      title: `تم نشر درجتك في الامتحان الشامل: ${exam.subjectName}`,
+      message: `حصلت على ${submission.totalScore} من ${submission.maxScore} وتم نشر النتيجة في ملفك الشخصي. اضغط لعرض الدرجة ومراجعة أخطائك.`,
       type: 'exam',
       targetSection: 'home',
       year: submission.studentYear,

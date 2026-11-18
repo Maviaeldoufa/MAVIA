@@ -283,7 +283,7 @@ export function ComprehensiveSubmissionReviewView({
 
 export function ComprehensiveExamBannerAndModal() {
   const { user } = useAuth();
-  const { tr, isEn } = useLanguage();
+  const { tr, isEn, formatYear } = useLanguage();
 
   const [activeExams, setActiveExams] = useState<ComprehensiveExamPublic[]>([]);
   const [mySubmissions, setMySubmissions] = useState<ComprehensiveSubmission[]>([]);
@@ -326,48 +326,105 @@ export function ComprehensiveExamBannerAndModal() {
     }
   }, [user?.id]);
 
+  const handleOpenExamFromBanner = useCallback(
+    (exam: ComprehensiveExamPublic, subsOverride?: ComprehensiveSubmission[]) => {
+      const listToSearch = subsOverride || mySubmissions;
+      const existing = listToSearch.find((s) => s.examId === exam.id);
+      if (existing) {
+        setOpenExam(null);
+        setOpenReviewSub(existing);
+        return;
+      }
+      setOpenReviewSub(null);
+      setJustSubmitted(null);
+      setSubmitError(null);
+      setSelectedChoices({});
+      setEssayTexts({});
+
+      const totalSeconds = Math.max(60, (exam.durationMinutes || 30) * 60);
+      let secsLeft = totalSeconds;
+      if (user) {
+        const storageKey = `mvia_cexam_deadline_${user.id}_${exam.id}`;
+        try {
+          const savedRaw = window.sessionStorage.getItem(storageKey);
+          if (savedRaw) {
+            const deadlineMs = Number(savedRaw);
+            if (Number.isFinite(deadlineMs) && deadlineMs > 0) {
+              const diffSecs = Math.ceil((deadlineMs - Date.now()) / 1000);
+              secsLeft = Math.max(5, Math.min(totalSeconds, diffSecs));
+            }
+          } else {
+            window.sessionStorage.setItem(
+              storageKey,
+              String(Date.now() + totalSeconds * 1000)
+            );
+          }
+        } catch {
+          secsLeft = totalSeconds;
+        }
+      }
+
+      setRemainingSeconds(secsLeft);
+      setOpenExam(exam);
+    },
+    [mySubmissions, user]
+  );
+
   useEffect(() => {
     void loadState();
-    const interval = window.setInterval(() => void loadState(), 25000);
+    const interval = window.setInterval(() => void loadState(), 12000);
     const onChanged = () => void loadState();
     const onFocus = () => void loadState();
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        void loadState();
+      }
+    };
 
     window.addEventListener('mvia:comprehensive-exam-changed', onChanged);
     window.addEventListener('focus', onFocus);
     window.addEventListener('online', onFocus);
+    document.addEventListener('visibilitychange', onVisibility);
 
     return () => {
       window.clearInterval(interval);
       window.removeEventListener('mvia:comprehensive-exam-changed', onChanged);
       window.removeEventListener('focus', onFocus);
       window.removeEventListener('online', onFocus);
+      document.removeEventListener('visibilitychange', onVisibility);
     };
   }, [loadState]);
 
-  // Allow notifications or home results panel to open a graded/pending submission modal
+  // Allow notifications or home results panel to open an active exam or graded/pending submission modal
   useEffect(() => {
     const onOpenResults = async (ev: Event) => {
       const detail = (ev as CustomEvent<{ examId?: string; submissionId?: string }>).detail;
       try {
-        const subsRes = await apiRequest<{ submissions: ComprehensiveSubmission[] }>(
-          '/api/comprehensive-exams/my-submissions'
-        );
+        const [activeRes, subsRes] = await Promise.all([
+          apiRequest<{ exams: ComprehensiveExamPublic[] }>('/api/comprehensive-exams/active'),
+          apiRequest<{ submissions: ComprehensiveSubmission[] }>(
+            '/api/comprehensive-exams/my-submissions'
+          ),
+        ]);
+        const latestExams = activeRes.exams || [];
         const list = subsRes.submissions || [];
+        setActiveExams(latestExams);
         setMySubmissions(list);
+
         const target =
           (detail?.submissionId && list.find((s) => s.id === detail.submissionId)) ||
           (detail?.examId && list.find((s) => s.examId === detail.examId)) ||
-          list[0];
+          (!detail?.examId ? list[0] : undefined);
         if (target) {
           setOpenExam(null);
           setOpenReviewSub(target);
           return;
         }
-        // If not submitted yet and exam is still active, open the exam directly
+        // If not submitted yet and exam is still active, open the exam directly to begin solving
         if (detail?.examId) {
-          const active = activeExams.find((e) => e.id === detail.examId);
+          const active = latestExams.find((e) => e.id === detail.examId);
           if (active) {
-            handleOpenExamFromBanner(active);
+            handleOpenExamFromBanner(active, list);
           }
         }
       } catch {
@@ -378,23 +435,7 @@ export function ComprehensiveExamBannerAndModal() {
     window.addEventListener('mvia:open-comprehensive-results', onOpenResults);
     return () =>
       window.removeEventListener('mvia:open-comprehensive-results', onOpenResults);
-  }, [activeExams]);
-
-  const handleOpenExamFromBanner = (exam: ComprehensiveExamPublic) => {
-    const existing = mySubmissions.find((s) => s.examId === exam.id);
-    if (existing) {
-      setOpenExam(null);
-      setOpenReviewSub(existing);
-      return;
-    }
-    setOpenReviewSub(null);
-    setJustSubmitted(null);
-    setSubmitError(null);
-    setSelectedChoices({});
-    setEssayTexts({});
-    setRemainingSeconds(Math.max(60, (exam.durationMinutes || 30) * 60));
-    setOpenExam(exam);
-  };
+  }, [handleOpenExamFromBanner]);
 
   const handleSubmitExam = useCallback(
     async (isAutoTimeout = false) => {
@@ -447,6 +488,15 @@ export function ComprehensiveExamBannerAndModal() {
           res.submission,
           ...prev.filter((s) => s.id !== res.submission.id),
         ]);
+        if (user) {
+          try {
+            window.sessionStorage.removeItem(
+              `mvia_cexam_deadline_${user.id}_${openExam.id}`
+            );
+          } catch {
+            // Ignore
+          }
+        }
         window.dispatchEvent(new CustomEvent('mvia:comprehensive-exam-changed'));
       } catch (err) {
         setSubmitError(
@@ -505,10 +555,17 @@ export function ComprehensiveExamBannerAndModal() {
                     </div>
                     <div className="min-w-0 space-y-0.5">
                       <div className="flex flex-wrap items-center gap-2 text-xs font-bold text-[#735303] dark:text-[#F5D061]">
-                        <span>{tr('خبر امتحان شامل', 'Comprehensive Exam Notice')}</span>
-                        <span aria-hidden="true">·</span>
                         <span className="text-[#141418] dark:text-[#F5F0E6] text-sm">
-                          {tr(`مادة: ${exam.subjectName}`, `Subject: ${exam.subjectName}`)}
+                          {tr(
+                            `الامتحان الشامل لمادة ${exam.subjectName}`,
+                            `Comprehensive Exam: ${exam.subjectName}`
+                          )}
+                        </span>
+                        <span aria-hidden="true">·</span>
+                        <span className="px-2 py-0.5 rounded bg-[#D4AF37]/15 border border-[#D4AF37]/35 text-[11px]">
+                          {exam.targetYear === 0
+                            ? tr('جميع الفرق', 'All Years')
+                            : formatYear(exam.targetYear)}
                         </span>
                       </div>
                       <div className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] font-mono tabular-nums">
@@ -516,10 +573,10 @@ export function ComprehensiveExamBannerAndModal() {
                         {' · '}
                         {exam.questionsCount} {tr('سؤال', 'questions')}
                         {status === 'pending_grading'
-                          ? ` · ${tr('تم التسليم — في انتظار التصحيح', 'Submitted — Pending Grading')}`
+                          ? ` · ${tr('تم التسليم — في انتظار التصحيح اليدوي', 'Submitted — Pending Grading')}`
                           : status === 'graded'
-                          ? ` · ${tr('تم التصحيح — اضغط لعرض درجتك وأخطائك', 'Graded — View score & mistakes')}`
-                          : ''}
+                          ? ` · ${tr('تم نشر الدرجة في ملفك الشخصي — اضغط للمراجعة', 'Graded — Published in your profile')}`
+                          : ` · ${tr('اضغط هنا للبدء بالحل الآن', 'Click here to start solving now')}`}
                       </div>
                     </div>
                   </div>
@@ -537,7 +594,7 @@ export function ComprehensiveExamBannerAndModal() {
                       </>
                     ) : (
                       <>
-                        <span>{tr('دخول الامتحان الآن', 'Enter Exam Now')}</span>
+                        <span>{tr('ابدأ الامتحان الآن', 'Start Exam Now')}</span>
                         <ArrowRight className={`w-3.5 h-3.5 ${isEn ? '' : 'rotate-180'}`} />
                       </>
                     )}
