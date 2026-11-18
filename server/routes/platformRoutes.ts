@@ -1,9 +1,9 @@
 import crypto from 'crypto';
 import { Router } from 'express';
-import { getUserByToken, requireAuth, requirePermission } from '../auth.ts';
-import type { AuthenticatedRequest } from '../auth.ts';
-import { db, pushNotification } from '../db.ts';
-import type { AnnouncementCountdown } from '../types.ts';
+import { getUserByToken, requireAuth, requirePermission } from '../auth.js';
+import type { AuthenticatedRequest } from '../auth.js';
+import { db, pushNotification } from '../db.js';
+import type { AnnouncementCountdown } from '../types.js';
 
 const router = Router();
 
