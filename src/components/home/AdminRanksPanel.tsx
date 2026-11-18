@@ -601,25 +601,25 @@ export function AdminRanksPanel({
   const supportSlots = Array.from({ length: maxSupportTeamSize }, (_, idx) => idx + 1);
 
   return (
-    <section className="rounded-2xl bg-[#121216] border border-[#D4AF37]/30 p-5 sm:p-6 space-y-6">
+    <section className="rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/30 p-5 sm:p-6 space-y-6">
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-white/10 pb-4">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-black/10 dark:border-white/10 pb-4">
         <div className="flex items-start gap-3">
           <div className="w-11 h-11 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/45 flex items-center justify-center shrink-0">
             <RankIconGlyph icon="crown" color="gold" className="w-5 h-5" />
           </div>
           <div className="space-y-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="font-display text-lg sm:text-xl font-bold text-[#F5F0E6]">
+              <h2 className="font-display text-lg sm:text-xl font-bold text-[#141418] dark:text-[#F5F0E6]">
                 {tr('إدارة فريق الدعم الفني والرتب والمسؤولين', 'Support Team, Ranks & Officials Control')}
               </h2>
-              <span className="text-[11px] font-semibold text-[#E5C158]">
+              <span className="text-[11px] font-semibold text-[#856104] dark:text-[#E5C158]">
                 {canEditRanks
                   ? tr('· صلاحية المدير العام الكاملة', '· Full Super Admin Control')
                   : tr('· تفويض إداري مقيّد', '· Delegated Scope')}
               </span>
             </div>
-            <p className="text-xs text-[#A8A29E] leading-relaxed">
+            <p className="text-xs text-[#5C5850] dark:text-[#A8A29E] leading-relaxed">
               {tr(
                 'اختيار فريق الدعم الفني المكون من 7 أشخاص من مستخدمي المنصة، بجانب إدارة المناصب الإدارية السبعة والمسؤولين وصلاحياتهم.',
                 'Select the 7-person Technical Support Team from registered users, and manage the 7 administrative ranks and permissions.'
@@ -632,7 +632,7 @@ export function AdminRanksPanel({
           <button
             type="button"
             onClick={loadDirectory}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#18181D] border border-white/15 text-xs text-[#C8C2B8] hover:border-[#D4AF37]/50 hover:text-[#E5C158] cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#ECE8DE] dark:bg-[#18181D] border border-black/15 dark:border-white/15 text-xs text-[#3F3D38] dark:text-[#C8C2B8] hover:border-[#D4AF37]/50 hover:text-[#E5C158] cursor-pointer"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             <span>{tr('تحديث', 'Refresh')}</span>
@@ -685,13 +685,13 @@ export function AdminRanksPanel({
 
       {/* Feedback banners */}
       {statusMsg && (
-        <div className="p-3 rounded-xl bg-emerald-950/35 border border-emerald-500/40 text-xs text-emerald-200 flex items-center gap-2">
+        <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/35 border border-emerald-500/40 text-xs text-emerald-800 dark:text-emerald-200 flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span>{statusMsg}</span>
         </div>
       )}
       {errorMsg && (
-        <div className="p-3 rounded-xl bg-red-950/35 border border-red-500/40 text-xs text-red-200">
+        <div className="p-3 rounded-xl bg-red-50 dark:bg-red-950/35 border border-red-500/40 text-xs text-red-700 dark:text-red-200">
           {errorMsg}
         </div>
       )}
@@ -701,13 +701,13 @@ export function AdminRanksPanel({
         <div className="space-y-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="space-y-0.5">
-              <div className="text-sm font-bold text-[#E5C158]">
+              <div className="text-sm font-bold text-[#856104] dark:text-[#E5C158]">
                 {tr(
                   `اختيار أعضاء فريق الدعم الفني (${supportTeam.length} من ${maxSupportTeamSize} مقاعد)`,
                   `Admin-Selected Technical Support Team (${supportTeam.length}/${maxSupportTeamSize} seats)`
                 )}
               </div>
-              <p className="text-xs text-[#A8A29E]">
+              <p className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
                 {tr(
                   'يمكنك اختيار حتى 7 أشخاص من مستخدمي المنصة ليظهروا للطلاب داخل مركز الدعم الفني.',
                   'Pick up to 7 platform users to serve on the Technical Support Team shown to students.'
@@ -738,10 +738,10 @@ export function AdminRanksPanel({
           {showSupportForm && (
             <form
               onSubmit={handleAssignSupportMember}
-              className="p-4 sm:p-5 rounded-2xl bg-[#0D0D10] border border-[#D4AF37]/35 space-y-4"
+              className="p-4 sm:p-5 rounded-2xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-[#D4AF37]/35 space-y-4"
             >
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-[#E5C158]">
+                <h3 className="text-sm font-bold text-[#856104] dark:text-[#E5C158]">
                   {tr(
                     `تعيين عضو في المقعد #${supportSlotNumber} بفريق الدعم الفني`,
                     `Assign User to Support Seat #${supportSlotNumber}`
@@ -750,7 +750,7 @@ export function AdminRanksPanel({
                 <button
                   type="button"
                   onClick={() => setShowSupportForm(false)}
-                  className="text-xs text-[#A8A29E] hover:text-white cursor-pointer"
+                  className="text-xs text-[#5C5850] dark:text-[#A8A29E] hover:text-white cursor-pointer"
                 >
                   {tr('إغلاق', 'Close')}
                 </button>
@@ -758,13 +758,13 @@ export function AdminRanksPanel({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs text-[#C8C2B8] block">
+                  <label className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] block">
                     {tr('رقم المقعد (من 1 إلى 7)', 'Support Slot (1..7)')}
                   </label>
                   <select
                     value={supportSlotNumber}
                     onChange={(e) => setSupportSlotNumber(Number(e.target.value))}
-                    className="w-full px-3 py-2 rounded-xl bg-[#151519] border border-white/15 text-xs text-[#F5F0E6]"
+                    className="w-full px-3 py-2 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs text-[#141418] dark:text-[#F5F0E6]"
                   >
                     {supportSlots.map((slot) => {
                       const occupied = supportTeam.find((m) => m.slotNumber === slot);
@@ -779,7 +779,7 @@ export function AdminRanksPanel({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs text-[#C8C2B8] block">
+                  <label className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] block">
                     {tr('اختر المستخدم من المنصة', 'Select Platform User')}
                   </label>
                   <select
@@ -793,7 +793,7 @@ export function AdminRanksPanel({
                         setSupportDisplayName(found.name);
                       }
                     }}
-                    className="w-full px-3 py-2 rounded-xl bg-[#151519] border border-white/15 text-xs text-[#F5F0E6]"
+                    className="w-full px-3 py-2 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs text-[#141418] dark:text-[#F5F0E6]"
                   >
                     <option value="">{tr('-- اختر المستخدم --', '-- Select User --')}</option>
                     {candidates.map((c) => (
@@ -805,7 +805,7 @@ export function AdminRanksPanel({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs text-[#C8C2B8] block">
+                  <label className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] block">
                     {tr('الاسم الظاهر في الدعم الفني', 'Display Name in Support')}
                   </label>
                   <input
@@ -814,12 +814,12 @@ export function AdminRanksPanel({
                     value={supportDisplayName}
                     onChange={(e) => setSupportDisplayName(e.target.value)}
                     placeholder={tr('مثال: م. سارة — دعم فني', 'e.g. Eng. Sara')}
-                    className="w-full px-3 py-2 rounded-xl bg-[#151519] border border-white/15 text-xs text-[#F5F0E6]"
+                    className="w-full px-3 py-2 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs text-[#141418] dark:text-[#F5F0E6]"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs text-[#C8C2B8] block">
+                  <label className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] block">
                     {tr('رقم WhatsApp الخاص بالتواصل (اختياري الآن)', 'WhatsApp Number (Optional)')}
                   </label>
                   <input
@@ -828,12 +828,12 @@ export function AdminRanksPanel({
                     value={supportWhatsapp}
                     onChange={(e) => setSupportWhatsapp(e.target.value)}
                     placeholder="01012345678"
-                    className="w-full px-3 py-2 rounded-xl bg-[#151519] border border-white/15 text-xs text-[#F5F0E6] font-mono"
+                    className="w-full px-3 py-2 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs text-[#141418] dark:text-[#F5F0E6] font-mono"
                   />
                 </div>
 
                 <div className="space-y-1 sm:col-span-2">
-                  <label className="text-xs text-[#C8C2B8] block">
+                  <label className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] block">
                     {tr('التخصص أو نطاق المساعدة (اختياري)', 'Specialty / Scope (Optional)')}
                   </label>
                   <input
@@ -844,12 +844,12 @@ export function AdminRanksPanel({
                       'مثال: دعم الفرقة الأولى ومشاكل الاختبارات',
                       'e.g. Year 1 support & quiz troubleshooting'
                     )}
-                    className="w-full px-3 py-2 rounded-xl bg-[#151519] border border-white/15 text-xs text-[#F5F0E6]"
+                    className="w-full px-3 py-2 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs text-[#141418] dark:text-[#F5F0E6]"
                   />
                 </div>
               </div>
 
-              <label className="inline-flex items-center gap-2 text-xs text-[#C8C2B8] cursor-pointer">
+              <label className="inline-flex items-center gap-2 text-xs text-[#3F3D38] dark:text-[#C8C2B8] cursor-pointer">
                 <input
                   type="checkbox"
                   checked={supportIsActive}
@@ -884,17 +884,17 @@ export function AdminRanksPanel({
                 return (
                   <div
                     key={slot}
-                    className="p-4 rounded-xl bg-[#0D0D10]/75 border border-dashed border-white/15 flex flex-col justify-between gap-3"
+                    className="p-4 rounded-xl bg-[#EFECE4]/85 dark:bg-[#0D0D10]/75 border border-dashed border-black/15 dark:border-white/15 flex flex-col justify-between gap-3"
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[11px] font-mono tabular-nums text-[#A8A29E]">
+                      <span className="px-2 py-0.5 rounded-md bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-[11px] font-mono tabular-nums text-[#5C5850] dark:text-[#A8A29E]">
                         #{slot}
                       </span>
-                      <span className="text-[11px] text-[#6B665E]">
+                      <span className="text-[11px] text-[#5C5850] dark:text-[#6B665E]">
                         {tr('مقعد شاغر', 'Vacant Seat')}
                       </span>
                     </div>
-                    <p className="text-xs text-[#A8A29E]">
+                    <p className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
                       {tr(
                         `اختر الشخص رقم ${slot} في فريق الدعم الفني.`,
                         `Select support team member #${slot}.`
@@ -903,7 +903,7 @@ export function AdminRanksPanel({
                     <button
                       type="button"
                       onClick={() => openAssignSupportSlot(slot)}
-                      className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-[#18181D] border border-[#D4AF37]/35 text-xs font-semibold text-[#E5C158] hover:bg-[#D4AF37]/15 cursor-pointer"
+                      className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-[#ECE8DE] dark:bg-[#18181D] border border-[#D4AF37]/35 text-xs font-semibold text-[#856104] dark:text-[#E5C158] hover:bg-[#D4AF37]/15 cursor-pointer"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       <span>{tr(`تعيين للمقعد #${slot}`, `Assign Seat #${slot}`)}</span>
@@ -918,20 +918,20 @@ export function AdminRanksPanel({
               return (
                 <div
                   key={member.id}
-                  className="p-4 rounded-xl bg-[#0D0D10] border border-[#D4AF37]/25 space-y-3 flex flex-col justify-between"
+                  className="p-4 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-[#D4AF37]/25 space-y-3 flex flex-col justify-between"
                 >
                   <div className="space-y-2.5">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center gap-2 min-w-0">
-                        <span className="px-2 py-0.5 rounded-md bg-[#D4AF37]/15 border border-[#D4AF37]/35 text-[11px] font-mono tabular-nums text-[#F5D061] font-bold shrink-0">
+                        <span className="px-2 py-0.5 rounded-md bg-[#D4AF37]/15 border border-[#D4AF37]/35 text-[11px] font-mono tabular-nums text-[#735303] dark:text-[#F5D061] font-bold shrink-0">
                           #{member.slotNumber}
                         </span>
                         <div className="min-w-0">
-                          <div className="text-sm font-bold text-[#F5F0E6] truncate">
+                          <div className="text-sm font-bold text-[#141418] dark:text-[#F5F0E6] truncate">
                             {member.displayName}
                           </div>
                           {baseUser && (
-                            <div className="text-[11px] text-[#A8A29E] truncate">
+                            <div className="text-[11px] text-[#5C5850] dark:text-[#A8A29E] truncate">
                               {baseUser.name} · {baseUser.role}
                             </div>
                           )}
@@ -940,7 +940,7 @@ export function AdminRanksPanel({
 
                       <span
                         className={`text-[11px] font-semibold shrink-0 ${
-                          member.isActive ? 'text-emerald-300' : 'text-red-300'
+                          member.isActive ? 'text-emerald-700 dark:text-emerald-300' : 'text-red-700 dark:text-red-300'
                         }`}
                       >
                         {member.isActive ? tr('نشط', 'Active') : tr('متوقف', 'Inactive')}
@@ -948,25 +948,25 @@ export function AdminRanksPanel({
                     </div>
 
                     {member.specialty && (
-                      <p className="text-xs text-[#C8C2B8] leading-snug line-clamp-2">
+                      <p className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] leading-snug line-clamp-2">
                         {member.specialty}
                       </p>
                     )}
 
-                    <div className="flex items-center justify-between gap-2 text-xs bg-[#151519] px-3 py-1.5 rounded-lg border border-white/5">
-                      <span className="text-[#A8A29E] flex items-center gap-1.5">
+                    <div className="flex items-center justify-between gap-2 text-xs bg-[#F5F2EA] dark:bg-[#151519] px-3 py-1.5 rounded-lg border border-black/5 dark:border-white/5">
+                      <span className="text-[#5C5850] dark:text-[#A8A29E] flex items-center gap-1.5">
                         <WhatsAppMark className="w-3.5 h-3.5 shrink-0" />
                         <span>{tr('واتساب:', 'WhatsApp:')}</span>
                       </span>
                       {member.whatsappNumber ? (
-                        <span className="font-mono text-[#F5F0E6] tabular-nums" dir="ltr">
+                        <span className="font-mono text-[#141418] dark:text-[#F5F0E6] tabular-nums" dir="ltr">
                           {member.whatsappNumber}
                         </span>
                       ) : (
                         <button
                           type="button"
                           onClick={() => openEditSupportMember(member)}
-                          className="inline-flex items-center gap-1 text-[11px] font-bold text-[#F5D061] hover:underline cursor-pointer"
+                          className="inline-flex items-center gap-1 text-[11px] font-bold text-[#735303] dark:text-[#F5D061] hover:underline cursor-pointer"
                         >
                           <Plus className="w-3 h-3" />
                           <span>{tr('إضافة رقم', 'Add Number')}</span>
@@ -980,9 +980,9 @@ export function AdminRanksPanel({
                       type="button"
                       disabled={isBusy}
                       onClick={() => openEditSupportMember(member)}
-                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#18181D] border border-white/15 text-[11px] text-[#F5F0E6] hover:border-[#D4AF37]/50 cursor-pointer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#ECE8DE] dark:bg-[#18181D] border border-black/15 dark:border-white/15 text-[11px] text-[#141418] dark:text-[#F5F0E6] hover:border-[#D4AF37]/50 cursor-pointer"
                     >
-                      <Pencil className="w-3 h-3 text-[#D4AF37]" />
+                      <Pencil className="w-3 h-3 text-[#9A7209] dark:text-[#D4AF37]" />
                       <span>{tr('تعديل', 'Edit')}</span>
                     </button>
 
@@ -990,7 +990,7 @@ export function AdminRanksPanel({
                       type="button"
                       disabled={isBusy}
                       onClick={() => handleToggleSupportMemberActive(member)}
-                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#18181D] border border-white/15 text-[11px] text-[#C8C2B8] hover:border-[#D4AF37]/50 cursor-pointer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#ECE8DE] dark:bg-[#18181D] border border-black/15 dark:border-white/15 text-[11px] text-[#3F3D38] dark:text-[#C8C2B8] hover:border-[#D4AF37]/50 cursor-pointer"
                     >
                       {member.isActive ? tr('إيقاف مؤقت', 'Pause') : tr('تنشيط', 'Activate')}
                     </button>
@@ -999,7 +999,7 @@ export function AdminRanksPanel({
                       type="button"
                       disabled={isBusy}
                       onClick={() => handleRemoveSupportMember(member)}
-                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-red-950/35 border border-red-500/35 text-[11px] text-red-200 hover:bg-red-700 hover:text-white cursor-pointer ms-auto"
+                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-red-50 dark:bg-red-950/35 border border-red-500/35 text-[11px] text-red-700 dark:text-red-200 hover:bg-red-700 hover:text-white cursor-pointer ms-auto"
                     >
                       <Trash2 className="w-3 h-3" />
                       <span>{tr('إزالة', 'Remove')}</span>
@@ -1014,7 +1014,7 @@ export function AdminRanksPanel({
         <div className="space-y-5">
           {/* Action bar */}
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="text-xs text-[#A8A29E] tabular-nums">
+            <div className="text-xs text-[#5C5850] dark:text-[#A8A29E] tabular-nums">
               {tr(
                 `عدد المسؤولين المعينين حالياً: ${officials.length} · النشطون في الدعم: ${
                   officials.filter((o) => o.isActive && o.showInSupport).length
@@ -1039,10 +1039,10 @@ export function AdminRanksPanel({
           {showAssignForm && (
             <form
               onSubmit={handleAssignOfficial}
-              className="p-4 sm:p-5 rounded-2xl bg-[#0D0D10] border border-[#D4AF37]/35 space-y-4"
+              className="p-4 sm:p-5 rounded-2xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-[#D4AF37]/35 space-y-4"
             >
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-[#E5C158]">
+                <h3 className="text-sm font-bold text-[#856104] dark:text-[#E5C158]">
                   {tr(
                     'تعيين حساب حقيقي في إحدى الرتب الإدارية',
                     'Assign Existing User to an Administrative Rank'
@@ -1051,7 +1051,7 @@ export function AdminRanksPanel({
                 <button
                   type="button"
                   onClick={() => setShowAssignForm(false)}
-                  className="text-xs text-[#A8A29E] hover:text-white cursor-pointer"
+                  className="text-xs text-[#5C5850] dark:text-[#A8A29E] hover:text-white cursor-pointer"
                 >
                   {tr('إغلاق', 'Close')}
                 </button>
@@ -1059,7 +1059,7 @@ export function AdminRanksPanel({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs text-[#C8C2B8] block">
+                  <label className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] block">
                     {tr('اختر الحساب (مستخدم مسجل بالفعل)', 'Select Registered User')}
                   </label>
                   <select
@@ -1073,7 +1073,7 @@ export function AdminRanksPanel({
                         setAssignDisplayName(found.name);
                       }
                     }}
-                    className="w-full px-3 py-2 rounded-xl bg-[#151519] border border-white/15 text-xs text-[#F5F0E6]"
+                    className="w-full px-3 py-2 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs text-[#141418] dark:text-[#F5F0E6]"
                   >
                     <option value="">{tr('-- اختر المستخدم --', '-- Select User --')}</option>
                     {assignableCandidates.map((c) => (
@@ -1085,14 +1085,14 @@ export function AdminRanksPanel({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs text-[#C8C2B8] block">
+                  <label className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] block">
                     {tr('الرتبة الإدارية', 'Administrative Rank')}
                   </label>
                   <select
                     required
                     value={assignRankId}
                     onChange={(e) => setAssignRankId(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-[#151519] border border-white/15 text-xs text-[#F5F0E6]"
+                    className="w-full px-3 py-2 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs text-[#141418] dark:text-[#F5F0E6]"
                   >
                     {assignableRanks.map((r) => (
                       <option key={r.id} value={r.id}>
@@ -1103,7 +1103,7 @@ export function AdminRanksPanel({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs text-[#C8C2B8] block">
+                  <label className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] block">
                     {tr('الاسم الظاهر في الدعم والإدارة', 'Display Name')}
                   </label>
                   <input
@@ -1112,12 +1112,12 @@ export function AdminRanksPanel({
                     value={assignDisplayName}
                     onChange={(e) => setAssignDisplayName(e.target.value)}
                     placeholder={tr('مثال: م. أحمد — الدعم الفني', 'e.g. Eng. Ahmed')}
-                    className="w-full px-3 py-2 rounded-xl bg-[#151519] border border-white/15 text-xs text-[#F5F0E6]"
+                    className="w-full px-3 py-2 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs text-[#141418] dark:text-[#F5F0E6]"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs text-[#C8C2B8] block">
+                  <label className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] block">
                     {tr('رقم WhatsApp الخاص بالتواصل (اختياري الآن)', 'Private WhatsApp Number (Optional)')}
                   </label>
                   <input
@@ -1126,12 +1126,12 @@ export function AdminRanksPanel({
                     value={assignWhatsapp}
                     onChange={(e) => setAssignWhatsapp(e.target.value)}
                     placeholder="01012345678"
-                    className="w-full px-3 py-2 rounded-xl bg-[#151519] border border-white/15 text-xs text-[#F5F0E6] font-mono"
+                    className="w-full px-3 py-2 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs text-[#141418] dark:text-[#F5F0E6] font-mono"
                   />
                 </div>
 
                 <div className="space-y-1 sm:col-span-2">
-                  <label className="text-xs text-[#C8C2B8] block">
+                  <label className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] block">
                     {tr('وصف مختصر لاختصاصه (اختياري)', 'Department Note (Optional)')}
                   </label>
                   <input
@@ -1142,12 +1142,12 @@ export function AdminRanksPanel({
                       'مثال: استفسارات الفرقة الأولى والثانية وحل مشاكل الدخول',
                       'e.g. Year 1–2 support and login issues'
                     )}
-                    className="w-full px-3 py-2 rounded-xl bg-[#151519] border border-white/15 text-xs text-[#F5F0E6]"
+                    className="w-full px-3 py-2 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs text-[#141418] dark:text-[#F5F0E6]"
                   />
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-5 pt-1 text-xs text-[#C8C2B8]">
+              <div className="flex flex-wrap items-center gap-5 pt-1 text-xs text-[#3F3D38] dark:text-[#C8C2B8]">
                 <label className="inline-flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
@@ -1188,11 +1188,11 @@ export function AdminRanksPanel({
 
           {/* Officials List */}
           {officials.length === 0 ? (
-            <div className="p-8 rounded-2xl bg-[#0D0D10] border border-white/10 text-center space-y-2">
-              <p className="text-sm font-semibold text-[#F5F0E6]">
+            <div className="p-8 rounded-2xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 text-center space-y-2">
+              <p className="text-sm font-semibold text-[#141418] dark:text-[#F5F0E6]">
                 {tr('لم يتم تعيين أي مسؤولين في الرتب بعد', 'No officials assigned to ranks yet')}
               </p>
-              <p className="text-xs text-[#A8A29E] max-w-lg mx-auto">
+              <p className="text-xs text-[#5C5850] dark:text-[#A8A29E] max-w-lg mx-auto">
                 {tr(
                   'حفاظاً على الأمان لم يتم إنشاء أي حسابات وهمية تلقائياً. اضغط "تعيين مسؤول في رتبة" لاختيار مستخدم حقيقي وتحديد رقمه ورتبته.',
                   'For security, no dummy admin accounts were created automatically. Click "Assign Official to Rank" to assign real users.'
@@ -1213,7 +1213,7 @@ export function AdminRanksPanel({
                 return (
                   <div
                     key={official.id}
-                    className="p-4 rounded-xl bg-[#0D0D10] border border-white/10 space-y-3"
+                    className="p-4 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 space-y-3"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-start gap-3 min-w-0">
@@ -1229,14 +1229,14 @@ export function AdminRanksPanel({
                           />
                         </div>
                         <div className="min-w-0 space-y-0.5">
-                          <div className="text-sm font-bold text-[#F5F0E6] truncate">
+                          <div className="text-sm font-bold text-[#141418] dark:text-[#F5F0E6] truncate">
                             {official.displayName}
                           </div>
-                          <div className="text-xs text-[#E5C158] font-medium">
+                          <div className="text-xs text-[#856104] dark:text-[#E5C158] font-medium">
                             {rank?.nameAr || official.rankId}
                           </div>
                           {official.titleNote && (
-                            <p className="text-[11px] text-[#A8A29E] truncate">
+                            <p className="text-[11px] text-[#5C5850] dark:text-[#A8A29E] truncate">
                               {official.titleNote}
                             </p>
                           )}
@@ -1246,12 +1246,12 @@ export function AdminRanksPanel({
                       <div className="text-end text-[11px] space-y-1 shrink-0">
                         <div
                           className={
-                            official.isActive ? 'text-emerald-300 font-semibold' : 'text-red-300'
+                            official.isActive ? 'text-emerald-700 dark:text-emerald-300 font-semibold' : 'text-red-700 dark:text-red-300'
                           }
                         >
                           {official.isActive ? tr('نشط', 'Active') : tr('متوقف', 'Inactive')}
                         </div>
-                        <div className="text-[#A8A29E]">
+                        <div className="text-[#5C5850] dark:text-[#A8A29E]">
                           {official.showInSupport
                             ? tr('ظاهر بالدعم', 'Visible in Support')
                             : tr('مخفي من الدعم', 'Hidden from Support')}
@@ -1259,12 +1259,12 @@ export function AdminRanksPanel({
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between gap-2 text-xs bg-[#151519] px-3 py-2 rounded-lg border border-white/5">
-                      <span className="text-[#A8A29E] flex items-center gap-1.5">
-                        <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
+                    <div className="flex items-center justify-between gap-2 text-xs bg-[#F5F2EA] dark:bg-[#151519] px-3 py-2 rounded-lg border border-black/5 dark:border-white/5">
+                      <span className="text-[#5C5850] dark:text-[#A8A29E] flex items-center gap-1.5">
+                        <MessageCircle className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                         <span>{tr('واتساب التواصل:', 'WhatsApp:')}</span>
                       </span>
-                      <span className="font-mono text-[#F5F0E6] tabular-nums" dir="ltr">
+                      <span className="font-mono text-[#141418] dark:text-[#F5F0E6] tabular-nums" dir="ltr">
                         {official.whatsappNumber}
                       </span>
                     </div>
@@ -1275,9 +1275,9 @@ export function AdminRanksPanel({
                           type="button"
                           disabled={isBusy}
                           onClick={() => openEditOfficial(official)}
-                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#18181D] border border-white/15 text-[11px] text-[#F5F0E6] hover:border-[#D4AF37]/50 cursor-pointer"
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#ECE8DE] dark:bg-[#18181D] border border-black/15 dark:border-white/15 text-[11px] text-[#141418] dark:text-[#F5F0E6] hover:border-[#D4AF37]/50 cursor-pointer"
                         >
-                          <Pencil className="w-3.5 h-3.5 text-[#D4AF37]" />
+                          <Pencil className="w-3.5 h-3.5 text-[#9A7209] dark:text-[#D4AF37]" />
                           <span>{tr('تعديل / نقل قسم', 'Edit / Transfer')}</span>
                         </button>
 
@@ -1289,16 +1289,16 @@ export function AdminRanksPanel({
                               showInSupport: !official.showInSupport,
                             })
                           }
-                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#18181D] border border-white/15 text-[11px] text-[#C8C2B8] hover:border-[#D4AF37]/50 cursor-pointer"
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#ECE8DE] dark:bg-[#18181D] border border-black/15 dark:border-white/15 text-[11px] text-[#3F3D38] dark:text-[#C8C2B8] hover:border-[#D4AF37]/50 cursor-pointer"
                         >
                           {official.showInSupport ? (
                             <>
-                              <EyeOff className="w-3.5 h-3.5 text-amber-300" />
+                              <EyeOff className="w-3.5 h-3.5 text-amber-800 dark:text-amber-300" />
                               <span>{tr('إخفاء من الدعم', 'Hide from Support')}</span>
                             </>
                           ) : (
                             <>
-                              <Eye className="w-3.5 h-3.5 text-emerald-300" />
+                              <Eye className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-300" />
                               <span>{tr('تفعيل بالدعم', 'Show in Support')}</span>
                             </>
                           )}
@@ -1310,7 +1310,7 @@ export function AdminRanksPanel({
                           onClick={() =>
                             handleQuickToggle(official, { isActive: !official.isActive })
                           }
-                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#18181D] border border-white/15 text-[11px] text-[#C8C2B8] hover:border-[#D4AF37]/50 cursor-pointer"
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#ECE8DE] dark:bg-[#18181D] border border-black/15 dark:border-white/15 text-[11px] text-[#3F3D38] dark:text-[#C8C2B8] hover:border-[#D4AF37]/50 cursor-pointer"
                         >
                           <span>
                             {official.isActive
@@ -1324,7 +1324,7 @@ export function AdminRanksPanel({
                             type="button"
                             disabled={isBusy}
                             onClick={() => handleRemoveOfficial(official)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-red-950/35 border border-red-500/35 text-[11px] text-red-200 hover:bg-red-700 hover:text-white cursor-pointer ms-auto"
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-red-50 dark:bg-red-950/35 border border-red-500/35 text-[11px] text-red-700 dark:text-red-200 hover:bg-red-700 hover:text-white cursor-pointer ms-auto"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                             <span>{tr('إزالة', 'Remove')}</span>
@@ -1343,7 +1343,7 @@ export function AdminRanksPanel({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
           {/* 7 Ranks Selector */}
           <div className="lg:col-span-5 space-y-2">
-            <div className="text-xs font-semibold text-[#C8C2B8] mb-1">
+            <div className="text-xs font-semibold text-[#3F3D38] dark:text-[#C8C2B8] mb-1">
               {tr('المناصب الإدارية السبعة', 'The 7 Administrative Ranks')}
             </div>
             {ranks.map((r) => {
@@ -1356,8 +1356,8 @@ export function AdminRanksPanel({
                   onClick={() => setSelectedRankId(r.id)}
                   className={`w-full text-start p-3 rounded-xl border transition-colors flex items-center justify-between gap-3 cursor-pointer ${
                     isSelected
-                      ? 'bg-[#1A1812] border-[#D4AF37]/70 text-[#F5F0E6]'
-                      : 'bg-[#0D0D10] border-white/10 text-[#C8C2B8] hover:border-[#D4AF37]/35'
+                      ? 'bg-[#FAF6EA] dark:bg-[#1A1812] border-[#D4AF37]/70 text-[#141418] dark:text-[#F5F0E6]'
+                      : 'bg-[#EFECE4] dark:bg-[#0D0D10] border-black/10 dark:border-white/10 text-[#3F3D38] dark:text-[#C8C2B8] hover:border-[#D4AF37]/35'
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
@@ -1376,12 +1376,12 @@ export function AdminRanksPanel({
                       <div className="text-xs sm:text-sm font-bold truncate flex flex-wrap items-center gap-1.5">
                         <span>{r.displayOrder}. {r.nameAr}</span>
                         {r.isSuperAdminRank && (
-                          <span className="px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-400/45 text-[10px] font-bold text-amber-200">
+                          <span className="px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-400/45 text-[10px] font-bold text-amber-800 dark:text-amber-200">
                             {tr('ليدر المنصة · للضرورة', 'Leader · Urgent')}
                           </span>
                         )}
                       </div>
-                      <div className="text-[11px] text-[#A8A29E] tabular-nums">
+                      <div className="text-[11px] text-[#5C5850] dark:text-[#A8A29E] tabular-nums">
                         {tr(
                           `${assignedCount} مسؤول · ${r.permissions.length} صلاحيات`,
                           `${assignedCount} officials · ${r.permissions.length} perms`
@@ -1390,7 +1390,7 @@ export function AdminRanksPanel({
                     </div>
                   </div>
                   {r.isSuperAdminRank && (
-                    <Lock className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                    <Lock className="w-3.5 h-3.5 text-[#9A7209] dark:text-[#D4AF37] shrink-0" />
                   )}
                 </button>
               );
@@ -1400,9 +1400,9 @@ export function AdminRanksPanel({
           {/* Selected Rank Editor & Permissions Matrix */}
           <form
             onSubmit={handleSaveRank}
-            className="lg:col-span-7 rounded-2xl bg-[#0D0D10] border border-white/10 p-4 sm:p-5 space-y-4"
+            className="lg:col-span-7 rounded-2xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 p-4 sm:p-5 space-y-4"
           >
-            <div className="flex items-center justify-between gap-3 border-b border-white/10 pb-3">
+            <div className="flex items-center justify-between gap-3 border-b border-black/10 dark:border-white/10 pb-3">
               <div className="flex items-center gap-2.5">
                 <div
                   className={`w-9 h-9 rounded-lg border flex items-center justify-center ${getRankIconBoxClass(
@@ -1412,8 +1412,8 @@ export function AdminRanksPanel({
                   <RankIconGlyph icon={rankIcon} color={rankColor} className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-[#F5F0E6]">{rankNameAr}</h3>
-                  <p className="text-[11px] text-[#A8A29E]">
+                  <h3 className="text-sm font-bold text-[#141418] dark:text-[#F5F0E6]">{rankNameAr}</h3>
+                  <p className="text-[11px] text-[#5C5850] dark:text-[#A8A29E]">
                     {canEditRanks
                       ? tr('يمكنك تعديل اسم الرتبة وعلامتها وصلاحياتها.', 'Editable by Super Admin.')
                       : tr(
@@ -1427,7 +1427,7 @@ export function AdminRanksPanel({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="text-xs text-[#C8C2B8] block">
+                <label className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] block">
                   {tr('اسم الرتبة (عربي)', 'Rank Title (Arabic)')}
                 </label>
                 <input
@@ -1435,12 +1435,12 @@ export function AdminRanksPanel({
                   disabled={!canEditRanks}
                   value={rankNameAr}
                   onChange={(e) => setRankNameAr(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#151519] border border-white/15 text-xs text-[#F5F0E6] disabled:opacity-60"
+                  className="w-full px-3 py-2 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs text-[#141418] dark:text-[#F5F0E6] disabled:opacity-60"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs text-[#C8C2B8] block">
+                <label className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] block">
                   {tr('اسم الرتبة (إنجليزي)', 'Rank Title (English)')}
                 </label>
                 <input
@@ -1448,19 +1448,19 @@ export function AdminRanksPanel({
                   disabled={!canEditRanks}
                   value={rankNameEn}
                   onChange={(e) => setRankNameEn(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#151519] border border-white/15 text-xs text-[#F5F0E6] disabled:opacity-60"
+                  className="w-full px-3 py-2 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs text-[#141418] dark:text-[#F5F0E6] disabled:opacity-60"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs text-[#C8C2B8] block">
+                <label className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] block">
                   {tr('العلامة / الأيقونة المميزة', 'Rank Emblem Icon')}
                 </label>
                 <select
                   disabled={!canEditRanks}
                   value={rankIcon}
                   onChange={(e) => setRankIcon(e.target.value as AdminRankIcon)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#151519] border border-white/15 text-xs text-[#F5F0E6] disabled:opacity-60"
+                  className="w-full px-3 py-2 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs text-[#141418] dark:text-[#F5F0E6] disabled:opacity-60"
                 >
                   {BADGE_ICON_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>
@@ -1471,14 +1471,14 @@ export function AdminRanksPanel({
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs text-[#C8C2B8] block">
+                <label className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] block">
                   {tr('لون الشارة المميزة', 'Badge Accent Color')}
                 </label>
                 <select
                   disabled={!canEditRanks}
                   value={rankColor}
                   onChange={(e) => setRankColor(e.target.value as AdminRankColor)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#151519] border border-white/15 text-xs text-[#F5F0E6] disabled:opacity-60"
+                  className="w-full px-3 py-2 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs text-[#141418] dark:text-[#F5F0E6] disabled:opacity-60"
                 >
                   {BADGE_COLOR_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>
@@ -1489,7 +1489,7 @@ export function AdminRanksPanel({
               </div>
 
               <div className="space-y-1 sm:col-span-2">
-                <label className="text-xs text-[#C8C2B8] block">
+                <label className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] block">
                   {tr('وصف مهام الرتبة', 'Rank Description')}
                 </label>
                 <input
@@ -1497,12 +1497,12 @@ export function AdminRanksPanel({
                   disabled={!canEditRanks}
                   value={rankDesc}
                   onChange={(e) => setRankDesc(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#151519] border border-white/15 text-xs text-[#F5F0E6] disabled:opacity-60"
+                  className="w-full px-3 py-2 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs text-[#141418] dark:text-[#F5F0E6] disabled:opacity-60"
                 />
               </div>
             </div>
 
-            <label className="inline-flex items-center gap-2 text-xs text-[#C8C2B8] cursor-pointer">
+            <label className="inline-flex items-center gap-2 text-xs text-[#3F3D38] dark:text-[#C8C2B8] cursor-pointer">
               <input
                 type="checkbox"
                 disabled={!canEditRanks}
@@ -1518,8 +1518,8 @@ export function AdminRanksPanel({
               </span>
             </label>
 
-            <div className="space-y-2 pt-2 border-t border-white/10">
-              <div className="text-xs font-bold text-[#E5C158]">
+            <div className="space-y-2 pt-2 border-t border-black/10 dark:border-white/10">
+              <div className="text-xs font-bold text-[#856104] dark:text-[#E5C158]">
                 {tr('صلاحيات هذه الرتبة المستقلة:', 'Independent Rank Permissions:')}
               </div>
 
@@ -1538,15 +1538,15 @@ export function AdminRanksPanel({
                       onClick={() => togglePermission(perm.key)}
                       className={`w-full text-start p-2.5 rounded-xl border transition-colors flex items-start gap-3 ${
                         checked
-                          ? 'bg-[#191711] border-[#D4AF37]/50 text-[#F5F0E6]'
-                          : 'bg-[#141418] border-white/10 text-[#A8A29E]'
+                          ? 'bg-[#FAF6EA] dark:bg-[#191711] border-[#D4AF37]/50 text-[#141418] dark:text-[#F5F0E6]'
+                          : 'bg-[#F5F2EA] dark:bg-[#141418] border-black/10 dark:border-white/10 text-[#5C5850] dark:text-[#A8A29E]'
                       } ${disabled ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer hover:border-[#D4AF37]/40'}`}
                     >
                       <span
                         className={`mt-0.5 w-4 h-4 rounded border flex items-center justify-center shrink-0 ${
                           checked
                             ? 'bg-[#D4AF37] border-[#D4AF37] text-[#09090B]'
-                            : 'border-white/25 bg-transparent'
+                            : 'border-black/20 dark:border-white/25 bg-transparent'
                         }`}
                       >
                         {checked && <Check className="w-3 h-3" />}
@@ -1555,12 +1555,12 @@ export function AdminRanksPanel({
                         <div className="text-xs font-semibold">
                           {perm.labelAr}{' '}
                           {perm.superAdminOnly && (
-                            <span className="text-[10px] text-[#D4AF37]">
+                            <span className="text-[10px] text-[#9A7209] dark:text-[#D4AF37]">
                               {tr('(حصري للمدير العام)', '(Super Admin Only)')}
                             </span>
                           )}
                         </div>
-                        <div className="text-[11px] text-[#A8A29E]">{perm.descriptionAr}</div>
+                        <div className="text-[11px] text-[#5C5850] dark:text-[#A8A29E]">{perm.descriptionAr}</div>
                       </div>
                     </button>
                   );
@@ -1591,12 +1591,12 @@ export function AdminRanksPanel({
       {activeTab === 'activationPassword' && canEditRanks && (
         <form
           onSubmit={handleSaveActivationPassword}
-          className="p-4 sm:p-5 rounded-2xl bg-[#0D0D10] border border-[#D4AF37]/35 space-y-4"
+          className="p-4 sm:p-5 rounded-2xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-[#D4AF37]/35 space-y-4"
         >
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-black/10 dark:border-white/10 pb-3">
             <div className="flex items-center gap-2">
-              <KeyRound className="w-4 h-4 text-[#D4AF37]" />
-              <h3 className="text-sm font-bold text-[#E5C158]">
+              <KeyRound className="w-4 h-4 text-[#9A7209] dark:text-[#D4AF37]" />
+              <h3 className="text-sm font-bold text-[#856104] dark:text-[#E5C158]">
                 {tr(
                   'تعيين باسورد تفعيل صلاحية الأدمن (حصري لمدير المنصة العام)',
                   'Custom Admin Activation Password (Super Admin Only)'
@@ -1605,7 +1605,7 @@ export function AdminRanksPanel({
             </div>
             <span
               className={`text-xs font-semibold ${
-                activationConfigured ? 'text-emerald-300' : 'text-amber-300'
+                activationConfigured ? 'text-emerald-700 dark:text-emerald-300' : 'text-amber-800 dark:text-amber-300'
               }`}
             >
               {activationConfigured
@@ -1614,7 +1614,7 @@ export function AdminRanksPanel({
             </span>
           </div>
 
-          <p className="text-xs text-[#A8A29E] leading-relaxed">
+          <p className="text-xs text-[#5C5850] dark:text-[#A8A29E] leading-relaxed">
             {tr(
               'اكتب كلمة السر التي تتيح لمن تعطيها له تفعيل صلاحية الأدمن من نافذة حسابي أو أثناء التسجيل. يتم حفظها مشفرة على الخادم ولا يراها أي مستخدم أو أدمن آخر.',
               'Define a custom activation password that allows recipients to unlock delegated Admin privileges from their Account modal or registration. Stored securely hashed on the server.'
@@ -1623,7 +1623,7 @@ export function AdminRanksPanel({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div className="space-y-1.5">
-              <label className="text-xs text-[#C8C2B8] block">
+              <label className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] block">
                 {activationConfigured
                   ? tr(
                       'كلمة سر تفعيل جديدة (اتركها فارغة لتعديل الرتبة فقط)',
@@ -1635,13 +1635,13 @@ export function AdminRanksPanel({
                 value={activationPassInput}
                 onChange={(e) => setActivationPassInput(e.target.value)}
                 placeholder={tr('اكتب كلمة سر التفعيل...', 'Enter activation password...')}
-                startIcon={<Lock className="w-4 h-4 text-[#D4AF37]" />}
-                className="w-full py-2.5 rounded-xl bg-[#151519] border border-white/15 text-xs sm:text-sm text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
+                startIcon={<Lock className="w-4 h-4 text-[#9A7209] dark:text-[#D4AF37]" />}
+                className="w-full py-2.5 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs sm:text-sm text-[#141418] dark:text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs text-[#C8C2B8] block">
+              <label className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] block">
                 {tr(
                   'الرتبة الإدارية الممنوحة عند التفعيل بهذه الكلمة',
                   'Default Rank Assigned Upon Activation'
@@ -1650,7 +1650,7 @@ export function AdminRanksPanel({
               <select
                 value={activationDefaultRankId}
                 onChange={(e) => setActivationDefaultRankId(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-[#151519] border border-white/15 text-xs sm:text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+                className="w-full px-3 py-2.5 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs sm:text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
               >
                 {ranks
                   .filter((r) => !r.isSuperAdminRank && r.id !== 'rank-super-admin')
@@ -1664,7 +1664,7 @@ export function AdminRanksPanel({
           </div>
 
           {activationUpdatedAt && (
-            <div className="text-[11px] font-mono text-[#A8A29E] tabular-nums">
+            <div className="text-[11px] font-mono text-[#5C5850] dark:text-[#A8A29E] tabular-nums">
               {tr('آخر تحديث:', 'Last updated:')}{' '}
               {new Date(activationUpdatedAt).toLocaleString()}
             </div>
@@ -1676,7 +1676,7 @@ export function AdminRanksPanel({
                 type="button"
                 disabled={savingActivationPass}
                 onClick={handleClearActivationPassword}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-950/40 border border-red-500/40 text-xs font-semibold text-red-200 hover:bg-red-700 hover:text-white cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-500/40 text-xs font-semibold text-red-700 dark:text-red-200 hover:bg-red-700 hover:text-white cursor-pointer"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 <span>{tr('مسح وإيقاف التفعيل', 'Clear Password')}</span>
@@ -1707,19 +1707,19 @@ export function AdminRanksPanel({
         >
           <form
             onSubmit={handleSaveSupportEdit}
-            className="w-full max-w-lg rounded-2xl bg-[#121216] border border-[#D4AF37]/40 p-5 sm:p-6 space-y-4 shadow-2xl"
+            className="w-full max-w-lg rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/40 p-5 sm:p-6 space-y-4 shadow-2xl"
           >
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+            <div className="flex items-center justify-between border-b border-black/10 dark:border-white/10 pb-3">
               <div className="flex items-center gap-2">
-                <Headset className="w-4 h-4 text-[#D4AF37]" />
-                <h3 className="text-base font-bold text-[#F5F0E6]">
+                <Headset className="w-4 h-4 text-[#9A7209] dark:text-[#D4AF37]" />
+                <h3 className="text-base font-bold text-[#141418] dark:text-[#F5F0E6]">
                   {tr('تعديل بيانات عضو الدعم الفني', 'Edit Support Team Member')}
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setEditingSupportMember(null)}
-                className="text-[#A8A29E] hover:text-white cursor-pointer"
+                className="text-[#5C5850] dark:text-[#A8A29E] hover:text-white cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1727,13 +1727,13 @@ export function AdminRanksPanel({
 
             <div className="space-y-3">
               <div className="space-y-1">
-                <label className="text-xs text-[#C8C2B8] block">
+                <label className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] block">
                   {tr('المقعد في فريق الدعم (1 إلى 7)', 'Support Seat (1..7)')}
                 </label>
                 <select
                   value={editSupportSlot}
                   onChange={(e) => setEditSupportSlot(Number(e.target.value))}
-                  className="w-full px-3 py-2 rounded-xl bg-[#151519] border border-white/15 text-xs text-[#F5F0E6]"
+                  className="w-full px-3 py-2 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs text-[#141418] dark:text-[#F5F0E6]"
                 >
                   {supportSlots.map((slot) => {
                     const occupant = supportTeam.find(
@@ -1750,7 +1750,7 @@ export function AdminRanksPanel({
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs text-[#C8C2B8] block">
+                <label className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] block">
                   {tr('الاسم الظاهر', 'Display Name')}
                 </label>
                 <input
@@ -1758,24 +1758,24 @@ export function AdminRanksPanel({
                   required
                   value={editSupportDisplayName}
                   onChange={(e) => setEditSupportDisplayName(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#151519] border border-white/15 text-xs text-[#F5F0E6]"
+                  className="w-full px-3 py-2 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs text-[#141418] dark:text-[#F5F0E6]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs text-[#C8C2B8] block">
+                <label className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] block">
                   {tr('التخصص أو نطاق المساعدة', 'Specialty / Scope')}
                 </label>
                 <input
                   type="text"
                   value={editSupportSpecialty}
                   onChange={(e) => setEditSupportSpecialty(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#151519] border border-white/15 text-xs text-[#F5F0E6]"
+                  className="w-full px-3 py-2 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs text-[#141418] dark:text-[#F5F0E6]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs text-[#C8C2B8] block">
+                <label className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] block">
                   {tr(
                     'رقم WhatsApp (اتركه فارغاً للإبقاء على الرقم الحالي)',
                     'WhatsApp Number (leave empty to keep current)'
@@ -1787,11 +1787,11 @@ export function AdminRanksPanel({
                   value={editSupportWhatsapp}
                   onChange={(e) => setEditSupportWhatsapp(e.target.value)}
                   placeholder="01012345678"
-                  className="w-full px-3 py-2 rounded-xl bg-[#151519] border border-white/15 text-xs text-[#F5F0E6] font-mono"
+                  className="w-full px-3 py-2 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs text-[#141418] dark:text-[#F5F0E6] font-mono"
                 />
               </div>
 
-              <label className="inline-flex items-center gap-2 text-xs text-[#C8C2B8] cursor-pointer pt-1">
+              <label className="inline-flex items-center gap-2 text-xs text-[#3F3D38] dark:text-[#C8C2B8] cursor-pointer pt-1">
                 <input
                   type="checkbox"
                   checked={editSupportActive}
@@ -1806,7 +1806,7 @@ export function AdminRanksPanel({
               <button
                 type="button"
                 onClick={() => setEditingSupportMember(null)}
-                className="px-4 py-2 rounded-xl bg-[#18181D] border border-white/15 text-xs text-[#C8C2B8] cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-[#ECE8DE] dark:bg-[#18181D] border border-black/15 dark:border-white/15 text-xs text-[#3F3D38] dark:text-[#C8C2B8] cursor-pointer"
               >
                 {tr('إلغاء', 'Cancel')}
               </button>
@@ -1832,19 +1832,19 @@ export function AdminRanksPanel({
         >
           <form
             onSubmit={handleSaveOfficialEdit}
-            className="w-full max-w-lg rounded-2xl bg-[#121216] border border-[#D4AF37]/40 p-5 sm:p-6 space-y-4 shadow-2xl"
+            className="w-full max-w-lg rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/40 p-5 sm:p-6 space-y-4 shadow-2xl"
           >
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+            <div className="flex items-center justify-between border-b border-black/10 dark:border-white/10 pb-3">
               <div className="flex items-center gap-2">
-                <ArrowRightLeft className="w-4 h-4 text-[#D4AF37]" />
-                <h3 className="text-base font-bold text-[#F5F0E6]">
+                <ArrowRightLeft className="w-4 h-4 text-[#9A7209] dark:text-[#D4AF37]" />
+                <h3 className="text-base font-bold text-[#141418] dark:text-[#F5F0E6]">
                   {tr('تعديل أو نقل المسؤول بين الأقسام', 'Edit or Transfer Official')}
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setEditingOfficial(null)}
-                className="text-[#A8A29E] hover:text-white cursor-pointer"
+                className="text-[#5C5850] dark:text-[#A8A29E] hover:text-white cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1852,13 +1852,13 @@ export function AdminRanksPanel({
 
             <div className="space-y-3">
               <div className="space-y-1">
-                <label className="text-xs text-[#C8C2B8] block">
+                <label className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] block">
                   {tr('نقل إلى رتبة / قسم:', 'Transfer to Rank / Department:')}
                 </label>
                 <select
                   value={editRankId}
                   onChange={(e) => setEditRankId(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#151519] border border-white/15 text-xs text-[#F5F0E6]"
+                  className="w-full px-3 py-2 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs text-[#141418] dark:text-[#F5F0E6]"
                 >
                   {assignableRanks.map((r) => (
                     <option key={r.id} value={r.id}>
@@ -1869,7 +1869,7 @@ export function AdminRanksPanel({
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs text-[#C8C2B8] block">
+                <label className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] block">
                   {tr('الاسم الظاهر', 'Display Name')}
                 </label>
                 <input
@@ -1877,12 +1877,12 @@ export function AdminRanksPanel({
                   required
                   value={editDisplayName}
                   onChange={(e) => setEditDisplayName(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#151519] border border-white/15 text-xs text-[#F5F0E6]"
+                  className="w-full px-3 py-2 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs text-[#141418] dark:text-[#F5F0E6]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs text-[#C8C2B8] block">
+                <label className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] block">
                   {tr(
                     'رقم WhatsApp (اتركه فارغاً للإبقاء على الرقم الحالي)',
                     'WhatsApp Number (leave empty to keep current)'
@@ -1894,23 +1894,23 @@ export function AdminRanksPanel({
                   value={editWhatsapp}
                   onChange={(e) => setEditWhatsapp(e.target.value)}
                   placeholder="01012345678"
-                  className="w-full px-3 py-2 rounded-xl bg-[#151519] border border-white/15 text-xs text-[#F5F0E6] font-mono"
+                  className="w-full px-3 py-2 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs text-[#141418] dark:text-[#F5F0E6] font-mono"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs text-[#C8C2B8] block">
+                <label className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] block">
                   {tr('ملاحظة القسم (اختياري)', 'Department Note')}
                 </label>
                 <input
                   type="text"
                   value={editNote}
                   onChange={(e) => setEditNote(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#151519] border border-white/15 text-xs text-[#F5F0E6]"
+                  className="w-full px-3 py-2 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs text-[#141418] dark:text-[#F5F0E6]"
                 />
               </div>
 
-              <div className="flex flex-wrap items-center gap-5 pt-1 text-xs text-[#C8C2B8]">
+              <div className="flex flex-wrap items-center gap-5 pt-1 text-xs text-[#3F3D38] dark:text-[#C8C2B8]">
                 <label className="inline-flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
@@ -1937,7 +1937,7 @@ export function AdminRanksPanel({
               <button
                 type="button"
                 onClick={() => setEditingOfficial(null)}
-                className="px-4 py-2 rounded-xl bg-[#18181D] border border-white/15 text-xs text-[#C8C2B8] cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-[#ECE8DE] dark:bg-[#18181D] border border-black/15 dark:border-white/15 text-xs text-[#3F3D38] dark:text-[#C8C2B8] cursor-pointer"
               >
                 {tr('إلغاء', 'Cancel')}
               </button>

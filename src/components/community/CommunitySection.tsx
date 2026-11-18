@@ -17,10 +17,10 @@ export function CommunitySection() {
     <div className="space-y-6">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="font-display text-2xl sm:text-3xl font-bold text-[#F5F0E6]">
+          <h1 className="font-display text-2xl sm:text-3xl font-bold text-[#141418] dark:text-[#F5F0E6]">
             {tr('مجتمع MAVIA (Community)', 'MAVIA Community Hub')}
           </h1>
-          <p className="text-sm text-[#A8A29E]">
+          <p className="text-sm text-[#5C5850] dark:text-[#A8A29E]">
             {tr(
               'تواصل مباشرة مع دفعتك داخل المنصة، انضم لجروبات الدفعات، أرسل تذكرة دعم فني، أو تحدث مع مساعد الذكاء الاصطناعي للتعرف على المنصة',
               'Chat live with your batch inside MAVIA, join official groups, open support tickets, or ask the AI Guide about the platform'
@@ -29,7 +29,7 @@ export function CommunitySection() {
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 p-2 rounded-2xl bg-[#121216] border border-white/10 w-fit">
+      <div className="flex flex-wrap items-center gap-2 p-2 rounded-2xl bg-white dark:bg-[#121216] border border-black/10 dark:border-white/10 w-fit">
         <GoldChip
           active={activeTab === 'chat'}
           layoutId="community-subtab"
@@ -67,7 +67,7 @@ export function CommunitySection() {
         </GoldChip>
       </div>
 
-      <section className="rounded-2xl bg-[#121216] border border-white/10 p-5 sm:p-6">
+      <section className="rounded-2xl bg-white dark:bg-[#121216] border border-black/10 dark:border-white/10 p-5 sm:p-6">
         {activeTab === 'chat' && <BatchChatTab />}
         {activeTab === 'groups' && <GroupLinksTab />}
         {activeTab === 'support' && <SupportTicketsTab />}

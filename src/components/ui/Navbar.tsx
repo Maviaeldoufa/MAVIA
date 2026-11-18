@@ -1,8 +1,18 @@
-import { Languages, LayoutDashboard, LogOut, ShieldCheck, Trophy, UserCog } from 'lucide-react';
+import {
+  Languages,
+  LayoutDashboard,
+  LogOut,
+  Moon,
+  ShieldCheck,
+  Sun,
+  Trophy,
+  UserCog,
+} from 'lucide-react';
 import { motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
 import type { NavSection } from '../../types';
 import { AccountModal } from './AccountModal';
 import { HonorBoardModal } from './HonorBoardModal';
@@ -19,6 +29,7 @@ interface NavbarProps {
 export function Navbar({ activeSection, onChangeSection }: NavbarProps) {
   const { user, logout } = useAuth();
   const { lang, toggleLang, tr } = useLanguage();
+  const { isLight, toggleTheme } = useTheme();
   const [honorBoardOpen, setHonorBoardOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [profileDashboardOpen, setProfileDashboardOpen] = useState(false);
@@ -52,7 +63,7 @@ export function Navbar({ activeSection, onChangeSection }: NavbarProps) {
 
   return (
     <>
-    <header className="sticky top-0 z-40 border-b border-[#D4AF37]/20 bg-[#09090B]/95 backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b border-black/10 dark:border-[#D4AF37]/20 bg-white/95 dark:bg-[#09090B]/95 backdrop-blur-md transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 h-16 flex items-center justify-between gap-2 sm:gap-4">
         {/* Zone 1: Custom M with Engineer Hard Hat + MVIA Wordmark */}
         <button
@@ -82,7 +93,7 @@ export function Navbar({ activeSection, onChangeSection }: NavbarProps) {
                 className={`relative px-3.5 py-2 rounded-lg text-sm font-semibold whitespace-nowrap shrink-0 cursor-pointer transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] ${
                   isActive
                     ? 'text-[#09090B]'
-                    : 'text-[#C8C2B8] hover:text-[#F5D061]'
+                    : 'text-[#3F3D38] dark:text-[#C8C2B8] hover:text-[#856104] dark:hover:text-[#F5D061]'
                 }`}
               >
                 {isActive && (
@@ -98,7 +109,7 @@ export function Navbar({ activeSection, onChangeSection }: NavbarProps) {
           })}
         </nav>
 
-        {/* Zone 3: Student Profile & Level Dashboard + Terms + Language + Notifications + User + Logout */}
+        {/* Zone 3: Dashboard + Honor Board + Theme Toggle + Language + Notifications + User + Logout */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {user && (
             <button
@@ -106,7 +117,7 @@ export function Navbar({ activeSection, onChangeSection }: NavbarProps) {
               onClick={() => setProfileDashboardOpen(true)}
               title={tr('لوحة التحكم — بيانات الطالب ومستواه', 'Dashboard — Student Profile & Level')}
               aria-label={tr('لوحة التحكم', 'Student Dashboard')}
-              className="inline-flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-xs font-semibold border border-[#D4AF37]/45 bg-[#D4AF37]/15 text-[#F5D061] hover:bg-[#D4AF37] hover:text-[#09090B] hover:shadow-[0_0_18px_rgba(212,175,55,0.45)] transition-all whitespace-nowrap shrink-0 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-xs font-semibold border border-[#D4AF37]/50 dark:border-[#D4AF37]/45 bg-[#D4AF37]/15 text-[#735303] dark:text-[#F5D061] hover:bg-[#D4AF37] hover:text-[#09090B] hover:shadow-[0_0_18px_rgba(212,175,55,0.45)] transition-all whitespace-nowrap shrink-0 cursor-pointer"
             >
               <LayoutDashboard className="w-3.5 h-3.5 shrink-0" />
               <span className="hidden sm:inline">{tr('لوحة التحكم', 'Dashboard')}</span>
@@ -118,7 +129,7 @@ export function Navbar({ activeSection, onChangeSection }: NavbarProps) {
             onClick={() => setHonorBoardOpen(true)}
             title={tr('لوحة الشرف — ترتيب جميع المسجلين', 'Honor Board — All Rankings')}
             aria-label={tr('لوحة الشرف', 'Honor Board')}
-            className="inline-flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-xs font-semibold border border-[#D4AF37]/35 bg-[#151519] text-[#E5C158] hover:bg-[#D4AF37] hover:text-[#09090B] transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-xs font-semibold border border-[#D4AF37]/40 dark:border-[#D4AF37]/35 bg-[#F5F2EA] dark:bg-[#151519] text-[#735303] dark:text-[#E5C158] hover:bg-[#D4AF37] hover:text-[#09090B] transition-colors whitespace-nowrap shrink-0 cursor-pointer"
           >
             <Trophy className="w-3.5 h-3.5 shrink-0" />
             <span className="hidden md:inline">{tr('لوحة الشرف', 'Honor Board')}</span>
@@ -126,10 +137,40 @@ export function Navbar({ activeSection, onChangeSection }: NavbarProps) {
 
           <motion.button
             type="button"
+            onClick={toggleTheme}
+            whileTap={{ scale: 0.95 }}
+            aria-pressed={isLight}
+            title={
+              isLight
+                ? tr('التبديل إلى الوضع المظلم', 'Switch to Dark Mode')
+                : tr('التبديل إلى الوضع الفاتح', 'Switch to Light Mode')
+            }
+            aria-label={
+              isLight
+                ? tr('التبديل إلى الوضع المظلم', 'Switch to Dark Mode')
+                : tr('التبديل إلى الوضع الفاتح', 'Switch to Light Mode')
+            }
+            className="inline-flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-xs font-semibold border border-[#D4AF37]/40 bg-[#F5F2EA] dark:bg-[#151519] text-[#735303] dark:text-[#E5C158] hover:bg-[#D4AF37] hover:text-[#09090B] transition-colors whitespace-nowrap shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+          >
+            {isLight ? (
+              <>
+                <Moon className="w-3.5 h-3.5 shrink-0" />
+                <span className="hidden xl:inline">{tr('مظلم', 'Dark')}</span>
+              </>
+            ) : (
+              <>
+                <Sun className="w-3.5 h-3.5 shrink-0" />
+                <span className="hidden xl:inline">{tr('فاتح', 'Light')}</span>
+              </>
+            )}
+          </motion.button>
+
+          <motion.button
+            type="button"
             onClick={toggleLang}
             whileTap={{ scale: 0.95 }}
             aria-label={tr('تبديل إلى الإنجليزية', 'Switch to Arabic')}
-            className="inline-flex items-center gap-1 px-2.5 py-2 rounded-lg text-xs font-mono font-semibold border border-[#D4AF37]/40 bg-[#151519] text-[#E5C158] hover:bg-[#D4AF37] hover:text-[#09090B] transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+            className="inline-flex items-center gap-1 px-2.5 py-2 rounded-lg text-xs font-mono font-semibold border border-[#D4AF37]/40 bg-[#F5F2EA] dark:bg-[#151519] text-[#735303] dark:text-[#E5C158] hover:bg-[#D4AF37] hover:text-[#09090B] transition-colors whitespace-nowrap shrink-0 cursor-pointer"
           >
             <Languages className="w-3.5 h-3.5" />
             <span>{lang === 'ar' ? 'EN' : 'عربي'}</span>
@@ -147,7 +188,7 @@ export function Navbar({ activeSection, onChangeSection }: NavbarProps) {
                   : tr('حسابي وإدارة البيانات', 'My Account & Data')
               }
               aria-label={tr('حسابي وإدارة البيانات', 'My Account & Data')}
-              className="inline-flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-xs font-medium border border-white/10 bg-[#151519] text-[#F5F0E6] hover:border-[#D4AF37]/50 hover:text-[#E5C158] transition-colors cursor-pointer shrink-0"
+              className="inline-flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-xs font-medium border border-black/10 dark:border-white/10 bg-[#F5F2EA] dark:bg-[#151519] text-[#141418] dark:text-[#F5F0E6] hover:border-[#D4AF37]/60 hover:text-[#856104] dark:hover:text-[#E5C158] transition-colors cursor-pointer shrink-0"
             >
               {user.rankBadge ? (
                 <RankIconGlyph
@@ -157,11 +198,11 @@ export function Navbar({ activeSection, onChangeSection }: NavbarProps) {
                 />
               ) : user.role === 'admin' ? (
                 <ShieldCheck
-                  className="w-4 h-4 text-[#D4AF37] shrink-0"
+                  className="w-4 h-4 text-[#B8860B] dark:text-[#D4AF37] shrink-0"
                   aria-label={tr('أدمن', 'Admin')}
                 />
               ) : (
-                <UserCog className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                <UserCog className="w-3.5 h-3.5 text-[#B8860B] dark:text-[#D4AF37] shrink-0" />
               )}
               <span className="hidden xl:inline max-w-[110px] truncate">
                 {user.name}
@@ -175,7 +216,7 @@ export function Navbar({ activeSection, onChangeSection }: NavbarProps) {
             whileTap={{ scale: 0.95 }}
             title={tr('تسجيل الخروج', 'Sign Out')}
             aria-label={tr('تسجيل الخروج', 'Sign Out')}
-            className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-lg text-xs font-semibold border border-red-500/30 bg-red-950/35 text-red-200 hover:bg-red-600 hover:text-white hover:border-red-500 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-lg text-xs font-semibold border border-red-600/30 dark:border-red-500/30 bg-red-50 dark:bg-red-950/35 text-red-700 dark:text-red-200 hover:bg-red-600 hover:text-white hover:border-red-500 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
           >
             <LogOut className="w-3.5 h-3.5 shrink-0" />
             <span className="hidden sm:inline">{tr('تسجيل الخروج', 'Logout')}</span>
@@ -198,7 +239,7 @@ export function Navbar({ activeSection, onChangeSection }: NavbarProps) {
               className={`px-3.5 py-2 rounded-lg text-xs font-semibold whitespace-nowrap shrink-0 transition-colors cursor-pointer ${
                 isActive
                   ? 'bg-[#D4AF37] text-[#09090B]'
-                  : 'bg-[#151519] text-[#C8C2B8] border border-white/10'
+                  : 'bg-[#F5F2EA] dark:bg-[#151519] text-[#3F3D38] dark:text-[#C8C2B8] border border-black/10 dark:border-white/10'
               }`}
             >
               {item.label}

@@ -120,7 +120,7 @@ export function AiChatbotTab() {
 
       <div
         ref={scrollRef}
-        className="h-[360px] overflow-y-auto rounded-xl bg-[#09090B] border border-white/10 p-4 space-y-3"
+        className="h-[360px] overflow-y-auto rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 p-4 space-y-3"
       >
         {messages.map((m) => (
           <div
@@ -130,12 +130,12 @@ export function AiChatbotTab() {
             <div
               className={`max-w-[85%] rounded-xl px-4 py-3 border text-sm leading-relaxed whitespace-pre-wrap ${
                 m.role === 'user'
-                  ? 'bg-[#D4AF37]/15 border-[#D4AF37]/40 text-[#F5F0E6]'
-                  : 'bg-[#151519] border-white/10 text-[#F5F0E6]'
+                  ? 'bg-[#D4AF37]/15 border-[#D4AF37]/40 text-[#141418] dark:text-[#F5F0E6]'
+                  : 'bg-[#F5F2EA] dark:bg-[#151519] border-black/10 dark:border-white/10 text-[#141418] dark:text-[#F5F0E6]'
               }`}
             >
               {m.role === 'model' && (
-                <div className="flex items-center gap-1.5 text-xs text-[#E5C158] font-semibold mb-1">
+                <div className="flex items-center gap-1.5 text-xs text-[#856104] dark:text-[#E5C158] font-semibold mb-1">
                   <Bot className="w-3.5 h-3.5" />
                   <span>{tr('مساعد MAVIA الذكي', 'MAVIA AI Guide')}</span>
                 </div>
@@ -146,7 +146,7 @@ export function AiChatbotTab() {
         ))}
         {loading && (
           <div className="flex justify-end">
-            <div className="rounded-xl px-4 py-2.5 bg-[#151519] border border-white/10 text-xs text-[#D4AF37]">
+            <div className="rounded-xl px-4 py-2.5 bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-xs text-[#9A7209] dark:text-[#D4AF37]">
               {tr('جاري التفكير...', 'Thinking...')}
             </div>
           </div>
@@ -162,7 +162,7 @@ export function AiChatbotTab() {
             'اسأل مساعد MAVIA الذكي عن أي شيء في المنصة...',
             'Ask MAVIA AI Assistant anything about the platform...'
           )}
-          className="flex-1 px-4 py-2.5 rounded-xl bg-[#09090B] border border-white/10 text-sm text-[#F5F0E6] placeholder-[#6B6661] focus:outline-none focus:border-[#D4AF37]"
+          className="flex-1 px-4 py-2.5 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] placeholder-[#6E6A61] dark:placeholder-[#6B6661] focus:outline-none focus:border-[#D4AF37]"
         />
         <GoldChip
           type="submit"

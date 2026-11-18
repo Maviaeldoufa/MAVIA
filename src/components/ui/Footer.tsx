@@ -11,9 +11,9 @@ export function Footer() {
 
   return (
     <>
-      <footer className="relative z-10 border-t border-white/10 bg-[#09090B]/95 backdrop-blur-sm py-5 px-4 sm:px-6 text-xs text-[#A8A29E]">
+      <footer className="relative z-10 border-t border-black/10 dark:border-white/10 bg-white/95 dark:bg-[#09090B]/95 backdrop-blur-sm py-5 px-4 sm:px-6 text-xs text-[#5C5850] dark:text-[#A8A29E] transition-colors duration-200">
         <div className="max-w-7xl mx-auto space-y-3">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 pb-3 border-b border-white/5">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 pb-3 border-b border-black/10 dark:border-white/5">
             <div className="space-y-2">
               <span>
                 {tr(
@@ -25,7 +25,7 @@ export function Footer() {
                 <button
                   type="button"
                   onClick={() => setLegalTab('terms')}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#151519] border border-[#D4AF37]/35 text-[#E5C158] hover:bg-[#D4AF37] hover:text-[#09090B] text-[11px] font-semibold transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#F5F2EA] dark:bg-[#151519] border border-[#D4AF37]/40 dark:border-[#D4AF37]/35 text-[#735303] dark:text-[#E5C158] hover:bg-[#D4AF37] hover:text-[#09090B] text-[11px] font-semibold transition-colors cursor-pointer"
                 >
                   <Scale className="w-3.5 h-3.5" />
                   <span>{tr('الشروط والأحكام', 'Terms & Conditions')}</span>
@@ -34,7 +34,7 @@ export function Footer() {
                 <button
                   type="button"
                   onClick={() => setLegalTab('privacy')}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#151519] border border-white/15 text-[#C8C2B8] hover:border-[#D4AF37]/50 hover:text-[#E5C158] text-[11px] font-semibold transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-[#3F3D38] dark:text-[#C8C2B8] hover:border-[#D4AF37]/50 hover:text-[#735303] dark:hover:text-[#E5C158] text-[11px] font-semibold transition-colors cursor-pointer"
                 >
                   <Lock className="w-3.5 h-3.5" />
                   <span>{tr('سياسة الخصوصية', 'Privacy Policy')}</span>
@@ -43,7 +43,7 @@ export function Footer() {
                 <button
                   type="button"
                   onClick={() => setStatusOpen(true)}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#151519] border border-white/15 text-emerald-300 hover:border-emerald-400/60 text-[11px] font-semibold transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-50 dark:bg-[#151519] border border-emerald-600/25 dark:border-white/15 text-emerald-700 dark:text-emerald-300 hover:border-emerald-500/60 text-[11px] font-semibold transition-colors cursor-pointer"
                 >
                   <Activity className="w-3.5 h-3.5" />
                   <span>{tr('حالة الخدمة والصيانة', 'Service Status')}</span>
@@ -52,13 +52,13 @@ export function Footer() {
             </div>
           </div>
 
-          <div className="text-center sm:text-end text-[#C8C2B8]">
+          <div className="text-center sm:text-end text-[#3F3D38] dark:text-[#C8C2B8]">
             © {new Date().getFullYear()}{' '}
             {tr(
               'جميع حقوق الطبع والنشر محفوظة لـ',
               'All copyrights reserved to'
             )}{' '}
-            <strong className="text-[#E5C158] font-semibold">
+            <strong className="text-[#856104] dark:text-[#E5C158] font-semibold">
               Mahmoud Haider Youseif
             </strong>
           </div>

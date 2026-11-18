@@ -42,21 +42,21 @@ export function ComprehensiveSubmissionReviewView({
   if (submission.status === 'pending_grading') {
     return (
       <div className="p-6 sm:p-8 text-center space-y-5">
-        <div className="mx-auto w-14 h-14 rounded-2xl bg-[#D4AF37]/15 border border-[#D4AF37]/40 flex items-center justify-center text-[#F5D061]">
+        <div className="mx-auto w-14 h-14 rounded-2xl bg-[#D4AF37]/15 border border-[#D4AF37]/40 flex items-center justify-center text-[#735303] dark:text-[#F5D061]">
           <Hourglass className="w-7 h-7" />
         </div>
         <div className="space-y-2">
-          <h3 className="font-display text-xl font-bold text-[#F5D061]">
+          <h3 className="font-display text-xl font-bold text-[#735303] dark:text-[#F5D061]">
             {tr('في انتظار التصحيح', 'Pending Manual Grading')}
           </h3>
-          <p className="text-sm text-[#C8C2B8] leading-relaxed max-w-md mx-auto">
+          <p className="text-sm text-[#3F3D38] dark:text-[#C8C2B8] leading-relaxed max-w-md mx-auto">
             {tr(
               `تم استلام إجاباتك في الامتحان الشامل لمادة "${submission.subjectName}" بنجاح. امتحانك الآن قيد المراجعة والتصحيح اليدوي من قِبل الأدمن، وستصلك الدرجة وتفاصيل الأخطاء فور إرسالها.`,
               `Your answers for the comprehensive exam "${submission.subjectName}" were received. Your exam is currently awaiting manual grading by the Admin.`
             )}
           </p>
         </div>
-        <div className="inline-flex flex-wrap items-center justify-center gap-3 px-4 py-2.5 rounded-xl bg-[#0D0D10] border border-white/10 text-xs text-[#A8A29E] font-mono tabular-nums">
+        <div className="inline-flex flex-wrap items-center justify-center gap-3 px-4 py-2.5 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 text-xs text-[#5C5850] dark:text-[#A8A29E] font-mono tabular-nums">
           <span>
             {tr('عدد الأسئلة:', 'Questions:')} {submission.answers.length}
           </span>
@@ -91,17 +91,17 @@ export function ComprehensiveSubmissionReviewView({
   return (
     <div className="space-y-5">
       {/* Score Overview */}
-      <div className="p-5 rounded-2xl bg-[#0D0D10] border border-[#D4AF37]/35 space-y-4">
+      <div className="p-5 rounded-2xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-[#D4AF37]/35 space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="space-y-1">
-            <div className="text-xs font-semibold text-[#D4AF37]">
+            <div className="text-xs font-semibold text-[#9A7209] dark:text-[#D4AF37]">
               {tr('نتيجة الامتحان الشامل ومراجعة الأخطاء', 'Comprehensive Exam Result & Mistakes')}
             </div>
-            <h3 className="font-display text-xl font-bold text-[#F5F0E6]">
+            <h3 className="font-display text-xl font-bold text-[#141418] dark:text-[#F5F0E6]">
               {submission.subjectName}
             </h3>
             {submission.gradedBy && (
-              <div className="text-xs text-[#A8A29E]">
+              <div className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
                 {tr('تم التصحيح بواسطة:', 'Graded by:')} {submission.gradedBy}{' '}
                 {submission.gradedAt
                   ? `· ${new Date(submission.gradedAt).toLocaleString()}`
@@ -110,17 +110,17 @@ export function ComprehensiveSubmissionReviewView({
             )}
           </div>
 
-          <div className="flex items-center gap-4 px-4 py-3 rounded-xl bg-[#151519] border border-[#D4AF37]/30 shrink-0">
+          <div className="flex items-center gap-4 px-4 py-3 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-[#D4AF37]/30 shrink-0">
             <div>
-              <div className="text-xs text-[#A8A29E]">{tr('الدرجة', 'Score')}</div>
-              <div className="font-mono text-2xl font-bold text-[#F5D061] tabular-nums">
+              <div className="text-xs text-[#5C5850] dark:text-[#A8A29E]">{tr('الدرجة', 'Score')}</div>
+              <div className="font-mono text-2xl font-bold text-[#735303] dark:text-[#F5D061] tabular-nums">
                 {submission.totalScore} / {submission.maxScore}
               </div>
             </div>
-            <div className="h-8 w-px bg-white/10" />
+            <div className="h-8 w-px bg-black/10 dark:bg-white/10" />
             <div>
-              <div className="text-xs text-[#A8A29E]">{tr('النسبة', 'Percent')}</div>
-              <div className="font-mono text-2xl font-bold text-emerald-300 tabular-nums">
+              <div className="text-xs text-[#5C5850] dark:text-[#A8A29E]">{tr('النسبة', 'Percent')}</div>
+              <div className="font-mono text-2xl font-bold text-emerald-700 dark:text-emerald-300 tabular-nums">
                 {pct}%
               </div>
             </div>
@@ -128,16 +128,16 @@ export function ComprehensiveSubmissionReviewView({
         </div>
 
         {submission.adminNote && (
-          <div className="p-3.5 rounded-xl bg-[#151519] border border-[#D4AF37]/25 text-xs text-[#E5C158] leading-relaxed">
+          <div className="p-3.5 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-[#D4AF37]/25 text-xs text-[#856104] dark:text-[#E5C158] leading-relaxed">
             <strong>{tr('ملاحظة المصحح:', 'Grader Note:')}</strong>{' '}
-            <span className="text-[#F5F0E6]">{submission.adminNote}</span>
+            <span className="text-[#141418] dark:text-[#F5F0E6]">{submission.adminNote}</span>
           </div>
         )}
       </div>
 
       {/* Filter Bar */}
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2 text-xs font-semibold text-[#E5C158]">
+        <div className="flex items-center gap-2 text-xs font-semibold text-[#856104] dark:text-[#E5C158]">
           <Filter className="w-4 h-4" />
           <span>{tr('مراجعة إجاباتك سؤالاً بسؤال', 'Question-by-Question Review')}</span>
         </div>
@@ -168,7 +168,7 @@ export function ComprehensiveSubmissionReviewView({
       </div>
 
       {filtered.length === 0 ? (
-        <div className="py-8 text-center text-sm text-[#A8A29E] rounded-xl bg-[#0D0D10] border border-white/10">
+        <div className="py-8 text-center text-sm text-[#5C5850] dark:text-[#A8A29E] rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10">
           {filter === 'wrong'
             ? tr('لا توجد أخطاء! إجاباتك كلها صحيحة.', 'No mistakes found! All answers were correct.')
             : tr('لا توجد أسئلة مطابقة.', 'No matching questions.')}
@@ -198,15 +198,15 @@ export function ComprehensiveSubmissionReviewView({
                 key={ans.questionId}
                 className={`p-4 rounded-xl border space-y-3 ${
                   isCorrect
-                    ? 'bg-emerald-950/20 border-emerald-500/35'
-                    : 'bg-red-950/20 border-red-500/35'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-500/35'
+                    : 'bg-red-50 dark:bg-red-950/20 border-red-500/35'
                 }`}
               >
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div className="space-y-1 flex-1 min-w-0">
-                    <div className="text-xs text-[#A8A29E] font-medium">{typeLabel}</div>
-                    <div className="text-sm font-semibold text-[#F5F0E6] leading-relaxed">
-                      <span className={`font-mono text-[#D4AF37] tabular-nums ${isEn ? 'mr-2' : 'ml-2'}`}>
+                    <div className="text-xs text-[#5C5850] dark:text-[#A8A29E] font-medium">{typeLabel}</div>
+                    <div className="text-sm font-semibold text-[#141418] dark:text-[#F5F0E6] leading-relaxed">
+                      <span className={`font-mono text-[#9A7209] dark:text-[#D4AF37] tabular-nums ${isEn ? 'mr-2' : 'ml-2'}`}>
                         {idx + 1}.
                       </span>
                       {ans.questionText}
@@ -214,14 +214,14 @@ export function ComprehensiveSubmissionReviewView({
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className="font-mono text-xs font-bold text-[#E5C158] tabular-nums px-2.5 py-1 rounded-lg bg-[#09090B]/70 border border-white/10">
+                    <span className="font-mono text-xs font-bold text-[#856104] dark:text-[#E5C158] tabular-nums px-2.5 py-1 rounded-lg bg-[#F6F4EF]/85 dark:bg-[#09090B]/70 border border-black/10 dark:border-white/10">
                       {ans.awardedPoints ?? 0} / {ans.maxPoints}
                     </span>
                     <span
                       className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold border ${
                         isCorrect
-                          ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500/40'
-                          : 'bg-red-950/80 text-red-300 border-red-500/40'
+                          ? 'bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border-emerald-500/40'
+                          : 'bg-red-50 dark:bg-red-950/80 text-red-700 dark:text-red-300 border-red-500/40'
                       }`}
                     >
                       {isCorrect ? (
@@ -240,13 +240,13 @@ export function ComprehensiveSubmissionReviewView({
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
-                  <div className="p-3 rounded-lg bg-[#09090B]/75 border border-white/10 space-y-1">
-                    <div className="text-xs text-[#A8A29E]">
+                  <div className="p-3 rounded-lg bg-[#F6F4EF]/85 dark:bg-[#09090B]/75 border border-black/10 dark:border-white/10 space-y-1">
+                    <div className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
                       {tr('إجابتك:', 'Your Answer:')}
                     </div>
                     <div
                       className={`text-sm font-medium whitespace-pre-wrap ${
-                        isCorrect ? 'text-emerald-200' : 'text-red-200'
+                        isCorrect ? 'text-emerald-800 dark:text-emerald-200' : 'text-red-700 dark:text-red-200'
                       }`}
                     >
                       {studentDisplayAnswer}
@@ -254,11 +254,11 @@ export function ComprehensiveSubmissionReviewView({
                   </div>
 
                   {(ans.correctAnswerText || !isCorrect) && (
-                    <div className="p-3 rounded-lg bg-emerald-950/25 border border-emerald-500/30 space-y-1">
-                      <div className="text-xs text-emerald-300">
+                    <div className="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/25 border border-emerald-500/30 space-y-1">
+                      <div className="text-xs text-emerald-700 dark:text-emerald-300">
                         {tr('الإجابة الصحيحة / النموذجية:', 'Correct / Model Answer:')}
                       </div>
-                      <div className="text-sm font-medium text-emerald-100 whitespace-pre-wrap">
+                      <div className="text-sm font-medium text-emerald-900 dark:text-emerald-100 whitespace-pre-wrap">
                         {ans.correctAnswerText ||
                           tr('راجع ملاحظة المصحح أو محتوى المادة.', 'See grader note or course material.')}
                       </div>
@@ -267,8 +267,8 @@ export function ComprehensiveSubmissionReviewView({
                 </div>
 
                 {ans.adminFeedback && (
-                  <div className="p-3 rounded-lg bg-[#0D0D10] border border-[#D4AF37]/30 text-xs text-[#C8C2B8] leading-relaxed">
-                    <strong className="text-[#E5C158]">{tr('توضيح المصحح:', 'Feedback:')}</strong>{' '}
+                  <div className="p-3 rounded-lg bg-[#EFECE4] dark:bg-[#0D0D10] border border-[#D4AF37]/30 text-xs text-[#3F3D38] dark:text-[#C8C2B8] leading-relaxed">
+                    <strong className="text-[#856104] dark:text-[#E5C158]">{tr('توضيح المصحح:', 'Feedback:')}</strong>{' '}
                     {ans.adminFeedback}
                   </div>
                 )}
@@ -486,7 +486,7 @@ export function ComprehensiveExamBannerAndModal() {
     <>
       {/* Persistent Top News Bar whenever at least one comprehensive exam is active */}
       {activeExams.length > 0 && (
-        <div className="relative z-30 border-b border-[#D4AF37]/45 bg-gradient-to-l from-[#1E190C] via-[#171410] to-[#1E190C]">
+        <div className="relative z-30 border-b border-[#D4AF37]/45 bg-gradient-to-l from-[#FBF4DE] via-[#F7ECC8] to-[#FBF4DE] dark:from-[#1E190C] dark:via-[#171410] dark:to-[#1E190C]">
           <div className="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 flex flex-col gap-2">
             {activeExams.map((exam) => {
               const mySub = mySubmissions.find((s) => s.examId === exam.id);
@@ -497,21 +497,21 @@ export function ComprehensiveExamBannerAndModal() {
                   key={exam.id}
                   type="button"
                   onClick={() => handleOpenExamFromBanner(exam)}
-                  className="w-full text-start flex flex-wrap items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl bg-[#0D0D10]/85 border border-[#D4AF37]/40 hover:border-[#F5D061] hover:bg-[#121216] transition-all cursor-pointer group"
+                  className="w-full text-start flex flex-wrap items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl bg-white/90 dark:bg-[#0D0D10]/85 border border-[#D4AF37]/40 hover:border-[#D4AF37] dark:hover:border-[#F5D061] hover:bg-white dark:hover:bg-[#121216] transition-all cursor-pointer group"
                 >
                   <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <div className="p-2 rounded-lg bg-[#D4AF37]/20 border border-[#D4AF37]/45 text-[#F5D061] shrink-0">
+                    <div className="p-2 rounded-lg bg-[#D4AF37]/20 border border-[#D4AF37]/45 text-[#735303] dark:text-[#F5D061] shrink-0">
                       <Megaphone className="w-4 h-4" />
                     </div>
                     <div className="min-w-0 space-y-0.5">
-                      <div className="flex flex-wrap items-center gap-2 text-xs font-bold text-[#F5D061]">
+                      <div className="flex flex-wrap items-center gap-2 text-xs font-bold text-[#735303] dark:text-[#F5D061]">
                         <span>{tr('خبر امتحان شامل', 'Comprehensive Exam Notice')}</span>
                         <span aria-hidden="true">·</span>
-                        <span className="text-[#F5F0E6] text-sm">
+                        <span className="text-[#141418] dark:text-[#F5F0E6] text-sm">
                           {tr(`مادة: ${exam.subjectName}`, `Subject: ${exam.subjectName}`)}
                         </span>
                       </div>
-                      <div className="text-xs text-[#C8C2B8] font-mono tabular-nums">
+                      <div className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] font-mono tabular-nums">
                         {tr(`المدة: ${exam.durationMinutes} دقيقة`, `Duration: ${exam.durationMinutes} min`)}
                         {' · '}
                         {exam.questionsCount} {tr('سؤال', 'questions')}
@@ -556,13 +556,13 @@ export function ComprehensiveExamBannerAndModal() {
           role="dialog"
           aria-modal="true"
         >
-          <div className="w-full max-w-4xl max-h-[92vh] flex flex-col rounded-2xl bg-[#121216] border border-[#D4AF37]/40 shadow-[0_24px_80px_rgba(0,0,0,0.85)] overflow-hidden">
+          <div className="w-full max-w-4xl max-h-[92vh] flex flex-col rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/40 shadow-[0_24px_80px_rgba(0,0,0,0.85)] overflow-hidden">
             {/* Modal Header */}
-            <div className="px-5 py-4 border-b border-white/10 bg-[#0D0D10] flex items-center justify-between gap-3 shrink-0">
+            <div className="px-5 py-4 border-b border-black/10 dark:border-white/10 bg-[#EFECE4] dark:bg-[#0D0D10] flex items-center justify-between gap-3 shrink-0">
               <div className="flex items-center gap-2.5 min-w-0">
-                <FileText className="w-5 h-5 text-[#D4AF37] shrink-0" />
+                <FileText className="w-5 h-5 text-[#9A7209] dark:text-[#D4AF37] shrink-0" />
                 <div className="min-w-0">
-                  <h2 className="font-display text-base sm:text-lg font-bold text-[#F5F0E6] truncate">
+                  <h2 className="font-display text-base sm:text-lg font-bold text-[#141418] dark:text-[#F5F0E6] truncate">
                     {openExam
                       ? `${tr('الامتحان الشامل:', 'Comprehensive Exam:')} ${openExam.subjectName}`
                       : openReviewSub
@@ -577,8 +577,8 @@ export function ComprehensiveExamBannerAndModal() {
                   <div
                     className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border font-mono text-sm font-bold tabular-nums ${
                       remainingSeconds <= 60
-                        ? 'bg-red-950/75 border-red-500/60 text-red-200'
-                        : 'bg-[#151519] border-[#D4AF37]/45 text-[#F5D061]'
+                        ? 'bg-red-50 dark:bg-red-950/75 border-red-500/60 text-red-700 dark:text-red-200'
+                        : 'bg-[#F5F2EA] dark:bg-[#151519] border-[#D4AF37]/45 text-[#735303] dark:text-[#F5D061]'
                     }`}
                   >
                     <Clock className="w-4 h-4" />
@@ -594,7 +594,7 @@ export function ComprehensiveExamBannerAndModal() {
                     setJustSubmitted(null);
                   }}
                   aria-label={tr('إغلاق', 'Close')}
-                  className="p-2 rounded-lg text-[#A8A29E] hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                  className="p-2 rounded-lg text-[#5C5850] dark:text-[#A8A29E] hover:text-[#141418] dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -619,21 +619,21 @@ export function ComprehensiveExamBannerAndModal() {
               ) : openExam ? (
                 <>
                   {/* Exam Meta Summary */}
-                  <div className="p-3.5 rounded-xl bg-[#0D0D10] border border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs text-[#C8C2B8]">
+                  <div className="p-3.5 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs text-[#3F3D38] dark:text-[#C8C2B8]">
                     <span>
                       {tr(
                         'يتم تصحيح جميع الأسئلة يدوياً من قِبل الأدمن. ركز جيداً في إجاباتك.',
                         'All questions are graded manually by the Admin.'
                       )}
                     </span>
-                    <span className="font-mono text-[#E5C158] tabular-nums">
+                    <span className="font-mono text-[#856104] dark:text-[#E5C158] tabular-nums">
                       {openExam.questions.length} {tr('سؤال', 'Questions')} ·{' '}
                       {openExam.totalPoints} {tr('درجة', 'Points')}
                     </span>
                   </div>
 
                   {submitError && (
-                    <div className="p-3.5 rounded-xl bg-red-950/50 border border-red-500/40 text-red-200 text-xs flex items-center gap-2">
+                    <div className="p-3.5 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-500/40 text-red-700 dark:text-red-200 text-xs flex items-center gap-2">
                       <AlertTriangle className="w-4 h-4 shrink-0" />
                       <span>{submitError}</span>
                     </div>
@@ -652,12 +652,12 @@ export function ComprehensiveExamBannerAndModal() {
                       return (
                         <div
                           key={q.id}
-                          className="p-4 sm:p-5 rounded-xl bg-[#0D0D10] border border-white/10 space-y-3.5"
+                          className="p-4 sm:p-5 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 space-y-3.5"
                         >
                           <div className="flex flex-wrap items-start justify-between gap-2">
-                            <div className="text-sm sm:text-base font-semibold text-[#F5F0E6] leading-relaxed">
+                            <div className="text-sm sm:text-base font-semibold text-[#141418] dark:text-[#F5F0E6] leading-relaxed">
                               <span
-                                className={`font-mono text-[#D4AF37] tabular-nums ${
+                                className={`font-mono text-[#9A7209] dark:text-[#D4AF37] tabular-nums ${
                                   isEn ? 'mr-2' : 'ml-2'
                                 }`}
                               >
@@ -666,10 +666,10 @@ export function ComprehensiveExamBannerAndModal() {
                               {q.question}
                             </div>
 
-                            <div className="flex items-center gap-2 text-xs text-[#A8A29E] shrink-0">
+                            <div className="flex items-center gap-2 text-xs text-[#5C5850] dark:text-[#A8A29E] shrink-0">
                               <span>{typeLabel}</span>
                               <span aria-hidden="true">·</span>
-                              <span className="font-mono text-[#E5C158] tabular-nums">
+                              <span className="font-mono text-[#856104] dark:text-[#E5C158] tabular-nums">
                                 {q.points} {tr('درجة', 'pts')}
                               </span>
                             </div>
@@ -689,7 +689,7 @@ export function ComprehensiveExamBannerAndModal() {
                                 'اكتب إجابتك المقالية بالتفصيل هنا...',
                                 'Write your detailed essay answer here...'
                               )}
-                              className="w-full px-3.5 py-2.5 rounded-xl bg-[#151519] border border-white/10 text-sm text-[#F5F0E6] leading-relaxed focus:outline-none focus:border-[#D4AF37]"
+                              className="w-full px-3.5 py-2.5 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] leading-relaxed focus:outline-none focus:border-[#D4AF37]"
                             />
                           ) : (
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -711,7 +711,7 @@ export function ComprehensiveExamBannerAndModal() {
                                       } px-4 py-2.5 rounded-xl text-sm font-medium border transition-colors cursor-pointer ${
                                         isSelected
                                           ? 'bg-[#D4AF37] border-[#E5C158] text-[#09090B] font-bold'
-                                          : 'bg-[#151519] border-white/10 text-[#C8C2B8] hover:border-[#D4AF37]/50'
+                                          : 'bg-[#F5F2EA] dark:bg-[#151519] border-black/10 dark:border-white/10 text-[#3F3D38] dark:text-[#C8C2B8] hover:border-[#D4AF37]/50'
                                       }`}
                                     >
                                       {opt}
@@ -726,8 +726,8 @@ export function ComprehensiveExamBannerAndModal() {
                     })}
                   </div>
 
-                  <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-white/10">
-                    <span className="text-xs text-[#A8A29E]">
+                  <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-black/10 dark:border-white/10">
+                    <span className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
                       {tr(
                         'بعد التسليم سيظهر لك أن الامتحان في انتظار التصحيح اليدوي.',
                         'After submission, your exam enters manual grading.'

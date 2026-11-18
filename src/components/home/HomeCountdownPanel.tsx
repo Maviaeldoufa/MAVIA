@@ -91,16 +91,16 @@ export function HomeCountdownPanel() {
   }
 
   return (
-    <section className="rounded-2xl bg-[#121216] border border-[#D4AF37]/30 p-6 space-y-5">
+    <section className="rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/30 p-6 space-y-5">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <BellRing className="w-5 h-5 text-[#D4AF37]" />
-            <h2 className="font-display text-xl font-bold text-[#F5F0E6]">
+            <BellRing className="w-5 h-5 text-[#9A7209] dark:text-[#D4AF37]" />
+            <h2 className="font-display text-xl font-bold text-[#141418] dark:text-[#F5F0E6]">
               {tr('أخبار الامتحانات والمواعيد القادمة', 'Upcoming Exams & News Countdowns')}
             </h2>
           </div>
-          <p className="text-xs text-[#A8A29E]">
+          <p className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
             {tr(
               'تابع العد التنازلي للامتحانات والمراجعات القادمة مباشرة',
               'Live countdowns for upcoming exams, deadlines, and announcements'
@@ -125,7 +125,7 @@ export function HomeCountdownPanel() {
       </div>
 
       {error && (
-        <div role="alert" className="p-3 rounded-xl bg-red-950/50 border border-red-500/40 text-red-200 text-xs">
+        <div role="alert" className="p-3 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-500/40 text-red-700 dark:text-red-200 text-xs">
           {error}
         </div>
       )}
@@ -133,7 +133,7 @@ export function HomeCountdownPanel() {
       {isAdmin && showAdd && (
         <form
           onSubmit={handleCreate}
-          className="p-4 rounded-xl bg-[#09090B] border border-[#D4AF37]/35 space-y-3"
+          className="p-4 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-[#D4AF37]/35 space-y-3"
         >
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <input
@@ -142,12 +142,12 @@ export function HomeCountdownPanel() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder={tr('عنوان الخبر أو الامتحان (مثال: امتحان GIS العملي)', 'Exam / News title')}
-              className="sm:col-span-2 px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+              className="sm:col-span-2 px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
             />
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value as 'exam' | 'news')}
-              className="px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+              className="px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
             >
               <option value="exam">{tr('خبر امتحان قادم', 'Upcoming Exam')}</option>
               <option value="news">{tr('خبر / تنبيه مهم', 'Important News')}</option>
@@ -159,14 +159,14 @@ export function HomeCountdownPanel() {
               required
               value={targetAt}
               onChange={(e) => setTargetAt(e.target.value)}
-              className="px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-sm text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
+              className="px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
             />
             <input
               type="text"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder={tr('تفاصيل إضافية (اختياري)', 'Details (optional)')}
-              className="px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+              className="px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
             />
           </div>
           <div className="flex justify-end">
@@ -178,9 +178,9 @@ export function HomeCountdownPanel() {
       )}
 
       {loading ? (
-        <div className="h-28 rounded-xl bg-white/5 animate-pulse" />
+        <div className="h-28 rounded-xl bg-black/5 dark:bg-white/5 animate-pulse" />
       ) : announcements.length === 0 ? (
-        <div className="p-5 rounded-xl bg-[#0D0D10] border border-white/10 text-center text-xs text-[#A8A29E]">
+        <div className="p-5 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 text-center text-xs text-[#5C5850] dark:text-[#A8A29E]">
           {tr('لا توجد مؤقتات امتحانات مضافة حالياً.', 'No active countdowns yet.')}
         </div>
       ) : (
@@ -188,16 +188,16 @@ export function HomeCountdownPanel() {
           {announcements.map((item) => (
             <article
               key={item.id}
-              className="p-5 rounded-xl bg-[#0D0D10] border border-[#D4AF37]/25 flex flex-col justify-between gap-4"
+              className="p-5 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-[#D4AF37]/25 flex flex-col justify-between gap-4"
             >
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-[11px] font-semibold text-[#D4AF37]">
+                  <span className="text-[11px] font-semibold text-[#9A7209] dark:text-[#D4AF37]">
                     {item.category === 'exam'
                       ? tr('امتحان قادم', 'Upcoming Exam')
                       : tr('خبر هام', 'Important News')}
                     {' · '}
-                    <span className="font-mono tabular-nums text-[#A8A29E]">
+                    <span className="font-mono tabular-nums text-[#5C5850] dark:text-[#A8A29E]">
                       {new Date(item.targetAt).toLocaleDateString()}
                     </span>
                   </span>
@@ -206,17 +206,17 @@ export function HomeCountdownPanel() {
                       type="button"
                       onClick={() => handleDelete(item.id)}
                       aria-label={tr('حذف المؤقت', 'Delete countdown')}
-                      className="p-1 text-red-400 hover:text-red-300 cursor-pointer"
+                      className="p-1 text-red-600 dark:text-red-400 hover:text-red-300 cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   )}
                 </div>
-                <h3 className="font-display text-base font-bold text-[#F5F0E6]">
+                <h3 className="font-display text-base font-bold text-[#141418] dark:text-[#F5F0E6]">
                   {item.title}
                 </h3>
                 {item.description && (
-                  <p className="text-xs text-[#C8C2B8]">{item.description}</p>
+                  <p className="text-xs text-[#3F3D38] dark:text-[#C8C2B8]">{item.description}</p>
                 )}
               </div>
 

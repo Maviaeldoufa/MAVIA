@@ -290,12 +290,12 @@ export function QuizRunner({
   return (
     <div className="space-y-6">
       {/* Header Bar with Live Timer */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-black/10 dark:border-white/10 pb-4">
         <div className="space-y-1 min-w-0">
-          <h3 className="font-display text-lg font-bold text-[#E5C158] truncate">
+          <h3 className="font-display text-lg font-bold text-[#856104] dark:text-[#E5C158] truncate">
             {quiz.title}
           </h3>
-          <div className="flex flex-wrap items-center gap-2 text-xs text-[#A8A29E] tabular-nums">
+          <div className="flex flex-wrap items-center gap-2 text-xs text-[#5C5850] dark:text-[#A8A29E] tabular-nums">
             <span>
               {result ? result.totalQuestions : renderedQuestions.length}{' '}
               {tr('سؤال', 'Questions')}
@@ -307,7 +307,7 @@ export function QuizRunner({
             {(quiz.randomizeQuestions !== false || quiz.questionsPerAttempt) && (
               <>
                 <span aria-hidden="true">·</span>
-                <span className="inline-flex items-center gap-1 text-[#D4AF37]">
+                <span className="inline-flex items-center gap-1 text-[#9A7209] dark:text-[#D4AF37]">
                   <Shuffle className="w-3 h-3" />
                   <span>{tr('بنك أسئلة عشوائي', 'Random Bank')}</span>
                 </span>
@@ -321,8 +321,8 @@ export function QuizRunner({
             <div
               className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border font-mono text-sm font-bold tabular-nums transition-colors ${
                 isLowTime
-                  ? 'bg-red-950/70 border-red-500/60 text-red-200 animate-pulse'
-                  : 'bg-[#0D0D10] border-[#D4AF37]/40 text-[#F5D061]'
+                  ? 'bg-red-50 dark:bg-red-950/70 border-red-500/60 text-red-700 dark:text-red-200 animate-pulse'
+                  : 'bg-[#EFECE4] dark:bg-[#0D0D10] border-[#D4AF37]/40 text-[#735303] dark:text-[#F5D061]'
               }`}
               title={tr('الوقت المتبقي للاختبار', 'Remaining Exam Time')}
             >
@@ -339,22 +339,22 @@ export function QuizRunner({
 
       {/* Progress Indicator during Active Attempt */}
       {!result && (
-        <div className="p-3 rounded-xl bg-[#0D0D10] border border-white/10 space-y-2">
-          <div className="flex items-center justify-between text-xs text-[#C8C2B8]">
+        <div className="p-3 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 space-y-2">
+          <div className="flex items-center justify-between text-xs text-[#3F3D38] dark:text-[#C8C2B8]">
             <span>
               {tr(
                 `تمت الإجابة على ${answeredCount} من ${renderedQuestions.length} سؤال`,
                 `Answered ${answeredCount} of ${renderedQuestions.length} questions`
               )}
             </span>
-            <span className="font-mono text-[#E5C158] tabular-nums">
+            <span className="font-mono text-[#856104] dark:text-[#E5C158] tabular-nums">
               {Math.round(
                 (answeredCount / Math.max(1, renderedQuestions.length)) * 100
               )}
               %
             </span>
           </div>
-          <div className="h-1.5 w-full rounded-full bg-white/10 overflow-hidden">
+          <div className="h-1.5 w-full rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-[#D4AF37] to-[#F5D061] transition-all duration-300"
               style={{
@@ -368,7 +368,7 @@ export function QuizRunner({
       )}
 
       {error && (
-        <div className="p-3 rounded-xl bg-red-950/50 border border-red-500/40 text-red-200 text-xs flex items-center gap-2">
+        <div className="p-3 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-500/40 text-red-700 dark:text-red-200 text-xs flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
@@ -378,19 +378,19 @@ export function QuizRunner({
       {result ? (
         <div className="space-y-5">
           {/* Score Summary Card */}
-          <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-[#D4AF37]/15 via-[#121216] to-[#0D0D10] border border-[#D4AF37]/40 space-y-5">
+          <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-[#D4AF37]/15 via-[#FBF8EE] to-[#EFECE4] dark:from-[#D4AF37]/15 dark:via-[#121216] dark:to-[#0D0D10] border border-[#D4AF37]/40 space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-start gap-3">
-                <div className="p-3 rounded-xl bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[#F5D061] shrink-0">
+                <div className="p-3 rounded-xl bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[#735303] dark:text-[#F5D061] shrink-0">
                   <Trophy className="w-6 h-6" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="font-display text-lg sm:text-xl font-bold text-[#F5D061]">
+                  <h4 className="font-display text-lg sm:text-xl font-bold text-[#735303] dark:text-[#F5D061]">
                     {autoSubmitted
                       ? tr('انتهى الوقت — تم التصحيح التلقائي', 'Time Up — Auto-Graded')
                       : tr('نتيجة الاختبار وتحليل الأخطاء', 'Exam Result & Mistake Analysis')}
                   </h4>
-                  <p className="text-xs text-[#C8C2B8]">
+                  <p className="text-xs text-[#3F3D38] dark:text-[#C8C2B8]">
                     {accuracyPct >= 80
                       ? tr(
                           'أداء ممتاز! مستوى استيعاب قوي جداً.',
@@ -423,39 +423,39 @@ export function QuizRunner({
 
             {/* 4 KPI Stat Boxes */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="p-3.5 rounded-xl bg-[#09090B]/80 border border-white/10">
-                <div className="text-[11px] text-[#A8A29E]">
+              <div className="p-3.5 rounded-xl bg-[#F6F4EF]/90 dark:bg-[#09090B]/80 border border-black/10 dark:border-white/10">
+                <div className="text-[11px] text-[#5C5850] dark:text-[#A8A29E]">
                   {tr('الدرجة النهائية', 'Final Score')}
                 </div>
-                <div className="font-mono text-xl font-bold text-[#E5C158] tabular-nums mt-0.5">
+                <div className="font-mono text-xl font-bold text-[#856104] dark:text-[#E5C158] tabular-nums mt-0.5">
                   {result.score} / {result.maxScore}
                 </div>
               </div>
-              <div className="p-3.5 rounded-xl bg-[#09090B]/80 border border-white/10">
-                <div className="text-[11px] text-[#A8A29E]">
+              <div className="p-3.5 rounded-xl bg-[#F6F4EF]/90 dark:bg-[#09090B]/80 border border-black/10 dark:border-white/10">
+                <div className="text-[11px] text-[#5C5850] dark:text-[#A8A29E]">
                   {tr('نسبة النجاح', 'Accuracy')}
                 </div>
-                <div className="font-mono text-xl font-bold text-emerald-300 tabular-nums mt-0.5">
+                <div className="font-mono text-xl font-bold text-emerald-700 dark:text-emerald-300 tabular-nums mt-0.5">
                   {accuracyPct}%
                 </div>
               </div>
-              <div className="p-3.5 rounded-xl bg-[#09090B]/80 border border-white/10">
-                <div className="text-[11px] text-[#A8A29E]">
+              <div className="p-3.5 rounded-xl bg-[#F6F4EF]/90 dark:bg-[#09090B]/80 border border-black/10 dark:border-white/10">
+                <div className="text-[11px] text-[#5C5850] dark:text-[#A8A29E]">
                   {tr('صحيح / خطأ', 'Correct / Wrong')}
                 </div>
                 <div className="font-mono text-xl font-bold tabular-nums mt-0.5">
-                  <span className="text-emerald-300">{result.correctCount}</span>
-                  <span className="text-[#A8A29E] mx-1">/</span>
-                  <span className="text-red-300">
+                  <span className="text-emerald-700 dark:text-emerald-300">{result.correctCount}</span>
+                  <span className="text-[#5C5850] dark:text-[#A8A29E] mx-1">/</span>
+                  <span className="text-red-700 dark:text-red-300">
                     {result.totalQuestions - result.correctCount}
                   </span>
                 </div>
               </div>
-              <div className="p-3.5 rounded-xl bg-[#09090B]/80 border border-white/10">
-                <div className="text-[11px] text-[#A8A29E]">
+              <div className="p-3.5 rounded-xl bg-[#F6F4EF]/90 dark:bg-[#09090B]/80 border border-black/10 dark:border-white/10">
+                <div className="text-[11px] text-[#5C5850] dark:text-[#A8A29E]">
                   {tr('الوقت المستغرق', 'Time Spent')}
                 </div>
-                <div className="font-mono text-xl font-bold text-[#F5F0E6] tabular-nums mt-0.5">
+                <div className="font-mono text-xl font-bold text-[#141418] dark:text-[#F5F0E6] tabular-nums mt-0.5">
                   {result.timeSpentSeconds
                     ? formatSecondsMMSS(result.timeSpentSeconds)
                     : '--:--'}
@@ -468,7 +468,7 @@ export function QuizRunner({
           {breakdownList.length > 0 && (
             <>
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-2 text-xs font-semibold text-[#E5C158]">
+                <div className="flex items-center gap-2 text-xs font-semibold text-[#856104] dark:text-[#E5C158]">
                   <Filter className="w-4 h-4" />
                   <span>{tr('تحليل الإجابات والأسئلة', 'Question-by-Question Analysis')}</span>
                 </div>
@@ -498,7 +498,7 @@ export function QuizRunner({
               </div>
 
               {unansweredInReview > 0 && (
-                <div className="p-3 rounded-xl bg-amber-950/40 border border-amber-500/30 text-amber-200 text-xs">
+                <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-500/30 text-amber-800 dark:text-amber-200 text-xs">
                   {tr(
                     `يوجد ${unansweredInReview} سؤال لم تتم الإجابة عليه قبل انتهاء الوقت وتم احتسابه ضمن الأخطاء.`,
                     `${unansweredInReview} question(s) were left unanswered before timeout and counted as wrong.`
@@ -507,7 +507,7 @@ export function QuizRunner({
               )}
 
               {filteredBreakdown.length === 0 ? (
-                <div className="py-8 text-center text-sm text-[#A8A29E] rounded-xl bg-[#0D0D10] border border-white/10">
+                <div className="py-8 text-center text-sm text-[#5C5850] dark:text-[#A8A29E] rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10">
                   {reviewFilter === 'wrong'
                     ? tr(
                         'لا توجد أخطاء! إجاباتك كلها صحيحة ما شاء الله.',
@@ -524,14 +524,14 @@ export function QuizRunner({
                         key={item.questionId + '-' + idx}
                         className={`p-4 sm:p-5 rounded-xl border space-y-3 ${
                           item.isCorrect
-                            ? 'bg-emerald-950/20 border-emerald-500/35'
-                            : 'bg-red-950/20 border-red-500/35'
+                            ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-500/35'
+                            : 'bg-red-50 dark:bg-red-950/20 border-red-500/35'
                         }`}
                       >
                         <div className="flex flex-wrap items-start justify-between gap-2">
-                          <div className="text-sm font-semibold text-[#F5F0E6]">
+                          <div className="text-sm font-semibold text-[#141418] dark:text-[#F5F0E6]">
                             <span
-                              className={`font-mono text-[#D4AF37] tabular-nums ${
+                              className={`font-mono text-[#9A7209] dark:text-[#D4AF37] tabular-nums ${
                                 isEn ? 'mr-2' : 'ml-2'
                               }`}
                             >
@@ -542,10 +542,10 @@ export function QuizRunner({
                           <span
                             className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-semibold shrink-0 ${
                               item.isCorrect
-                                ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/40'
+                                ? 'bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-500/40'
                                 : isUnanswered
-                                ? 'bg-amber-950/80 text-amber-300 border border-amber-500/40'
-                                : 'bg-red-950/80 text-red-300 border border-red-500/40'
+                                ? 'bg-amber-50 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-500/40'
+                                : 'bg-red-50 dark:bg-red-950/80 text-red-700 dark:text-red-300 border border-red-500/40'
                             }`}
                           >
                             {item.isCorrect ? (
@@ -576,10 +576,10 @@ export function QuizRunner({
                                 key={optIdx}
                                 className={`px-3.5 py-2 rounded-lg text-xs border flex items-center justify-between gap-2 ${
                                   isCorrectOpt
-                                    ? 'bg-emerald-950/60 border-emerald-500 text-emerald-200 font-semibold'
+                                    ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-800 dark:text-emerald-200 font-semibold'
                                     : isStudentPick
-                                    ? 'bg-red-950/60 border-red-500 text-red-200 font-semibold'
-                                    : 'bg-[#121216] border-white/10 text-[#A8A29E]'
+                                    ? 'bg-red-50 dark:bg-red-950/60 border-red-500 text-red-700 dark:text-red-200 font-semibold'
+                                    : 'bg-white dark:bg-[#121216] border-black/10 dark:border-white/10 text-[#5C5850] dark:text-[#A8A29E]'
                                 }`}
                               >
                                 <span>{opt}</span>
@@ -596,9 +596,9 @@ export function QuizRunner({
                         </div>
 
                         {item.explanation && (
-                          <div className="p-3 rounded-lg bg-[#09090B]/70 border border-[#D4AF37]/25 text-xs text-[#E5C158]">
+                          <div className="p-3 rounded-lg bg-[#F6F4EF]/85 dark:bg-[#09090B]/70 border border-[#D4AF37]/25 text-xs text-[#856104] dark:text-[#E5C158]">
                             <strong>{tr('التوضيح العلمي:', 'Explanation:')}</strong>{' '}
-                            <span className="text-[#C8C2B8]">{item.explanation}</span>
+                            <span className="text-[#3F3D38] dark:text-[#C8C2B8]">{item.explanation}</span>
                           </div>
                         )}
                       </div>
@@ -618,11 +618,11 @@ export function QuizRunner({
               return (
                 <div
                   key={q.id}
-                  className="p-4 sm:p-5 rounded-xl bg-[#0D0D10] border border-white/10 space-y-3"
+                  className="p-4 sm:p-5 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 space-y-3"
                 >
-                  <div className="text-sm font-semibold text-[#F5F0E6]">
+                  <div className="text-sm font-semibold text-[#141418] dark:text-[#F5F0E6]">
                     <span
-                      className={`font-mono text-[#D4AF37] tabular-nums ${
+                      className={`font-mono text-[#9A7209] dark:text-[#D4AF37] tabular-nums ${
                         isEn ? 'mr-2' : 'ml-2'
                       }`}
                     >
@@ -644,7 +644,7 @@ export function QuizRunner({
                           } px-4 py-2.5 rounded-lg text-xs sm:text-sm font-medium border transition-all cursor-pointer flex items-center justify-between gap-2 ${
                             isSelected
                               ? 'bg-[#D4AF37] border-[#E5C158] text-[#09090B] font-semibold'
-                              : 'bg-[#151519] border-white/10 text-[#C8C2B8] hover:border-[#D4AF37]/50'
+                              : 'bg-[#F5F2EA] dark:bg-[#151519] border-black/10 dark:border-white/10 text-[#3F3D38] dark:text-[#C8C2B8] hover:border-[#D4AF37]/50'
                           }`}
                         >
                           <span>{opt.label}</span>
@@ -658,7 +658,7 @@ export function QuizRunner({
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-            <span className="text-xs text-[#A8A29E]">
+            <span className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
               {tr(
                 'سيتم التصحيح التلقائي وعرض النتيجة وتحليل الأخطاء فور التسليم.',
                 'Auto-grading & mistake analysis will be shown immediately after submission.'
@@ -773,10 +773,10 @@ export function QuizBuilder({
   return (
     <form
       onSubmit={handleCreate}
-      className="p-4 sm:p-5 rounded-xl bg-[#0D0D10] border border-[#D4AF37]/30 space-y-4"
+      className="p-4 sm:p-5 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-[#D4AF37]/30 space-y-4"
     >
       <div className="flex items-center justify-between gap-2">
-        <h4 className="font-display text-base font-bold text-[#E5C158]">
+        <h4 className="font-display text-base font-bold text-[#856104] dark:text-[#E5C158]">
           {tr(
             'إنشاء اختبار متطور (مؤقت + بنك أسئلة عشوائي)',
             'Create Advanced Quiz (Timer + Random Question Bank)'
@@ -785,14 +785,14 @@ export function QuizBuilder({
         <button
           type="button"
           onClick={onCancel}
-          className="text-xs text-[#A8A29E] hover:text-[#F5F0E6] cursor-pointer"
+          className="text-xs text-[#5C5850] dark:text-[#A8A29E] hover:text-[#F5F0E6] cursor-pointer"
         >
           {tr('إلغاء', 'Cancel')}
         </button>
       </div>
 
       {error && (
-        <div className="p-3 rounded-lg bg-red-950/50 border border-red-500/40 text-red-200 text-xs">
+        <div className="p-3 rounded-lg bg-red-50 dark:bg-red-950/50 border border-red-500/40 text-red-700 dark:text-red-200 text-xs">
           {error}
         </div>
       )}
@@ -800,7 +800,7 @@ export function QuizBuilder({
       {/* Title & Timer & Points */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <div className="lg:col-span-2 space-y-1">
-          <label className="block text-[11px] text-[#A8A29E]">
+          <label className="block text-[11px] text-[#5C5850] dark:text-[#A8A29E]">
             {tr('عنوان الاختبار', 'Exam Title')}
           </label>
           <input
@@ -812,12 +812,12 @@ export function QuizBuilder({
               'مثال: اختبار منتصف الفصل',
               'e.g. Midterm Comprehensive Exam'
             )}
-            className="w-full px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+            className="w-full px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
           />
         </div>
 
         <div className="space-y-1">
-          <label className="block text-[11px] text-[#E5C158]">
+          <label className="block text-[11px] text-[#856104] dark:text-[#E5C158]">
             {tr('مؤقت الامتحان (بالدقائق)', 'Exam Timer (minutes)')}
           </label>
           <input
@@ -826,12 +826,12 @@ export function QuizBuilder({
             max={180}
             value={durationMinutes}
             onChange={(e) => setDurationMinutes(Math.max(1, Number(e.target.value)))}
-            className="w-full px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-sm text-[#F5F0E6] font-mono tabular-nums focus:outline-none focus:border-[#D4AF37]"
+            className="w-full px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] font-mono tabular-nums focus:outline-none focus:border-[#D4AF37]"
           />
         </div>
 
         <div className="space-y-1">
-          <label className="block text-[11px] text-[#A8A29E]">
+          <label className="block text-[11px] text-[#5C5850] dark:text-[#A8A29E]">
             {tr('نقاط كل سؤال', 'Points / Question')}
           </label>
           <input
@@ -840,15 +840,15 @@ export function QuizBuilder({
             max={100}
             value={pointsPerQuestion}
             onChange={(e) => setPointsPerQuestion(Math.max(1, Number(e.target.value)))}
-            className="w-full px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-sm text-[#F5F0E6] font-mono tabular-nums focus:outline-none focus:border-[#D4AF37]"
+            className="w-full px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] font-mono tabular-nums focus:outline-none focus:border-[#D4AF37]"
           />
         </div>
       </div>
 
       {/* Question Bank Settings */}
-      <div className="p-3.5 rounded-xl bg-[#151519] border border-white/10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-center">
+      <div className="p-3.5 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-center">
         <div className="space-y-1">
-          <label className="block text-[11px] text-[#A8A29E]">
+          <label className="block text-[11px] text-[#5C5850] dark:text-[#A8A29E]">
             {tr('عدد أسئلة المحاولة (0 = الكل)', 'Questions / Attempt (0 = All)')}
           </label>
           <input
@@ -857,11 +857,11 @@ export function QuizBuilder({
             max={questions.length}
             value={questionsPerAttempt}
             onChange={(e) => setQuestionsPerAttempt(Math.max(0, Number(e.target.value)))}
-            className="w-full px-3 py-1.5 rounded-lg bg-[#09090B] border border-white/10 text-sm text-[#F5F0E6] font-mono tabular-nums focus:outline-none focus:border-[#D4AF37]"
+            className="w-full px-3 py-1.5 rounded-lg bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] font-mono tabular-nums focus:outline-none focus:border-[#D4AF37]"
           />
         </div>
 
-        <label className="flex items-center gap-2 text-xs text-[#E5C158] cursor-pointer pt-2 sm:pt-4">
+        <label className="flex items-center gap-2 text-xs text-[#856104] dark:text-[#E5C158] cursor-pointer pt-2 sm:pt-4">
           <input
             type="checkbox"
             checked={randomizeQuestions}
@@ -871,7 +871,7 @@ export function QuizBuilder({
           <span>{tr('ترتيب عشوائي للأسئلة', 'Shuffle Questions')}</span>
         </label>
 
-        <label className="flex items-center gap-2 text-xs text-[#E5C158] cursor-pointer pt-2 sm:pt-4">
+        <label className="flex items-center gap-2 text-xs text-[#856104] dark:text-[#E5C158] cursor-pointer pt-2 sm:pt-4">
           <input
             type="checkbox"
             checked={randomizeOptions}
@@ -882,14 +882,14 @@ export function QuizBuilder({
         </label>
 
         <div className="space-y-1">
-          <label className="block text-[11px] text-[#A8A29E]">
+          <label className="block text-[11px] text-[#5C5850] dark:text-[#A8A29E]">
             {tr('موعد الإتاحة (اختياري)', 'Release Countdown (Opt)')}
           </label>
           <input
             type="datetime-local"
             value={releaseAt}
             onChange={(e) => setReleaseAt(e.target.value)}
-            className="w-full px-2.5 py-1.5 rounded-lg bg-[#09090B] border border-white/10 text-xs text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
+            className="w-full px-2.5 py-1.5 rounded-lg bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 text-xs text-[#141418] dark:text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
           />
         </div>
       </div>
@@ -899,17 +899,17 @@ export function QuizBuilder({
         {questions.map((q, qIdx) => (
           <div
             key={qIdx}
-            className="p-3.5 rounded-lg bg-[#151519] border border-white/10 space-y-2.5"
+            className="p-3.5 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 space-y-2.5"
           >
             <div className="flex items-center justify-between gap-2">
-              <span className="text-xs font-semibold text-[#D4AF37]">
+              <span className="text-xs font-semibold text-[#9A7209] dark:text-[#D4AF37]">
                 {tr(`سؤال في البنك #${qIdx + 1}`, `Bank Question #${qIdx + 1}`)}
               </span>
               {questions.length > 1 && (
                 <button
                   type="button"
                   onClick={() => removeQuestion(qIdx)}
-                  className="text-xs text-red-400 hover:text-red-300 inline-flex items-center gap-1 cursor-pointer"
+                  className="text-xs text-red-600 dark:text-red-400 hover:text-red-300 inline-flex items-center gap-1 cursor-pointer"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   <span>{tr('حذف', 'Delete')}</span>
@@ -926,7 +926,7 @@ export function QuizBuilder({
                 setQuestions(next);
               }}
               placeholder={tr('اكتب نص السؤال...', 'Write question text...')}
-              className="w-full px-3 py-2 rounded-lg bg-[#09090B] border border-white/10 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+              className="w-full px-3 py-2 rounded-lg bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
             />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {q.options.map((opt, optIdx) => (
@@ -953,7 +953,7 @@ export function QuizBuilder({
                       setQuestions(next);
                     }}
                     placeholder={tr(`الخيار ${optIdx + 1}`, `Option ${optIdx + 1}`)}
-                    className="flex-1 px-2.5 py-1.5 rounded-md bg-[#09090B] border border-white/10 text-xs text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+                    className="flex-1 px-2.5 py-1.5 rounded-md bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 text-xs text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
                   />
                 </div>
               ))}
@@ -970,7 +970,7 @@ export function QuizBuilder({
                 'توضيح الإجابة (يظهر في تحليل الأخطاء بعد التصحيح)',
                 'Answer explanation (shown in mistake analysis)'
               )}
-              className="w-full px-3 py-1.5 rounded-lg bg-[#09090B] border border-white/10 text-xs text-[#C8C2B8] focus:outline-none focus:border-[#D4AF37]"
+              className="w-full px-3 py-1.5 rounded-lg bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 text-xs text-[#3F3D38] dark:text-[#C8C2B8] focus:outline-none focus:border-[#D4AF37]"
             />
           </div>
         ))}

@@ -111,7 +111,7 @@ export function GroupLinksTab() {
       {isAdmin && showAdd && (
         <form
           onSubmit={handleAdd}
-          className="p-4 rounded-xl bg-[#09090B] border border-[#D4AF37]/30 space-y-3"
+          className="p-4 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-[#D4AF37]/30 space-y-3"
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <input
@@ -120,7 +120,7 @@ export function GroupLinksTab() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder={tr('اسم الجروب', 'Group name')}
-              className="px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+              className="px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
             />
             <input
               type="url"
@@ -129,7 +129,7 @@ export function GroupLinksTab() {
               onChange={(e) => setUrl(e.target.value)}
               placeholder={tr('رابط الدعوة (https://t.me/...)', 'Invite URL (https://t.me/...)')}
               dir="ltr"
-              className="px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-sm text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
+              className="px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
             />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -138,7 +138,7 @@ export function GroupLinksTab() {
               onChange={(e) =>
                 setPlatform(e.target.value as GroupLink['platform'])
               }
-              className="px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+              className="px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
             >
               <option value="Telegram">Telegram</option>
               <option value="WhatsApp">WhatsApp</option>
@@ -148,7 +148,7 @@ export function GroupLinksTab() {
             <select
               value={year}
               onChange={(e) => setYear(Number(e.target.value))}
-              className="px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+              className="px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
             >
               <option value={0}>{tr('جروب عام لكل الدفعات', 'General Group (All Years)')}</option>
               <option value={1}>{formatYear(1)}</option>
@@ -162,7 +162,7 @@ export function GroupLinksTab() {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder={tr('وصف الجروب...', 'Group description...')}
-            className="w-full px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+            className="w-full px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
           />
           <div className="flex justify-end">
             <GoldChip type="submit" active={true} disabled={saving}>
@@ -173,7 +173,7 @@ export function GroupLinksTab() {
       )}
 
       {loading ? (
-        <div className="py-8 text-center text-sm text-[#A8A29E]">
+        <div className="py-8 text-center text-sm text-[#5C5850] dark:text-[#A8A29E]">
           {tr('جاري تحميل روابط الجروبات...', 'Loading group links...')}
         </div>
       ) : (
@@ -181,10 +181,10 @@ export function GroupLinksTab() {
           {filtered.map((grp) => (
             <div
               key={grp.id}
-              className="p-5 rounded-xl bg-[#0D0D10] border border-white/10 hover:border-[#D4AF37]/50 flex flex-col justify-between gap-4 transition-colors"
+              className="p-5 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 hover:border-[#D4AF37]/50 flex flex-col justify-between gap-4 transition-colors"
             >
               <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-xs text-[#D4AF37]">
+                <div className="flex items-center justify-between text-xs text-[#9A7209] dark:text-[#D4AF37]">
                   <div className="flex items-center gap-2">
                     <Users className="w-3.5 h-3.5" />
                     <span>{grp.platform}</span>
@@ -197,24 +197,24 @@ export function GroupLinksTab() {
                     <button
                       type="button"
                       onClick={() => handleDelete(grp.id)}
-                      className="p-1 text-red-400 hover:text-red-300 cursor-pointer"
+                      className="p-1 text-red-600 dark:text-red-400 hover:text-red-300 cursor-pointer"
                       aria-label={tr('حذف الجروب', 'Delete group')}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   )}
                 </div>
-                <h4 className="font-display text-base font-bold text-[#F5F0E6]">
+                <h4 className="font-display text-base font-bold text-[#141418] dark:text-[#F5F0E6]">
                   {grp.title}
                 </h4>
-                <p className="text-xs text-[#C8C2B8]">{grp.description}</p>
+                <p className="text-xs text-[#3F3D38] dark:text-[#C8C2B8]">{grp.description}</p>
               </div>
 
               <a
                 href={grp.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold bg-[#151519] border border-[#D4AF37]/40 text-[#E5C158] hover:bg-[#D4AF37] hover:text-[#09090B] transition-all"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold bg-[#F5F2EA] dark:bg-[#151519] border border-[#D4AF37]/40 text-[#856104] dark:text-[#E5C158] hover:bg-[#D4AF37] hover:text-[#09090B] transition-all"
               >
                 <span>{tr('انضمام للجروب', 'Join Group')}</span>
                 <ExternalLink className="w-3.5 h-3.5" />

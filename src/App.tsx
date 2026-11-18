@@ -11,8 +11,14 @@ import { Footer } from './components/ui/Footer';
 import { GeoEngineeringBackground } from './components/ui/GeoEngineeringBackground';
 import { MviaBrandMark } from './components/ui/MviaBrandMark';
 import { Navbar } from './components/ui/Navbar';
+import {
+  PdfViewerPage,
+  getPdfTargetFromLocation,
+  type StandalonePdfTarget,
+} from './components/ui/PdfViewerPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
+import { ThemeProvider } from './context/ThemeContext';
 import type { NavSection, SystemStatusData } from './types';
 import { apiRequest, getStoredToken, resolveApiUrl } from './utils/api';
 
@@ -75,6 +81,24 @@ function MviaWorkspace() {
   const [activeSection, setActiveSection] = useState<NavSection>('home');
   const [pendingCourseId, setPendingCourseId] = useState<string | null>(null);
   const [maintenanceMessage, setMaintenanceMessage] = useState<string | null>(null);
+  const [standalonePdf, setStandalonePdf] = useState<StandalonePdfTarget | null>(() =>
+    getPdfTargetFromLocation()
+  );
+
+  useEffect(() => {
+    const syncPdfFromUrl = () => {
+      setStandalonePdf(getPdfTargetFromLocation());
+    };
+    window.addEventListener('popstate', syncPdfFromUrl);
+    return () => window.removeEventListener('popstate', syncPdfFromUrl);
+  }, []);
+
+  const handleExitPdfViewer = () => {
+    setStandalonePdf(null);
+    if (window.location.search) {
+      window.history.replaceState(null, '', window.location.pathname || '/');
+    }
+  };
 
   // Check initial maintenance status and listen for 503 maintenance responses
   useEffect(() => {
@@ -176,11 +200,11 @@ function MviaWorkspace() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#09090B] flex items-center justify-center px-4 relative overflow-hidden">
+      <div className="min-h-screen bg-[#F6F4EF] dark:bg-[#09090B] flex items-center justify-center px-4 relative overflow-hidden">
         <GeoEngineeringBackground variant="page" />
         <div className="relative z-10 text-center space-y-3 flex flex-col items-center">
           <MviaBrandMark size="lg" />
-          <p className="text-xs text-[#A8A29E]">
+          <p className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
             {tr('جاري تحميل المنصة...', 'Loading MAVIA platform...')}
           </p>
         </div>
@@ -191,18 +215,18 @@ function MviaWorkspace() {
   // Maintenance gate for non-admin signed-in users
   if (maintenanceMessage && user && user.role !== 'admin') {
     return (
-      <div className="min-h-screen bg-[#09090B] text-[#F5F0E6] flex flex-col justify-between px-4 relative overflow-hidden">
+      <div className="min-h-screen bg-[#F6F4EF] dark:bg-[#09090B] text-[#141418] dark:text-[#F5F0E6] flex flex-col justify-between px-4 relative overflow-hidden">
         <GeoEngineeringBackground variant="page" />
         <main className="relative z-10 flex-1 flex items-center justify-center py-12">
-          <div className="w-full max-w-lg rounded-2xl bg-[#121216] border border-amber-500/40 p-6 sm:p-8 text-center space-y-5 shadow-[0_24px_80px_rgba(0,0,0,0.75)]">
-            <div className="mx-auto w-14 h-14 rounded-2xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-amber-300">
+          <div className="w-full max-w-lg rounded-2xl bg-white dark:bg-[#121216] border border-amber-500/40 p-6 sm:p-8 text-center space-y-5 shadow-xl dark:shadow-[0_24px_80px_rgba(0,0,0,0.75)]">
+            <div className="mx-auto w-14 h-14 rounded-2xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-amber-700 dark:text-amber-300">
               <Wrench className="w-7 h-7" />
             </div>
             <div className="space-y-2">
-              <h1 className="font-display text-2xl font-bold text-[#E5C158]">
+              <h1 className="font-display text-2xl font-bold text-[#856104] dark:text-[#E5C158]">
                 {tr('المنصة في وضع الصيانة المجدولة', 'Scheduled Platform Maintenance')}
               </h1>
-              <p className="text-sm text-[#C8C2B8] leading-relaxed">{maintenanceMessage}</p>
+              <p className="text-sm text-[#3F3D38] dark:text-[#C8C2B8] leading-relaxed">{maintenanceMessage}</p>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
               <button
@@ -216,7 +240,7 @@ function MviaWorkspace() {
               <button
                 type="button"
                 onClick={logout}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#18181D] border border-white/15 text-[#F5F0E6] text-xs hover:border-[#D4AF37]/50 cursor-pointer"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#F2EFE7] dark:bg-[#18181D] border border-black/15 dark:border-white/15 text-[#141418] dark:text-[#F5F0E6] text-xs hover:border-[#D4AF37]/50 cursor-pointer"
               >
                 <LogOut className="w-4 h-4" />
                 <span>{tr('تسجيل الخروج', 'Sign Out')}</span>
@@ -233,7 +257,7 @@ function MviaWorkspace() {
     return (
       <>
         {maintenanceMessage && (
-          <div className="bg-amber-950/85 border-b border-amber-500/40 text-amber-100 text-xs text-center px-4 py-2.5">
+          <div className="bg-amber-50 dark:bg-amber-950/85 border-b border-amber-500/40 text-amber-900 dark:text-amber-100 text-xs text-center px-4 py-2.5">
             <strong>{tr('وضع الصيانة:', 'Maintenance Mode:')}</strong> {maintenanceMessage}
           </div>
         )}
@@ -246,8 +270,19 @@ function MviaWorkspace() {
     return <WelcomeCelebrationScreen />;
   }
 
+  if (standalonePdf) {
+    return (
+      <PdfViewerPage
+        fileUrl={standalonePdf.fileUrl}
+        title={standalonePdf.title}
+        downloadName={standalonePdf.downloadName}
+        onBack={handleExitPdfViewer}
+      />
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-[#09090B] text-[#F5F0E6] flex flex-col relative overflow-x-hidden mvia-protected">
+    <div className="min-h-screen bg-[#F6F4EF] dark:bg-[#09090B] text-[#141418] dark:text-[#F5F0E6] flex flex-col relative overflow-x-hidden mvia-protected transition-colors duration-200">
       <AntiScreenshotGuard />
       <a href="#main-content" className="skip-to-content">
         {tr('تخطي إلى المحتوى الرئيسي', 'Skip to main content')}
@@ -256,7 +291,7 @@ function MviaWorkspace() {
       <GeoEngineeringBackground variant="page" />
 
       {maintenanceMessage && user.role === 'admin' && (
-        <div className="relative z-40 bg-amber-950/90 border-b border-amber-500/50 text-amber-100 text-xs text-center px-4 py-2">
+        <div className="relative z-40 bg-amber-50 dark:bg-amber-950/90 border-b border-amber-500/50 text-amber-900 dark:text-amber-100 text-xs text-center px-4 py-2">
           {tr(
             'تنبيه للأدمن: وضع الصيانة مُفعّل حالياً (الطلاب لا يمكنهم التصفح حتى يتم إيقافه من لوحة الصيانة بالأسفل).',
             'Admin Notice: Maintenance mode is currently ACTIVE (students see maintenance screen until disabled).'
@@ -277,7 +312,7 @@ function MviaWorkspace() {
       >
         <Suspense
           fallback={
-            <div className="py-16 text-center text-xs text-[#A8A29E] space-y-2">
+            <div className="py-16 text-center text-xs text-[#5C5850] dark:text-[#A8A29E] space-y-2">
               <div className="mx-auto w-8 h-8 border-2 border-[#D4AF37]/30 border-t-[#D4AF37] rounded-full animate-spin" />
               <p>{tr('جاري تحميل القسم...', 'Loading section...')}</p>
             </div>
@@ -336,11 +371,13 @@ function MviaWorkspace() {
 export default function App() {
   return (
     <MotionConfig reducedMotion="user">
-      <LanguageProvider>
-        <AuthProvider>
-          <MviaWorkspace />
-        </AuthProvider>
-      </LanguageProvider>
+      <ThemeProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <MviaWorkspace />
+          </AuthProvider>
+        </LanguageProvider>
+      </ThemeProvider>
     </MotionConfig>
   );
 }

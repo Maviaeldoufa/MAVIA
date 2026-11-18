@@ -4,15 +4,18 @@ import {
   Languages,
   Lock,
   Mail,
+  Moon,
   Phone,
   Scale,
   ShieldCheck,
+  Sun,
   User as UserIcon,
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
 import type { AcademicYear } from '../../types';
 import {
   clearAuthHistory,
@@ -45,6 +48,7 @@ interface FieldErrors {
 export function AuthScreen() {
   const { login, register, suspensionNotice, clearSuspensionNotice } = useAuth();
   const { lang, toggleLang, tr } = useLanguage();
+  const { isLight, toggleTheme } = useTheme();
   const [mode, setMode] = useState<'register' | 'login'>(() =>
     hasRegisteredBefore() ? 'login' : 'register'
   );
@@ -193,27 +197,34 @@ export function AuthScreen() {
   };
 
   return (
-    <div className="min-h-screen bg-[#09090B] text-[#F5F0E6] flex flex-col relative overflow-x-hidden">
+    <div className="min-h-screen bg-[#F6F4EF] dark:bg-[#09090B] text-[#141418] dark:text-[#F5F0E6] flex flex-col relative overflow-x-hidden transition-colors duration-200">
       <GeoEngineeringBackground variant="page" />
       <div className="relative z-10 flex-1 grid grid-cols-1 lg:grid-cols-2 items-stretch">
         {/* Form Column */}
         <div className="flex flex-col justify-center px-6 py-8 sm:px-12 lg:px-14">
           <div className="w-full max-w-md mx-auto space-y-6">
-            {/* Top Bar with Terms Badge & Language Switcher */}
-            <div className="flex items-center justify-between gap-2">
+            {/* Top Bar with Terms Badge, Theme Toggle & Language Switcher */}
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <GoldChip
                 type="button"
                 onClick={() => setTermsOpen(true)}
                 className="text-xs px-3 py-1.5"
               >
-                <Scale className="w-3.5 h-3.5 text-[#D4AF37]" />
+                <Scale className="w-3.5 h-3.5 text-[#856104] dark:text-[#D4AF37]" />
                 <span>{tr('الشروط والأحكام', 'Terms & Conditions')}</span>
               </GoldChip>
 
-              <GoldChip onClick={toggleLang} className="text-xs px-3 py-1.5 font-mono">
-                <Languages className="w-3.5 h-3.5" />
-                <span>{lang === 'ar' ? 'English (EN)' : 'العربية (AR)'}</span>
-              </GoldChip>
+              <div className="flex items-center gap-2">
+                <GoldChip onClick={toggleTheme} className="text-xs px-3 py-1.5">
+                  {isLight ? <Moon className="w-3.5 h-3.5" /> : <Sun className="w-3.5 h-3.5" />}
+                  <span>{isLight ? tr('مظلم', 'Dark') : tr('فاتح', 'Light')}</span>
+                </GoldChip>
+
+                <GoldChip onClick={toggleLang} className="text-xs px-3 py-1.5 font-mono">
+                  <Languages className="w-3.5 h-3.5" />
+                  <span>{lang === 'ar' ? 'English (EN)' : 'العربية (AR)'}</span>
+                </GoldChip>
+              </div>
             </div>
 
             {/* Larger Official Floating Logo & MAVIA Engineer Hat Title */}
@@ -222,14 +233,14 @@ export function AuthScreen() {
               <div className="space-y-1 flex flex-col items-center">
                 <h1 className="sr-only">MAVIA</h1>
                 <MviaBrandMark size="lg" />
-                <p className="text-xs text-[#D4AF37]">
+                <p className="text-xs font-semibold text-[#856104] dark:text-[#D4AF37]">
                   {tr(
                     'منصة MAVIA التعليمية · GIS والبرمجة',
                     'MAVIA Educational Platform · GIS & Programming'
                   )}
                 </p>
               </div>
-              <p className="text-xs sm:text-sm text-[#C8C2B8] leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#3F3D38] dark:text-[#C8C2B8] leading-relaxed">
                 {tr(
                   'سجّل دخولك أو أنشئ حسابك بالاسم والبريد الإلكتروني ورقم التليفون والسنة الدراسية للوصول إلى مواد دفعتك، الملخصات، الاختبارات الشاملة، ومجتمع الدفعة.',
                   'Sign in or register with your full name, email, phone, and academic year to access courses, PDF summaries, quizzes, and your batch community.'
@@ -238,7 +249,7 @@ export function AuthScreen() {
             </div>
 
             {/* Mode Toggle with Interactive Gold Chips */}
-            <div className="grid grid-cols-2 gap-2 p-1.5 rounded-xl bg-[#121216] border border-white/10">
+            <div className="grid grid-cols-2 gap-2 p-1.5 rounded-xl bg-white dark:bg-[#121216] border border-black/10 dark:border-white/10 shadow-xs dark:shadow-none">
               <GoldChip
                 active={mode === 'register'}
                 layoutId="auth-mode-chip"
@@ -266,8 +277,8 @@ export function AuthScreen() {
             </div>
 
             {requiresInitialAdminSetup && mode === 'register' && (
-              <div className="p-3.5 rounded-xl bg-[#D4AF37]/12 border border-[#D4AF37]/45 text-[#F5D061] text-xs sm:text-sm flex items-start gap-2.5">
-                <ShieldCheck className="w-5 h-5 text-[#F5D061] shrink-0 mt-0.5" />
+              <div className="p-3.5 rounded-xl bg-[#D4AF37]/15 dark:bg-[#D4AF37]/12 border border-[#D4AF37]/45 text-[#735303] dark:text-[#F5D061] text-xs sm:text-sm flex items-start gap-2.5">
+                <ShieldCheck className="w-5 h-5 text-[#856104] dark:text-[#F5D061] shrink-0 mt-0.5" />
                 <span>
                   {tr(
                     'التسجيل التأسيسي الأول: أول حساب يتم إنشاؤه الآن سيُمنح تلقائياً رتبة المدير العام مع كامل صلاحيات الأدمن.',
@@ -280,16 +291,16 @@ export function AuthScreen() {
             {suspensionNotice && (
               <div
                 role="alert"
-                className="p-3.5 rounded-xl bg-amber-950/60 border border-amber-500/50 text-amber-200 text-xs sm:text-sm flex items-start justify-between gap-2"
+                className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-500/50 text-amber-900 dark:text-amber-200 text-xs sm:text-sm flex items-start justify-between gap-2"
               >
                 <div className="flex items-start gap-2">
-                  <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
                   <span>{suspensionNotice}</span>
                 </div>
                 <button
                   type="button"
                   onClick={clearSuspensionNotice}
-                  className="text-[11px] text-amber-300 underline shrink-0 cursor-pointer"
+                  className="text-[11px] text-amber-700 dark:text-amber-300 underline shrink-0 cursor-pointer"
                 >
                   {tr('إغلاق', 'Dismiss')}
                 </button>
@@ -299,9 +310,9 @@ export function AuthScreen() {
             {error && (
               <div
                 role="alert"
-                className="p-3.5 rounded-xl bg-red-950/50 border border-red-500/40 text-red-200 text-sm flex items-center gap-2"
+                className="p-3.5 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-500/40 text-red-800 dark:text-red-200 text-sm flex items-center gap-2"
               >
-                <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+                <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0" />
                 <span>{error}</span>
               </div>
             )}
@@ -312,11 +323,11 @@ export function AuthScreen() {
                   {/* Name */}
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <label className="block text-xs font-semibold text-[#C8C2B8]">
+                      <label className="block text-xs font-semibold text-[#3F3D38] dark:text-[#C8C2B8]">
                         {tr('الاسم الكامل', 'Full Name')}
                       </label>
                       {fieldErrors.name && (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-400">
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 dark:text-amber-400">
                           <AlertCircle className="w-3.5 h-3.5" />
                           <span>{fieldErrors.name}</span>
                         </span>
@@ -325,7 +336,7 @@ export function AuthScreen() {
                     <div className="relative">
                       <UserIcon
                         className={`w-4 h-4 absolute start-3.5 top-1/2 -translate-y-1/2 pointer-events-none ${
-                          fieldErrors.name ? 'text-amber-400' : 'text-[#A8A29E]'
+                          fieldErrors.name ? 'text-amber-600 dark:text-amber-400' : 'text-[#5C5850] dark:text-[#A8A29E]'
                         }`}
                       />
                       <input
@@ -336,10 +347,10 @@ export function AuthScreen() {
                           clearFieldError('name');
                         }}
                         placeholder={tr('مثال: محمد أحمد علي', 'e.g. Mohamed Ahmed')}
-                        className={`w-full ps-10 pe-4 py-2.5 rounded-xl bg-[#121216] border text-sm text-[#F5F0E6] placeholder-[#6B6661] focus:outline-none transition-colors ${
+                        className={`w-full ps-10 pe-4 py-2.5 rounded-xl bg-white dark:bg-[#121216] border text-sm text-[#141418] dark:text-[#F5F0E6] placeholder-[#6E6A61] dark:placeholder-[#6B6661] focus:outline-none transition-colors ${
                           fieldErrors.name
-                            ? 'border-amber-400/80 bg-amber-950/15'
-                            : 'border-white/10 focus:border-[#D4AF37]'
+                            ? 'border-amber-500/80 dark:border-amber-400/80 bg-amber-50 dark:bg-amber-950/15'
+                            : 'border-black/15 dark:border-white/10 focus:border-[#D4AF37]'
                         }`}
                       />
                     </div>
@@ -348,11 +359,11 @@ export function AuthScreen() {
                   {/* Email */}
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <label className="block text-xs font-semibold text-[#C8C2B8]">
+                      <label className="block text-xs font-semibold text-[#3F3D38] dark:text-[#C8C2B8]">
                         {tr('البريد الإلكتروني (الإيميل)', 'Email Address')}
                       </label>
                       {fieldErrors.email && (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-400">
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 dark:text-amber-400">
                           <AlertCircle className="w-3.5 h-3.5" />
                           <span>{fieldErrors.email}</span>
                         </span>
@@ -361,7 +372,7 @@ export function AuthScreen() {
                     <div className="relative">
                       <Mail
                         className={`w-4 h-4 absolute start-3.5 top-1/2 -translate-y-1/2 pointer-events-none ${
-                          fieldErrors.email ? 'text-amber-400' : 'text-[#A8A29E]'
+                          fieldErrors.email ? 'text-amber-600 dark:text-amber-400' : 'text-[#5C5850] dark:text-[#A8A29E]'
                         }`}
                       />
                       <input
@@ -372,10 +383,10 @@ export function AuthScreen() {
                           clearFieldError('email');
                         }}
                         placeholder="name@example.com"
-                        className={`w-full ps-10 pe-4 py-2.5 rounded-xl bg-[#121216] border text-sm text-[#F5F0E6] placeholder-[#6B6661] font-mono focus:outline-none transition-colors ${
+                        className={`w-full ps-10 pe-4 py-2.5 rounded-xl bg-white dark:bg-[#121216] border text-sm text-[#141418] dark:text-[#F5F0E6] placeholder-[#6E6A61] dark:placeholder-[#6B6661] font-mono focus:outline-none transition-colors ${
                           fieldErrors.email
-                            ? 'border-amber-400/80 bg-amber-950/15'
-                            : 'border-white/10 focus:border-[#D4AF37]'
+                            ? 'border-amber-500/80 dark:border-amber-400/80 bg-amber-50 dark:bg-amber-950/15'
+                            : 'border-black/15 dark:border-white/10 focus:border-[#D4AF37]'
                         }`}
                       />
                     </div>
@@ -384,11 +395,11 @@ export function AuthScreen() {
                   {/* Phone */}
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <label className="block text-xs font-semibold text-[#C8C2B8]">
+                      <label className="block text-xs font-semibold text-[#3F3D38] dark:text-[#C8C2B8]">
                         {tr('رقم التليفون', 'Phone Number')}
                       </label>
                       {fieldErrors.phone && (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-400">
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 dark:text-amber-400">
                           <AlertCircle className="w-3.5 h-3.5" />
                           <span>{fieldErrors.phone}</span>
                         </span>
@@ -397,7 +408,7 @@ export function AuthScreen() {
                     <div className="relative">
                       <Phone
                         className={`w-4 h-4 absolute start-3.5 top-1/2 -translate-y-1/2 pointer-events-none ${
-                          fieldErrors.phone ? 'text-amber-400' : 'text-[#A8A29E]'
+                          fieldErrors.phone ? 'text-amber-600 dark:text-amber-400' : 'text-[#5C5850] dark:text-[#A8A29E]'
                         }`}
                       />
                       <input
@@ -408,10 +419,10 @@ export function AuthScreen() {
                           clearFieldError('phone');
                         }}
                         placeholder="010xxxxxxxx"
-                        className={`w-full ps-10 pe-4 py-2.5 rounded-xl bg-[#121216] border text-sm text-[#F5F0E6] placeholder-[#6B6661] font-mono tabular-nums focus:outline-none transition-colors ${
+                        className={`w-full ps-10 pe-4 py-2.5 rounded-xl bg-white dark:bg-[#121216] border text-sm text-[#141418] dark:text-[#F5F0E6] placeholder-[#6E6A61] dark:placeholder-[#6B6661] font-mono tabular-nums focus:outline-none transition-colors ${
                           fieldErrors.phone
-                            ? 'border-amber-400/80 bg-amber-950/15'
-                            : 'border-white/10 focus:border-[#D4AF37]'
+                            ? 'border-amber-500/80 dark:border-amber-400/80 bg-amber-50 dark:bg-amber-950/15'
+                            : 'border-black/15 dark:border-white/10 focus:border-[#D4AF37]'
                         }`}
                       />
                     </div>
@@ -420,11 +431,11 @@ export function AuthScreen() {
                   {/* Password */}
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <label className="block text-xs font-semibold text-[#C8C2B8]">
+                      <label className="block text-xs font-semibold text-[#3F3D38] dark:text-[#C8C2B8]">
                         {tr('كلمة المرور (الباسورد)', 'Password')}
                       </label>
                       {fieldErrors.password && (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-400">
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 dark:text-amber-400">
                           <AlertCircle className="w-3.5 h-3.5" />
                           <span>{fieldErrors.password}</span>
                         </span>
@@ -440,14 +451,14 @@ export function AuthScreen() {
                       startIcon={
                         <Lock
                           className={`w-4 h-4 ${
-                            fieldErrors.password ? 'text-amber-400' : 'text-[#A8A29E]'
+                            fieldErrors.password ? 'text-amber-600 dark:text-amber-400' : 'text-[#5C5850] dark:text-[#A8A29E]'
                           }`}
                         />
                       }
-                      className={`w-full py-2.5 rounded-xl bg-[#121216] border text-sm text-[#F5F0E6] placeholder-[#6B6661] focus:outline-none transition-colors ${
+                      className={`w-full py-2.5 rounded-xl bg-white dark:bg-[#121216] border text-sm text-[#141418] dark:text-[#F5F0E6] placeholder-[#6E6A61] dark:placeholder-[#6B6661] focus:outline-none transition-colors ${
                         fieldErrors.password
-                          ? 'border-amber-400/80 bg-amber-950/15'
-                          : 'border-white/10 focus:border-[#D4AF37]'
+                          ? 'border-amber-500/80 dark:border-amber-400/80 bg-amber-50 dark:bg-amber-950/15'
+                          : 'border-black/15 dark:border-white/10 focus:border-[#D4AF37]'
                       }`}
                     />
                   </div>
@@ -455,11 +466,11 @@ export function AuthScreen() {
                   {/* Academic Year */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <label className="block text-xs font-semibold text-[#C8C2B8]">
+                      <label className="block text-xs font-semibold text-[#3F3D38] dark:text-[#C8C2B8]">
                         {tr('السنة الدراسية', 'Academic Year')}
                       </label>
                       {fieldErrors.year && (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-400">
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 dark:text-amber-400">
                           <AlertCircle className="w-3.5 h-3.5" />
                           <span>{fieldErrors.year}</span>
                         </span>
@@ -468,7 +479,7 @@ export function AuthScreen() {
                     <div
                       className={`grid grid-cols-4 gap-2 p-1 rounded-xl border transition-colors ${
                         fieldErrors.year
-                          ? 'border-amber-400/80 bg-amber-950/15'
+                          ? 'border-amber-500/80 dark:border-amber-400/80 bg-amber-50 dark:bg-amber-950/15'
                           : 'border-transparent'
                       }`}
                     >
@@ -493,7 +504,7 @@ export function AuthScreen() {
                     <button
                       type="button"
                       onClick={() => setRegisterAsAdmin((prev) => !prev)}
-                      className="inline-flex items-center gap-2 text-xs font-medium text-[#D4AF37] hover:text-[#F5D061] cursor-pointer"
+                      className="inline-flex items-center gap-2 text-xs font-medium text-[#856104] dark:text-[#D4AF37] hover:text-[#735303] dark:hover:text-[#F5D061] cursor-pointer"
                     >
                       <ShieldCheck className="w-4 h-4" />
                       <span>
@@ -510,9 +521,9 @@ export function AuthScreen() {
                       <motion.div
                         initial={{ opacity: 0, y: -6 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="space-y-1.5 p-3.5 rounded-xl bg-[#121216] border border-[#D4AF37]/30"
+                        className="space-y-1.5 p-3.5 rounded-xl bg-white dark:bg-[#121216] border border-[#D4AF37]/35 dark:border-[#D4AF37]/30"
                       >
-                        <label className="block text-xs font-semibold text-[#E5C158]">
+                        <label className="block text-xs font-semibold text-[#856104] dark:text-[#E5C158]">
                           {tr(
                             'كود تفعيل الأدمن السري',
                             'Admin Secret Activation Code'
@@ -522,10 +533,10 @@ export function AuthScreen() {
                           value={adminCode}
                           onChange={(e) => setAdminCode(e.target.value)}
                           placeholder="••••••••"
-                          startIcon={<KeyRound className="w-4 h-4 text-[#D4AF37]" />}
-                          className="w-full py-2 rounded-lg bg-[#09090B] border border-[#D4AF37]/40 text-sm text-[#F5F0E6] font-mono focus:outline-none focus:border-[#E5C158]"
+                          startIcon={<KeyRound className="w-4 h-4 text-[#856104] dark:text-[#D4AF37]" />}
+                          className="w-full py-2 rounded-lg bg-[#F6F4EF] dark:bg-[#09090B] border border-[#D4AF37]/40 text-sm text-[#141418] dark:text-[#F5F0E6] font-mono focus:outline-none focus:border-[#E5C158]"
                         />
-                        <p className="text-[11px] text-[#A8A29E]">
+                        <p className="text-[11px] text-[#5C5850] dark:text-[#A8A29E]">
                           {tr(
                             'يمنحك حساب الأدمن المحمي صلاحية إضافة/طرد الأعضاء وإضافة المواد والمجلدات والملخصات ولا يمكن لأي شخص طردك.',
                             'Protected Admin accounts manage users, courses, folders, covers, and announcements with kick immunity.'
@@ -539,11 +550,11 @@ export function AuthScreen() {
                   <div
                     className={`p-3 rounded-xl border transition-colors space-y-1.5 ${
                       fieldErrors.terms
-                        ? 'bg-amber-950/20 border-amber-400/80'
-                        : 'bg-[#121216] border-white/10'
+                        ? 'bg-amber-50 dark:bg-amber-950/20 border-amber-500/80 dark:border-amber-400/80'
+                        : 'bg-white dark:bg-[#121216] border-black/10 dark:border-white/10'
                     }`}
                   >
-                    <label className="flex items-start gap-2.5 text-xs text-[#E5E0D8] cursor-pointer">
+                    <label className="flex items-start gap-2.5 text-xs text-[#2F2D28] dark:text-[#E5E0D8] cursor-pointer">
                       <input
                         type="checkbox"
                         checked={acceptedTerms}
@@ -561,7 +572,7 @@ export function AuthScreen() {
                         <button
                           type="button"
                           onClick={() => setTermsOpen(true)}
-                          className="text-[#E5C158] underline font-semibold hover:text-[#F5D061] cursor-pointer"
+                          className="text-[#856104] dark:text-[#E5C158] underline font-semibold hover:text-[#735303] dark:hover:text-[#F5D061] cursor-pointer"
                         >
                           {tr('الشروط والأحكام', 'Terms & Conditions')}
                         </button>{' '}
@@ -572,7 +583,7 @@ export function AuthScreen() {
                       </span>
                     </label>
                     {fieldErrors.terms && (
-                      <div className="flex items-center gap-1 text-[11px] font-semibold text-amber-400">
+                      <div className="flex items-center gap-1 text-[11px] font-semibold text-amber-700 dark:text-amber-400">
                         <AlertCircle className="w-3.5 h-3.5" />
                         <span>{fieldErrors.terms}</span>
                       </div>
@@ -583,11 +594,11 @@ export function AuthScreen() {
                 <>
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <label className="block text-xs font-semibold text-[#C8C2B8]">
+                      <label className="block text-xs font-semibold text-[#3F3D38] dark:text-[#C8C2B8]">
                         {tr('البريد الإلكتروني أو رقم التليفون', 'Email or Phone Number')}
                       </label>
                       {fieldErrors.identifier && (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-400">
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 dark:text-amber-400">
                           <AlertCircle className="w-3.5 h-3.5" />
                           <span>{fieldErrors.identifier}</span>
                         </span>
@@ -596,7 +607,7 @@ export function AuthScreen() {
                     <div className="relative">
                       <Phone
                         className={`w-4 h-4 absolute start-3.5 top-1/2 -translate-y-1/2 pointer-events-none ${
-                          fieldErrors.identifier ? 'text-amber-400' : 'text-[#A8A29E]'
+                          fieldErrors.identifier ? 'text-amber-600 dark:text-amber-400' : 'text-[#5C5850] dark:text-[#A8A29E]'
                         }`}
                       />
                       <input
@@ -607,10 +618,10 @@ export function AuthScreen() {
                           clearFieldError('identifier');
                         }}
                         placeholder="name@example.com / 010xxxxxxxx"
-                        className={`w-full ps-10 pe-4 py-2.5 rounded-xl bg-[#121216] border text-sm text-[#F5F0E6] placeholder-[#6B6661] focus:outline-none transition-colors ${
+                        className={`w-full ps-10 pe-4 py-2.5 rounded-xl bg-white dark:bg-[#121216] border text-sm text-[#141418] dark:text-[#F5F0E6] placeholder-[#6E6A61] dark:placeholder-[#6B6661] focus:outline-none transition-colors ${
                           fieldErrors.identifier
-                            ? 'border-amber-400/80 bg-amber-950/15'
-                            : 'border-white/10 focus:border-[#D4AF37]'
+                            ? 'border-amber-500/80 dark:border-amber-400/80 bg-amber-50 dark:bg-amber-950/15'
+                            : 'border-black/15 dark:border-white/10 focus:border-[#D4AF37]'
                         }`}
                       />
                     </div>
@@ -618,11 +629,11 @@ export function AuthScreen() {
 
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <label className="block text-xs font-semibold text-[#C8C2B8]">
+                      <label className="block text-xs font-semibold text-[#3F3D38] dark:text-[#C8C2B8]">
                         {tr('كلمة المرور', 'Password')}
                       </label>
                       {fieldErrors.loginPassword && (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-400">
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 dark:text-amber-400">
                           <AlertCircle className="w-3.5 h-3.5" />
                           <span>{fieldErrors.loginPassword}</span>
                         </span>
@@ -638,14 +649,14 @@ export function AuthScreen() {
                       startIcon={
                         <Lock
                           className={`w-4 h-4 ${
-                            fieldErrors.loginPassword ? 'text-amber-400' : 'text-[#A8A29E]'
+                            fieldErrors.loginPassword ? 'text-amber-600 dark:text-amber-400' : 'text-[#5C5850] dark:text-[#A8A29E]'
                           }`}
                         />
                       }
-                      className={`w-full py-2.5 rounded-xl bg-[#121216] border text-sm text-[#F5F0E6] placeholder-[#6B6661] focus:outline-none transition-colors ${
+                      className={`w-full py-2.5 rounded-xl bg-white dark:bg-[#121216] border text-sm text-[#141418] dark:text-[#F5F0E6] placeholder-[#6E6A61] dark:placeholder-[#6B6661] focus:outline-none transition-colors ${
                         fieldErrors.loginPassword
-                          ? 'border-amber-400/80 bg-amber-950/15'
-                          : 'border-white/10 focus:border-[#D4AF37]'
+                          ? 'border-amber-500/80 dark:border-amber-400/80 bg-amber-50 dark:bg-amber-950/15'
+                          : 'border-black/15 dark:border-white/10 focus:border-[#D4AF37]'
                       }`}
                     />
                   </div>
@@ -667,18 +678,18 @@ export function AuthScreen() {
             </form>
 
             {/* Support Contact Bar right on Auth screen */}
-            <div className="p-3.5 rounded-xl bg-[#121216] border border-[#D4AF37]/25">
+            <div className="p-3.5 rounded-xl bg-white dark:bg-[#121216] border border-[#D4AF37]/30 dark:border-[#D4AF37]/25">
               <SupportBar />
             </div>
           </div>
         </div>
 
         {/* Showcase Column with Large Floating MAVIA Logo */}
-        <div className="relative hidden lg:flex flex-col justify-between p-12 overflow-hidden border-s border-[#D4AF37]/20 bg-[#0D0D10]/90">
+        <div className="relative hidden lg:flex flex-col justify-between p-12 overflow-hidden border-s border-black/10 dark:border-[#D4AF37]/20 bg-[#EFECE4] dark:bg-[#0D0D10]/90">
           <GeoEngineeringBackground variant="hero" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#09090B] via-[#09090B]/55 to-[#09090B]/30" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#EFECE4]/95 via-[#F6F4EF]/70 to-[#EFECE4]/40 dark:from-[#09090B] dark:via-[#09090B]/55 dark:to-[#09090B]/30" />
 
-          <div className="relative z-10 flex items-center justify-between text-xs text-[#D4AF37]">
+          <div className="relative z-10 flex items-center justify-between text-xs font-semibold text-[#856104] dark:text-[#D4AF37]">
             <span>
               {tr(
                 'الفرقة الأولى · الثانية · الثالثة · الرابعة',
@@ -693,40 +704,40 @@ export function AuthScreen() {
           </div>
 
           <div className="relative z-10 space-y-6 max-w-lg">
-            <h2 className="font-display text-3xl sm:text-4xl font-bold leading-snug text-[#F5F0E6] text-balance">
+            <h2 className="font-display text-3xl sm:text-4xl font-bold leading-snug text-[#141418] dark:text-[#F5F0E6] text-balance">
               {tr(
                 'كل ما تحتاجه دفعتك من ملخصات واختبارات ومسارات GIS والبرمجة في مكان واحد.',
                 'Everything your batch needs: folders, PDF summaries, quizzes, GIS & programming tracks in one place.'
               )}
             </h2>
-            <p className="text-sm text-[#C8C2B8] leading-relaxed">
+            <p className="text-sm text-[#3F3D38] dark:text-[#C8C2B8] leading-relaxed">
               {tr(
                 'منصة MAVIA مصممة خصيصاً لربط طلاب الفرق الأربع بمواد كل دفعة، مجلدات منظمة بأغلفة مخصصة، اختبارات تفاعلية بلوحة تصدر، حاسبة GPA، ومجتمع متكامل.',
                 'MAVIA connects students across all 4 academic years with organized course folders, PDF libraries, interactive quizzes, a GPA calculator, and a live batch community.'
               )}
             </p>
-            <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/10">
+            <div className="grid grid-cols-3 gap-4 pt-4 border-t border-black/10 dark:border-white/10">
               <div>
-                <div className="font-mono text-2xl font-semibold text-[#E5C158] tabular-nums">
+                <div className="font-mono text-2xl font-semibold text-[#856104] dark:text-[#E5C158] tabular-nums">
                   4
                 </div>
-                <div className="text-xs text-[#A8A29E] mt-0.5">
+                <div className="text-xs text-[#5C5850] dark:text-[#A8A29E] mt-0.5">
                   {tr('دفعات دراسية', 'Academic Years')}
                 </div>
               </div>
               <div>
-                <div className="font-mono text-2xl font-semibold text-[#E5C158] tabular-nums">
+                <div className="font-mono text-2xl font-semibold text-[#856104] dark:text-[#E5C158] tabular-nums">
                   PDF
                 </div>
-                <div className="text-xs text-[#A8A29E] mt-0.5">
+                <div className="text-xs text-[#5C5850] dark:text-[#A8A29E] mt-0.5">
                   {tr('ملخصات ومذكرات', 'PDF Summaries')}
                 </div>
               </div>
               <div>
-                <div className="font-mono text-2xl font-semibold text-[#E5C158] tabular-nums">
+                <div className="font-mono text-2xl font-semibold text-[#856104] dark:text-[#E5C158] tabular-nums">
                   4.0
                 </div>
-                <div className="text-xs text-[#A8A29E] mt-0.5">
+                <div className="text-xs text-[#5C5850] dark:text-[#A8A29E] mt-0.5">
                   {tr('حاسبة GPA دقيقة', 'GPA Calculator')}
                 </div>
               </div>

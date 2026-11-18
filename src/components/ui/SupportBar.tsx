@@ -39,7 +39,7 @@ export function SupportBar({ compact = false }: { compact?: boolean }) {
           compact ? 'justify-start' : 'justify-between'
         }`}
       >
-        <span className="text-xs text-[#C8C2B8] font-medium">
+        <span className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] font-medium">
           {tr('الدعم الفني:', 'Technical Support:')}
         </span>
         <div className="flex flex-wrap items-center gap-2">
@@ -49,7 +49,7 @@ export function SupportBar({ compact = false }: { compact?: boolean }) {
             rel="noopener noreferrer"
             aria-label={tr('تواصل عبر واتساب', 'Contact via WhatsApp')}
             title={tr('تواصل عبر واتساب للضرورة فقط', 'WhatsApp Support (Urgent Only)')}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-600 hover:text-white text-xs font-semibold transition-colors whitespace-nowrap shrink-0"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-500/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-600 hover:text-white text-xs font-semibold transition-colors whitespace-nowrap shrink-0"
           >
             <MessageCircle className="w-4 h-4 shrink-0" />
             <span>{tr('واتساب', 'WhatsApp')}</span>
@@ -64,7 +64,7 @@ export function SupportBar({ compact = false }: { compact?: boolean }) {
             rel="noopener noreferrer"
             aria-label={tr('تواصل عبر تليجرام', 'Contact via Telegram')}
             title={tr('تواصل عبر تليجرام للضرورة فقط', 'Telegram Support (Urgent Only)')}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-sky-950/60 border border-sky-500/40 text-sky-300 hover:bg-sky-600 hover:text-white text-xs font-semibold transition-colors whitespace-nowrap shrink-0"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-sky-950/60 border border-sky-500/40 text-sky-700 dark:text-sky-300 hover:bg-sky-600 hover:text-white text-xs font-semibold transition-colors whitespace-nowrap shrink-0"
           >
             <Send className="w-4 h-4 shrink-0" />
             <span>{tr('تليجرام', 'Telegram')}</span>
@@ -73,7 +73,7 @@ export function SupportBar({ compact = false }: { compact?: boolean }) {
       </div>
 
       <p className="flex items-center gap-1.5 text-[11px] text-amber-300/90 leading-snug">
-        <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+        <AlertTriangle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
         <span>
           {tr(
             'تنبيه: يُمنع منعاً باتاً التواصل مع الدعم الفني إلا إذا احتاج الأمر لذلك بالفعل.',

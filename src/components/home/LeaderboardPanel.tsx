@@ -51,16 +51,16 @@ export function LeaderboardPanel({ refreshTrigger }: { refreshTrigger?: number }
   }, [isAdmin, selectedYear, currentUser?.year, refreshTrigger]);
 
   return (
-    <section className="rounded-2xl bg-[#121216] border border-white/10 p-6 space-y-6">
+    <section className="rounded-2xl bg-white dark:bg-[#121216] border border-black/10 dark:border-white/10 p-6 space-y-6">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-[#D4AF37]" />
-            <h2 className="font-display text-xl font-bold text-[#F5F0E6]">
+            <Trophy className="w-5 h-5 text-[#9A7209] dark:text-[#D4AF37]" />
+            <h2 className="font-display text-xl font-bold text-[#141418] dark:text-[#F5F0E6]">
               {tr('لوحة تصدر الدفعة', 'Batch Leaderboard')}
             </h2>
           </div>
-          <p className="text-xs text-[#A8A29E]">
+          <p className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
             {tr(
               'تُحتسب النقاط تلقائياً عند اجتياز الاختبارات الشاملة في قسم الكورسات',
               'Points are earned automatically when completing quizzes in Courses'
@@ -84,7 +84,7 @@ export function LeaderboardPanel({ refreshTrigger }: { refreshTrigger?: number }
           </div>
         ) : (
           currentUser?.year && (
-            <span className="px-3 py-1.5 rounded-lg bg-[#D4AF37]/15 border border-[#D4AF37]/35 text-xs font-semibold text-[#F5D061] whitespace-nowrap self-start lg:self-auto">
+            <span className="px-3 py-1.5 rounded-lg bg-[#D4AF37]/15 border border-[#D4AF37]/35 text-xs font-semibold text-[#735303] dark:text-[#F5D061] whitespace-nowrap self-start lg:self-auto">
               {formatYear(currentUser.year)}
             </span>
           )
@@ -96,12 +96,12 @@ export function LeaderboardPanel({ refreshTrigger }: { refreshTrigger?: number }
           {[1, 2, 3, 4].map((n) => (
             <div
               key={n}
-              className="h-12 rounded-xl bg-white/5 animate-pulse"
+              className="h-12 rounded-xl bg-black/5 dark:bg-white/5 animate-pulse"
             />
           ))}
         </div>
       ) : users.length === 0 ? (
-        <div className="py-10 text-center text-sm text-[#A8A29E]">
+        <div className="py-10 text-center text-sm text-[#5C5850] dark:text-[#A8A29E]">
           {tr(
             'لا يوجد طلاب مسجلون في هذه الدفعة حتى الآن.',
             'No students registered in this academic year yet.'
@@ -111,7 +111,7 @@ export function LeaderboardPanel({ refreshTrigger }: { refreshTrigger?: number }
         <div className="overflow-x-auto">
           <table className="w-full text-start border-collapse">
             <thead>
-              <tr className="border-b border-white/10 text-xs text-[#A8A29E]">
+              <tr className="border-b border-black/10 dark:border-white/10 text-xs text-[#5C5850] dark:text-[#A8A29E]">
                 <th className="py-3 px-3 font-semibold">{tr('الترتيب', 'Rank')}</th>
                 <th className="py-3 px-3 font-semibold">{tr('الطالب', 'Student')}</th>
                 <th className="py-3 px-3 font-semibold">{tr('الفرقة الدراسية', 'Year')}</th>
@@ -119,7 +119,7 @@ export function LeaderboardPanel({ refreshTrigger }: { refreshTrigger?: number }
                 <th className="py-3 px-3 font-semibold text-end">{tr('النقاط', 'Points')}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5 text-sm">
+            <tbody className="divide-y divide-black/5 dark:divide-white/5 text-sm">
               {users.map((student, idx) => {
                 const rank = idx + 1;
                 const isMe = student.id === currentUser?.id;
@@ -129,7 +129,7 @@ export function LeaderboardPanel({ refreshTrigger }: { refreshTrigger?: number }
                     className={`transition-colors ${
                       isMe
                         ? 'bg-[#D4AF37]/10'
-                        : 'hover:bg-white/[0.03]'
+                        : 'hover:bg-black/[0.03] dark:hover:bg-white/[0.03]'
                     }`}
                   >
                     <td className="py-3.5 px-3 font-mono tabular-nums font-semibold">
@@ -137,20 +137,20 @@ export function LeaderboardPanel({ refreshTrigger }: { refreshTrigger?: number }
                         <span
                           className={`inline-flex items-center gap-1.5 ${
                             rank === 1
-                              ? 'text-[#F5D061]'
+                              ? 'text-[#735303] dark:text-[#F5D061]'
                               : rank === 2
-                              ? 'text-zinc-300'
-                              : 'text-amber-600'
+                              ? 'text-slate-600 dark:text-zinc-300'
+                              : 'text-amber-700 dark:text-amber-600'
                           }`}
                         >
                           <Award className="w-4 h-4" />
                           <span>#{rank}</span>
                         </span>
                       ) : (
-                        <span className="text-[#A8A29E]">#{rank}</span>
+                        <span className="text-[#5C5850] dark:text-[#A8A29E]">#{rank}</span>
                       )}
                     </td>
-                    <td className="py-3.5 px-3 font-medium text-[#F5F0E6]">
+                    <td className="py-3.5 px-3 font-medium text-[#141418] dark:text-[#F5F0E6]">
                       <div className="flex items-center gap-2">
                         {canInspectProfiles ? (
                           <button
@@ -160,7 +160,7 @@ export function LeaderboardPanel({ refreshTrigger }: { refreshTrigger?: number }
                             className="inline-flex items-center gap-1.5 text-start hover:text-[#E5C158] cursor-pointer transition-colors underline decoration-[#D4AF37]/30 underline-offset-4"
                           >
                             <span>{student.name}</span>
-                            <Eye className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                            <Eye className="w-3.5 h-3.5 text-[#9A7209] dark:text-[#D4AF37] shrink-0" />
                           </button>
                         ) : (
                           <span>{student.name}</span>
@@ -169,36 +169,36 @@ export function LeaderboardPanel({ refreshTrigger }: { refreshTrigger?: number }
                           <>
                             <RankBadge rankBadge={student.rankBadge} size="xs" />
                             {student.rankBadge.isSuperAdminRank && (
-                              <span className="px-1.5 py-0.5 rounded bg-amber-500/15 border border-amber-400/40 text-[10px] font-bold text-amber-200 whitespace-nowrap">
+                              <span className="px-1.5 py-0.5 rounded bg-amber-500/15 border border-amber-400/40 text-[10px] font-bold text-amber-800 dark:text-amber-200 whitespace-nowrap">
                                 {tr('ليدر المنصة · للضرورة', 'Leader · Urgent')}
                               </span>
                             )}
                           </>
                         ) : student.role === 'admin' ? (
                           <ShieldCheck
-                            className="w-4 h-4 text-[#D4AF37] shrink-0"
+                            className="w-4 h-4 text-[#9A7209] dark:text-[#D4AF37] shrink-0"
                             aria-label={tr('أدمن', 'Admin')}
                           />
                         ) : null}
                         {student.role === 'teacher' && (
-                          <span className="text-[11px] font-medium text-sky-300">
+                          <span className="text-[11px] font-medium text-sky-700 dark:text-sky-300">
                             {tr('معلم', 'Teacher')}
                           </span>
                         )}
                         {isMe && (
-                          <span className="text-xs text-[#D4AF37]">
+                          <span className="text-xs text-[#9A7209] dark:text-[#D4AF37]">
                             {tr('(أنت)', '(You)')}
                           </span>
                         )}
                       </div>
                     </td>
-                    <td className="py-3.5 px-3 text-xs text-[#C8C2B8]">
+                    <td className="py-3.5 px-3 text-xs text-[#3F3D38] dark:text-[#C8C2B8]">
                       {formatYear(student.year)}
                     </td>
-                    <td className="py-3.5 px-3 text-center font-mono tabular-nums text-[#C8C2B8]">
+                    <td className="py-3.5 px-3 text-center font-mono tabular-nums text-[#3F3D38] dark:text-[#C8C2B8]">
                       {student.quizzesCompleted}
                     </td>
-                    <td className="py-3.5 px-3 text-end font-mono tabular-nums font-bold text-[#E5C158]">
+                    <td className="py-3.5 px-3 text-end font-mono tabular-nums font-bold text-[#856104] dark:text-[#E5C158]">
                       {student.points}
                     </td>
                   </tr>

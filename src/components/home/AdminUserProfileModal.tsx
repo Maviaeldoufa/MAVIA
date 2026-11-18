@@ -257,12 +257,12 @@ export function AdminUserProfileModal({
       aria-labelledby="admin-profile-title"
       className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
     >
-      <div className="w-full max-w-3xl max-h-[88vh] overflow-y-auto rounded-2xl bg-[#121216] border border-[#D4AF37]/40 p-5 sm:p-6 space-y-5 shadow-[0_24px_80px_rgba(0,0,0,0.85)]">
-        <div className="flex items-start justify-between gap-3 border-b border-white/10 pb-3">
+      <div className="w-full max-w-3xl max-h-[88vh] overflow-y-auto rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/40 p-5 sm:p-6 space-y-5 shadow-[0_24px_80px_rgba(0,0,0,0.85)]">
+        <div className="flex items-start justify-between gap-3 border-b border-black/10 dark:border-white/10 pb-3">
           <div>
             <h3
               id="admin-profile-title"
-              className="font-display text-lg font-bold text-[#E5C158]"
+              className="font-display text-lg font-bold text-[#856104] dark:text-[#E5C158]"
             >
               {tr(
                 'بروفايل المستخدم وملاحظات الإدارة',
@@ -270,7 +270,7 @@ export function AdminUserProfileModal({
               )}
             </h3>
             {profileData && (
-              <p className="text-xs text-[#A8A29E] mt-0.5">
+              <p className="text-xs text-[#5C5850] dark:text-[#A8A29E] mt-0.5">
                 {profileData.user.name} · {roleLabel(profileData.user.role)} ·{' '}
                 {formatYear(profileData.user.year)}
               </p>
@@ -280,64 +280,64 @@ export function AdminUserProfileModal({
             type="button"
             onClick={onClose}
             aria-label={tr('إغلاق', 'Close')}
-            className="p-1.5 rounded-lg bg-[#151519] border border-white/10 text-[#C8C2B8] hover:text-white cursor-pointer"
+            className="p-1.5 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-[#3F3D38] dark:text-[#C8C2B8] hover:text-white cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {loading ? (
-          <div className="py-12 text-center text-xs text-[#A8A29E]">
+          <div className="py-12 text-center text-xs text-[#5C5850] dark:text-[#A8A29E]">
             {tr(
               'جاري تحميل البروفايل والإحصائيات الأكاديمية...',
               'Loading profile and academic statistics...'
             )}
           </div>
         ) : errorMsg ? (
-          <div className="p-4 rounded-xl bg-red-950/40 border border-red-500/40 text-xs text-red-200">
+          <div className="p-4 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-500/40 text-xs text-red-700 dark:text-red-200">
             {errorMsg}
           </div>
         ) : profileData ? (
           <div className="space-y-5">
             {/* Identity & Account Details */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs p-3.5 rounded-xl bg-[#09090B] border border-white/10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs p-3.5 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10">
               <div>
-                <div className="text-[#A8A29E]">{tr('البريد الإلكتروني', 'Email')}</div>
-                <div className="font-mono text-[#F5F0E6] mt-0.5 break-all">
+                <div className="text-[#5C5850] dark:text-[#A8A29E]">{tr('البريد الإلكتروني', 'Email')}</div>
+                <div className="font-mono text-[#141418] dark:text-[#F5F0E6] mt-0.5 break-all">
                   {profileData.user.email || '—'}
                 </div>
               </div>
               <div>
-                <div className="text-[#A8A29E]">{tr('رقم الهاتف', 'Phone')}</div>
-                <div className="font-mono tabular-nums text-[#F5F0E6] mt-0.5">
+                <div className="text-[#5C5850] dark:text-[#A8A29E]">{tr('رقم الهاتف', 'Phone')}</div>
+                <div className="font-mono tabular-nums text-[#141418] dark:text-[#F5F0E6] mt-0.5">
                   {profileData.user.phone || '—'}
                 </div>
               </div>
               <div>
-                <div className="text-[#A8A29E]">
+                <div className="text-[#5C5850] dark:text-[#A8A29E]">
                   {tr('حالة الحساب', 'Account Status')}
                 </div>
-                <div className="mt-0.5 font-medium text-[#F5F0E6]">
+                <div className="mt-0.5 font-medium text-[#141418] dark:text-[#F5F0E6]">
                   {profileData.user.isSuspended
                     ? tr('معلق', 'Suspended')
                     : tr('نشط', 'Active')}
                 </div>
               </div>
               <div>
-                <div className="text-[#A8A29E]">{tr('تاريخ التسجيل', 'Registered At')}</div>
-                <div className="font-mono tabular-nums text-[#C8C2B8] mt-0.5">
+                <div className="text-[#5C5850] dark:text-[#A8A29E]">{tr('تاريخ التسجيل', 'Registered At')}</div>
+                <div className="font-mono tabular-nums text-[#3F3D38] dark:text-[#C8C2B8] mt-0.5">
                   {formatDateTime(profileData.user.createdAt)}
                 </div>
               </div>
               <div>
-                <div className="text-[#A8A29E]">{tr('آخر تسجيل دخول', 'Last Login')}</div>
-                <div className="font-mono tabular-nums text-[#C8C2B8] mt-0.5">
+                <div className="text-[#5C5850] dark:text-[#A8A29E]">{tr('آخر تسجيل دخول', 'Last Login')}</div>
+                <div className="font-mono tabular-nums text-[#3F3D38] dark:text-[#C8C2B8] mt-0.5">
                   {formatDateTime(profileData.user.lastLoginAt)}
                 </div>
               </div>
               <div>
-                <div className="text-[#A8A29E]">{tr('معرّف المستخدم', 'User ID')}</div>
-                <div className="font-mono text-[11px] text-[#78716C] mt-0.5 truncate">
+                <div className="text-[#5C5850] dark:text-[#A8A29E]">{tr('معرّف المستخدم', 'User ID')}</div>
+                <div className="font-mono text-[11px] text-[#5C5850] dark:text-[#78716C] mt-0.5 truncate">
                   {profileData.user.id}
                 </div>
               </div>
@@ -347,60 +347,60 @@ export function AdminUserProfileModal({
             {callerIsSuperAdmin && (
               <form
                 onSubmit={handleSaveCredentials}
-                className="p-4 rounded-xl bg-[#0D0D10] border border-[#D4AF37]/40 space-y-3"
+                className="p-4 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-[#D4AF37]/40 space-y-3"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <KeyRound className="w-4 h-4 text-[#D4AF37]" />
-                    <h4 className="font-display text-sm font-bold text-[#E5C158]">
+                    <KeyRound className="w-4 h-4 text-[#9A7209] dark:text-[#D4AF37]" />
+                    <h4 className="font-display text-sm font-bold text-[#856104] dark:text-[#E5C158]">
                       {tr(
                         'تعديل البريد الإلكتروني وكلمة المرور (حصري لك كمدير عام)',
                         'Edit Email & Password (Super Admin Only)'
                       )}
                     </h4>
                   </div>
-                  <span className="text-[11px] text-[#A8A29E]">
+                  <span className="text-[11px] text-[#5C5850] dark:text-[#A8A29E]">
                     {tr('غير متاح لباقي الأدمنز أو الطلاب', 'Blocked for sub-admins & students')}
                   </span>
                 </div>
 
                 {credError && (
-                  <div className="p-2.5 rounded-lg bg-red-950/40 border border-red-500/40 text-xs text-red-200">
+                  <div className="p-2.5 rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-500/40 text-xs text-red-700 dark:text-red-200">
                     {credError}
                   </div>
                 )}
                 {credSuccess && (
-                  <div className="p-2.5 rounded-lg bg-emerald-950/40 border border-emerald-500/40 text-xs text-emerald-200">
+                  <div className="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/40 text-xs text-emerald-800 dark:text-emerald-200">
                     {credSuccess}
                   </div>
                 )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-xs text-[#C8C2B8] block">
+                    <label className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] block">
                       {tr('البريد الإلكتروني الجديد', 'Updated Email Address')}
                     </label>
                     <div className="relative">
-                      <Mail className="w-4 h-4 text-[#A8A29E] absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      <Mail className="w-4 h-4 text-[#5C5850] dark:text-[#A8A29E] absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                       <input
                         type="email"
                         value={editEmail}
                         onChange={(e) => setEditEmail(e.target.value)}
                         placeholder="user@example.com"
-                        className="w-full ps-9 pe-3 py-2 rounded-xl bg-[#151519] border border-white/15 text-xs sm:text-sm text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
+                        className="w-full ps-9 pe-3 py-2 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs sm:text-sm text-[#141418] dark:text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs text-[#C8C2B8] block">
+                    <label className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] block">
                       {tr('كلمة المرور الجديدة (اتركها فارغة للإبقاء)', 'New Password (optional)')}
                     </label>
                     <PasswordInput
                       value={editPassword}
                       onChange={(e) => setEditPassword(e.target.value)}
                       placeholder={tr('كلمة المرور الجديدة (4+ أحرف)', 'New password (4+ chars)')}
-                      className="w-full px-3 py-2 rounded-xl bg-[#151519] border border-white/15 text-xs sm:text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+                      className="w-full px-3 py-2 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs sm:text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
                     />
                   </div>
                 </div>
@@ -423,18 +423,18 @@ export function AdminUserProfileModal({
             )}
 
             {/* Admin Notes Section (Write + Track User Emoji Reactions) */}
-            <div className="p-4 rounded-xl bg-[#0D0D10] border border-[#D4AF37]/35 space-y-3.5">
+            <div className="p-4 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-[#D4AF37]/35 space-y-3.5">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <MessageSquarePlus className="w-4 h-4 text-[#D4AF37]" />
-                  <h4 className="font-display text-sm font-bold text-[#E5C158]">
+                  <MessageSquarePlus className="w-4 h-4 text-[#9A7209] dark:text-[#D4AF37]" />
+                  <h4 className="font-display text-sm font-bold text-[#856104] dark:text-[#E5C158]">
                     {tr(
                       'كتابة ملاحظات على بروفايل المستخدم',
                       'Admin Profile Notes'
                     )}
                   </h4>
                 </div>
-                <span className="text-[11px] text-[#A8A29E]">
+                <span className="text-[11px] text-[#5C5850] dark:text-[#A8A29E]">
                   {tr(
                     'المستخدم يرى الملاحظة ويتفاعل بالرياكت فقط',
                     'Recipient can react with emojis only'
@@ -444,12 +444,12 @@ export function AdminUserProfileModal({
 
               <form onSubmit={handleAddNote} className="space-y-2.5">
                 {noteError && (
-                  <div className="p-2.5 rounded-lg bg-red-950/40 border border-red-500/40 text-xs text-red-200">
+                  <div className="p-2.5 rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-500/40 text-xs text-red-700 dark:text-red-200">
                     {noteError}
                   </div>
                 )}
                 {noteSuccess && (
-                  <div className="p-2.5 rounded-lg bg-emerald-950/40 border border-emerald-500/40 text-xs text-emerald-200">
+                  <div className="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/40 text-xs text-emerald-800 dark:text-emerald-200">
                     {noteSuccess}
                   </div>
                 )}
@@ -464,10 +464,10 @@ export function AdminUserProfileModal({
                     `اكتب ملاحظة خاصة لـ ${profileData.user.name}...`,
                     `Write a note for ${profileData.user.name}...`
                   )}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#151519] border border-white/15 text-xs sm:text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs sm:text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
                 />
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-[11px] font-mono text-[#A8A29E] tabular-nums">
+                  <span className="text-[11px] font-mono text-[#5C5850] dark:text-[#A8A29E] tabular-nums">
                     {noteContent.length} / 600
                   </span>
                   <button
@@ -486,26 +486,26 @@ export function AdminUserProfileModal({
               </form>
 
               {notes.length === 0 ? (
-                <p className="text-xs text-[#A8A29E] pt-1">
+                <p className="text-xs text-[#5C5850] dark:text-[#A8A29E] pt-1">
                   {tr(
                     'لم تُكتب ملاحظات على هذا البروفايل بعد.',
                     'No notes written for this user yet.'
                   )}
                 </p>
               ) : (
-                <div className="space-y-2.5 pt-2 border-t border-white/10">
+                <div className="space-y-2.5 pt-2 border-t border-black/10 dark:border-white/10">
                   {notes.map((n) => (
                     <div
                       key={n.id}
-                      className="p-3 rounded-xl bg-[#141418] border border-white/10 space-y-2"
+                      className="p-3 rounded-xl bg-[#F5F2EA] dark:bg-[#141418] border border-black/10 dark:border-white/10 space-y-2"
                     >
                       <div className="flex items-center justify-between gap-2 text-[11px]">
-                        <span className="inline-flex items-center gap-1.5 font-semibold text-[#E5C158]">
+                        <span className="inline-flex items-center gap-1.5 font-semibold text-[#856104] dark:text-[#E5C158]">
                           <ShieldCheck className="w-3.5 h-3.5" />
                           <span>{n.authorName}</span>
                         </span>
                         <div className="flex items-center gap-2">
-                          <span className="font-mono tabular-nums text-[#A8A29E]">
+                          <span className="font-mono tabular-nums text-[#5C5850] dark:text-[#A8A29E]">
                             {formatDateTime(n.createdAt)}
                           </span>
                           <button
@@ -513,25 +513,25 @@ export function AdminUserProfileModal({
                             disabled={deletingNoteId === n.id}
                             onClick={() => handleDeleteNote(n.id)}
                             aria-label={tr('حذف الملاحظة', 'Delete note')}
-                            className="p-1 rounded-md text-[#A8A29E] hover:text-red-300 hover:bg-red-950/40 cursor-pointer"
+                            className="p-1 rounded-md text-[#5C5850] dark:text-[#A8A29E] hover:text-red-300 hover:bg-red-950/40 cursor-pointer"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>
                       </div>
-                      <p className="text-xs sm:text-sm text-[#F5F0E6] leading-relaxed whitespace-pre-wrap">
+                      <p className="text-xs sm:text-sm text-[#141418] dark:text-[#F5F0E6] leading-relaxed whitespace-pre-wrap">
                         {n.content}
                       </p>
                       <div className="text-[11px] flex items-center gap-2">
                         {n.reactions && n.reactions.length > 0 ? (
-                          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[#FFF1B8]">
+                          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[#735303] dark:text-[#FFF1B8]">
                             <span>{n.reactions.map((r) => r.emoji).join(' ')}</span>
                             <span>
                               {tr('تفاعل صاحب الحساب', 'User reacted')}
                             </span>
                           </span>
                         ) : (
-                          <span className="text-[#78716C]">
+                          <span className="text-[#5C5850] dark:text-[#78716C]">
                             {tr('بانتظار تفاعل المستخدم بالرياكت', 'Awaiting user reaction')}
                           </span>
                         )}
@@ -544,63 +544,63 @@ export function AdminUserProfileModal({
 
             {/* Academic Stats Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 text-xs">
-              <div className="p-3 rounded-xl bg-[#0D0D10] border border-white/10">
-                <div className="text-[#A8A29E] flex items-center gap-1">
-                  <Award className="w-3.5 h-3.5 text-[#D4AF37]" />
+              <div className="p-3 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10">
+                <div className="text-[#5C5850] dark:text-[#A8A29E] flex items-center gap-1">
+                  <Award className="w-3.5 h-3.5 text-[#9A7209] dark:text-[#D4AF37]" />
                   <span>{tr('النقاط', 'Points')}</span>
                 </div>
-                <div className="font-mono text-lg font-bold text-[#E5C158] tabular-nums mt-1">
+                <div className="font-mono text-lg font-bold text-[#856104] dark:text-[#E5C158] tabular-nums mt-1">
                   {profileData.academicStats.points}
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-[#0D0D10] border border-white/10">
-                <div className="text-[#A8A29E] flex items-center gap-1">
-                  <Activity className="w-3.5 h-3.5 text-emerald-400" />
+              <div className="p-3 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10">
+                <div className="text-[#5C5850] dark:text-[#A8A29E] flex items-center gap-1">
+                  <Activity className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                   <span>{tr('متوسط الدرجات', 'Avg Score')}</span>
                 </div>
-                <div className="font-mono text-lg font-bold text-emerald-400 tabular-nums mt-1">
+                <div className="font-mono text-lg font-bold text-emerald-600 dark:text-emerald-400 tabular-nums mt-1">
                   {profileData.academicStats.avgQuizScorePercent}%
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-[#0D0D10] border border-white/10">
-                <div className="text-[#A8A29E] flex items-center gap-1">
-                  <FileText className="w-3.5 h-3.5 text-sky-400" />
+              <div className="p-3 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10">
+                <div className="text-[#5C5850] dark:text-[#A8A29E] flex items-center gap-1">
+                  <FileText className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                   <span>{tr('الاختبارات', 'Quizzes')}</span>
                 </div>
-                <div className="font-mono text-lg font-bold text-[#F5F0E6] tabular-nums mt-1">
+                <div className="font-mono text-lg font-bold text-[#141418] dark:text-[#F5F0E6] tabular-nums mt-1">
                   {profileData.academicStats.quizzesCompleted}
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-[#0D0D10] border border-white/10">
-                <div className="text-[#A8A29E] flex items-center gap-1">
-                  <BookOpen className="w-3.5 h-3.5 text-[#D4AF37]" />
+              <div className="p-3 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10">
+                <div className="text-[#5C5850] dark:text-[#A8A29E] flex items-center gap-1">
+                  <BookOpen className="w-3.5 h-3.5 text-[#9A7209] dark:text-[#D4AF37]" />
                   <span>{tr('مواد / ملخصات', 'Courses / PDFs')}</span>
                 </div>
-                <div className="font-mono text-lg font-bold text-[#F5F0E6] tabular-nums mt-1">
+                <div className="font-mono text-lg font-bold text-[#141418] dark:text-[#F5F0E6] tabular-nums mt-1">
                   {profileData.academicStats.enrolledCoursesCount} /{' '}
                   {profileData.academicStats.completedSummariesCount}
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-[#0D0D10] border border-white/10">
-                <div className="text-[#A8A29E] flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-amber-300" />
+              <div className="p-3 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10">
+                <div className="text-[#5C5850] dark:text-[#A8A29E] flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5 text-amber-800 dark:text-amber-300" />
                   <span>{tr('دقائق المذاكرة', 'Study Mins')}</span>
                 </div>
-                <div className="font-mono text-lg font-bold text-amber-200 tabular-nums mt-1">
+                <div className="font-mono text-lg font-bold text-amber-800 dark:text-amber-200 tabular-nums mt-1">
                   {profileData.academicStats.studyMinutes}
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-[#0D0D10] border border-white/10">
-                <div className="text-[#A8A29E] flex items-center gap-1">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+              <div className="p-3 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10">
+                <div className="text-[#5C5850] dark:text-[#A8A29E] flex items-center gap-1">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                   <span>{tr('المهام / GPA', 'Tasks / GPA')}</span>
                 </div>
-                <div className="font-mono text-lg font-bold text-[#F5F0E6] tabular-nums mt-1">
+                <div className="font-mono text-lg font-bold text-[#141418] dark:text-[#F5F0E6] tabular-nums mt-1">
                   {profileData.academicStats.tasksCompleted}/
                   {profileData.academicStats.tasksTotal} ·{' '}
                   {profileData.academicStats.gpaEntriesCount}
@@ -610,12 +610,12 @@ export function AdminUserProfileModal({
 
             {/* Enrolled Courses */}
             <div className="space-y-2">
-              <div className="text-xs font-semibold text-[#E5C158]">
+              <div className="text-xs font-semibold text-[#856104] dark:text-[#E5C158]">
                 {tr('المواد المسجل بها', 'Enrolled Courses')} (
                 {profileData.academicStats.enrolledCourses.length})
               </div>
               {profileData.academicStats.enrolledCourses.length === 0 ? (
-                <p className="text-xs text-[#A8A29E]">
+                <p className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
                   {tr('لم يسجل في مواد بعد.', 'No enrolled courses recorded yet.')}
                 </p>
               ) : (
@@ -623,10 +623,10 @@ export function AdminUserProfileModal({
                   {profileData.academicStats.enrolledCourses.map((c) => (
                     <div
                       key={c.id}
-                      className="px-3 py-2 rounded-lg bg-[#09090B] border border-white/10 flex items-center justify-between gap-2"
+                      className="px-3 py-2 rounded-lg bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 flex items-center justify-between gap-2"
                     >
-                      <span className="text-[#F5F0E6] truncate">{c.title}</span>
-                      <span className="font-mono text-[11px] text-[#D4AF37] shrink-0">
+                      <span className="text-[#141418] dark:text-[#F5F0E6] truncate">{c.title}</span>
+                      <span className="font-mono text-[11px] text-[#9A7209] dark:text-[#D4AF37] shrink-0">
                         {c.code}
                       </span>
                     </div>
@@ -637,18 +637,18 @@ export function AdminUserProfileModal({
 
             {/* Recent Quiz Submissions */}
             <div className="space-y-2">
-              <div className="text-xs font-semibold text-[#E5C158]">
+              <div className="text-xs font-semibold text-[#856104] dark:text-[#E5C158]">
                 {tr('أحدث نتائج الاختبارات', 'Recent Quiz Submissions')}
               </div>
               {profileData.recentSubmissions.length === 0 ? (
-                <p className="text-xs text-[#A8A29E]">
+                <p className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
                   {tr('لا توجد محاولات اختبار مسجلة حتى الآن.', 'No quiz attempts recorded yet.')}
                 </p>
               ) : (
-                <div className="overflow-x-auto rounded-xl border border-white/10 bg-[#09090B]">
+                <div className="overflow-x-auto rounded-xl border border-black/10 dark:border-white/10 bg-[#F6F4EF] dark:bg-[#09090B]">
                   <table className="w-full text-start border-collapse text-xs">
                     <thead>
-                      <tr className="border-b border-white/10 text-[#A8A29E]">
+                      <tr className="border-b border-black/10 dark:border-white/10 text-[#5C5850] dark:text-[#A8A29E]">
                         <th className="py-2 px-3">{tr('الاختبار', 'Quiz')}</th>
                         <th className="py-2 px-3">{tr('المادة', 'Course')}</th>
                         <th className="py-2 px-3 text-center">{tr('الصحيحة', 'Correct')}</th>
@@ -656,18 +656,18 @@ export function AdminUserProfileModal({
                         <th className="py-2 px-3 text-end">{tr('التاريخ', 'Date')}</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/5">
+                    <tbody className="divide-y divide-black/5 dark:divide-white/5">
                       {profileData.recentSubmissions.map((sub) => (
                         <tr key={sub.id}>
-                          <td className="py-2 px-3 text-[#F5F0E6]">{sub.quizTitle}</td>
-                          <td className="py-2 px-3 text-[#A8A29E]">{sub.courseTitle}</td>
-                          <td className="py-2 px-3 text-center font-mono tabular-nums text-[#C8C2B8]">
+                          <td className="py-2 px-3 text-[#141418] dark:text-[#F5F0E6]">{sub.quizTitle}</td>
+                          <td className="py-2 px-3 text-[#5C5850] dark:text-[#A8A29E]">{sub.courseTitle}</td>
+                          <td className="py-2 px-3 text-center font-mono tabular-nums text-[#3F3D38] dark:text-[#C8C2B8]">
                             {sub.correctCount}/{sub.totalQuestions}
                           </td>
-                          <td className="py-2 px-3 text-end font-mono tabular-nums font-semibold text-[#E5C158]">
+                          <td className="py-2 px-3 text-end font-mono tabular-nums font-semibold text-[#856104] dark:text-[#E5C158]">
                             {sub.score}/{sub.maxScore}
                           </td>
-                          <td className="py-2 px-3 text-end font-mono tabular-nums text-[#A8A29E] whitespace-nowrap">
+                          <td className="py-2 px-3 text-end font-mono tabular-nums text-[#5C5850] dark:text-[#A8A29E] whitespace-nowrap">
                             {formatDateTime(sub.submittedAt)}
                           </td>
                         </tr>

@@ -153,9 +153,9 @@ export function CourseAiTutorTab({
   return (
     <div className="space-y-4">
       {/* Grounded Sources & Explanation Level Controls */}
-      <div className="p-4 rounded-xl bg-[#0D0D10] border border-white/10 space-y-3">
+      <div className="p-4 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-xs text-[#E5C158] font-semibold">
+          <div className="flex items-center gap-2 text-xs text-[#856104] dark:text-[#E5C158] font-semibold">
             <GraduationCap className="w-4 h-4 shrink-0" />
             <span>
               {tr('اختر مستوى الشرح المناسب لك:', 'Choose your explanation level:')}
@@ -177,8 +177,8 @@ export function CourseAiTutorTab({
           </div>
         </div>
 
-        <div className="pt-2.5 border-t border-white/10 flex flex-wrap items-center gap-2 text-xs text-[#A8A29E]">
-          <BookCheck className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+        <div className="pt-2.5 border-t border-black/10 dark:border-white/10 flex flex-wrap items-center gap-2 text-xs text-[#5C5850] dark:text-[#A8A29E]">
+          <BookCheck className="w-3.5 h-3.5 text-[#9A7209] dark:text-[#D4AF37] shrink-0" />
           <span>
             {folderName
               ? tr(`المصادر المعتمدة في مجلد "${folderName}":`, `Sources in folder "${folderName}":`)
@@ -192,7 +192,7 @@ export function CourseAiTutorTab({
               )}
             </span>
           ) : (
-            <span className="text-[#C8C2B8]">
+            <span className="text-[#3F3D38] dark:text-[#C8C2B8]">
               {[
                 ...summaries.map((s) => s.fileName || s.title),
                 ...assignments.map((a) => a.fileName || a.title),
@@ -218,7 +218,7 @@ export function CourseAiTutorTab({
       {/* Tutor Conversation */}
       <div
         ref={scrollRef}
-        className="h-[340px] overflow-y-auto rounded-xl bg-[#09090B] border border-white/10 p-4 space-y-3"
+        className="h-[340px] overflow-y-auto rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 p-4 space-y-3"
       >
         {messages.map((m) => (
           <div
@@ -228,12 +228,12 @@ export function CourseAiTutorTab({
             <div
               className={`max-w-[88%] rounded-xl px-4 py-3 border text-sm leading-relaxed whitespace-pre-wrap ${
                 m.role === 'user'
-                  ? 'bg-[#D4AF37]/15 border-[#D4AF37]/40 text-[#F5F0E6]'
-                  : 'bg-[#151519] border-white/10 text-[#F5F0E6]'
+                  ? 'bg-[#D4AF37]/15 border-[#D4AF37]/40 text-[#141418] dark:text-[#F5F0E6]'
+                  : 'bg-[#F5F2EA] dark:bg-[#151519] border-black/10 dark:border-white/10 text-[#141418] dark:text-[#F5F0E6]'
               }`}
             >
               {m.role === 'model' && (
-                <div className="flex items-center gap-1.5 text-xs text-[#E5C158] font-semibold mb-1">
+                <div className="flex items-center gap-1.5 text-xs text-[#856104] dark:text-[#E5C158] font-semibold mb-1">
                   <GraduationCap className="w-3.5 h-3.5" />
                   <span>
                     {tr('المدرس الذكي', 'AI Tutor')} — {course.code}
@@ -242,7 +242,7 @@ export function CourseAiTutorTab({
               )}
               <p>{m.text}</p>
               {m.sources && m.sources.length > 0 && (
-                <div className="mt-2 pt-2 border-t border-white/10 text-[11px] text-[#A8A29E]">
+                <div className="mt-2 pt-2 border-t border-black/10 dark:border-white/10 text-[11px] text-[#5C5850] dark:text-[#A8A29E]">
                   {tr('اعتمد على:', 'Grounded in:')} {m.sources.join(' · ')}
                 </div>
               )}
@@ -251,7 +251,7 @@ export function CourseAiTutorTab({
         ))}
         {loading && (
           <div className="flex justify-end">
-            <div className="rounded-xl px-4 py-2.5 bg-[#151519] border border-white/10 text-xs text-[#D4AF37]">
+            <div className="rounded-xl px-4 py-2.5 bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-xs text-[#9A7209] dark:text-[#D4AF37]">
               {tr(
                 'جاري قراءة الكتب والملخصات وصياغة الشرح بمستواك...',
                 'Reading uploaded books & summaries to craft your explanation...'
@@ -271,7 +271,7 @@ export function CourseAiTutorTab({
             'اكتب الجزئية التي لم تفهمها في هذه المادة...',
             'Ask about any topic you need explained in this course...'
           )}
-          className="flex-1 px-4 py-2.5 rounded-xl bg-[#09090B] border border-white/10 text-sm text-[#F5F0E6] placeholder-[#6B6661] focus:outline-none focus:border-[#D4AF37]"
+          className="flex-1 px-4 py-2.5 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] placeholder-[#6E6A61] dark:placeholder-[#6B6661] focus:outline-none focus:border-[#D4AF37]"
         />
         <GoldChip
           type="submit"

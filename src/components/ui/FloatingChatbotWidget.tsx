@@ -212,19 +212,19 @@ export function FloatingChatbotWidget({
             exit={{ opacity: 0, y: 12, scale: 0.95 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
             aria-label={tr('مرشد منصة MAVIA الذكي', 'MAVIA Smart Platform Guide')}
-            className="w-[calc(100vw-2rem)] sm:w-[390px] max-h-[calc(100dvh-10rem)] rounded-2xl bg-[#121216] border border-[#D4AF37]/45 shadow-[0_24px_70px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col"
+            className="w-[calc(100vw-2rem)] sm:w-[390px] max-h-[calc(100dvh-10rem)] rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/45 shadow-[0_24px_70px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col"
           >
             {/* Header */}
-            <div className="px-4 py-3 border-b border-white/10 bg-[#0D0D10] flex items-center justify-between gap-2">
+            <div className="px-4 py-3 border-b border-black/10 dark:border-white/10 bg-[#EFECE4] dark:bg-[#0D0D10] flex items-center justify-between gap-2">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/50 flex items-center justify-center text-[#E5C158]">
+                <div className="w-8 h-8 rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/50 flex items-center justify-center text-[#856104] dark:text-[#E5C158]">
                   <Bot className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-display text-sm font-bold text-[#E5C158]">
+                  <h3 className="font-display text-sm font-bold text-[#856104] dark:text-[#E5C158]">
                     {tr('مرشد MAVIA الذكي', 'MAVIA Smart Guide')}
                   </h3>
-                  <p className="text-[11px] text-[#A8A29E]">
+                  <p className="text-[11px] text-[#5C5850] dark:text-[#A8A29E]">
                     {tr('دليلك السريع لكل أقسام المنصة', 'Quick navigation for every section')}
                   </p>
                 </div>
@@ -233,16 +233,16 @@ export function FloatingChatbotWidget({
                 type="button"
                 onClick={() => setOpen(false)}
                 aria-label={tr('إغلاق الشات بوت', 'Close chatbot')}
-                className="p-1.5 rounded-lg text-[#A8A29E] hover:text-[#F5F0E6] hover:bg-white/5 cursor-pointer"
+                className="p-1.5 rounded-lg text-[#5C5850] dark:text-[#A8A29E] hover:text-[#141418] dark:hover:text-[#F5F0E6] hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Instant Platform Navigation Bar */}
-            <div className="px-3.5 py-2.5 border-b border-white/10 bg-[#09090B]/70 space-y-1.5">
-              <div className="flex items-center gap-1.5 text-[11px] text-[#A8A29E]">
-                <Compass className="w-3.5 h-3.5 text-[#D4AF37]" />
+            <div className="px-3.5 py-2.5 border-b border-black/10 dark:border-white/10 bg-[#F6F4EF]/85 dark:bg-[#09090B]/70 space-y-1.5">
+              <div className="flex items-center gap-1.5 text-[11px] text-[#5C5850] dark:text-[#A8A29E]">
+                <Compass className="w-3.5 h-3.5 text-[#9A7209] dark:text-[#D4AF37]" />
                 <span>{tr('انتقل مباشرة لأي قسم في المنصة:', 'Jump directly to any section:')}</span>
               </div>
               <div className="flex flex-wrap gap-1.5">
@@ -264,7 +264,7 @@ export function FloatingChatbotWidget({
             {/* Chat Messages */}
             <div
               ref={scrollRef}
-              className="h-52 sm:h-64 overflow-y-auto p-3.5 space-y-2.5 bg-[#09090B]"
+              className="h-52 sm:h-64 overflow-y-auto p-3.5 space-y-2.5 bg-[#F6F4EF] dark:bg-[#09090B]"
             >
               {messages.map((m) => (
                 <div
@@ -276,8 +276,8 @@ export function FloatingChatbotWidget({
                   <div
                     className={`max-w-[88%] rounded-xl px-3.5 py-2.5 text-xs leading-relaxed border whitespace-pre-wrap ${
                       m.role === 'user'
-                        ? 'bg-[#D4AF37]/15 border-[#D4AF37]/40 text-[#F5F0E6]'
-                        : 'bg-[#151519] border-white/10 text-[#F5F0E6]'
+                        ? 'bg-[#D4AF37]/15 border-[#D4AF37]/40 text-[#141418] dark:text-[#F5F0E6]'
+                        : 'bg-[#F5F2EA] dark:bg-[#151519] border-black/10 dark:border-white/10 text-[#141418] dark:text-[#F5F0E6]'
                     }`}
                   >
                     <p>{m.text}</p>
@@ -299,7 +299,7 @@ export function FloatingChatbotWidget({
               ))}
               {loading && (
                 <div className="flex justify-end">
-                  <div className="rounded-xl px-3 py-2 bg-[#151519] border border-white/10 text-[11px] text-[#D4AF37]">
+                  <div className="rounded-xl px-3 py-2 bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-[11px] text-[#9A7209] dark:text-[#D4AF37]">
                     {tr('جاري الرد...', 'Replying...')}
                   </div>
                 </div>
@@ -307,13 +307,13 @@ export function FloatingChatbotWidget({
             </div>
 
             {/* Quick Suggestion Chips */}
-            <div className="px-3.5 pt-2 pb-1 flex items-center gap-1.5 overflow-x-auto border-t border-white/10 bg-[#121216]">
+            <div className="px-3.5 pt-2 pb-1 flex items-center gap-1.5 overflow-x-auto border-t border-black/10 dark:border-white/10 bg-white dark:bg-[#121216]">
               {quickQuestions.map((q) => (
                 <button
                   key={q}
                   type="button"
                   onClick={() => sendMessage(q)}
-                  className="px-2.5 py-1 rounded-md bg-[#18181D] border border-white/10 text-[11px] text-[#C8C2B8] hover:border-[#D4AF37]/60 hover:text-[#F5D061] whitespace-nowrap shrink-0 cursor-pointer transition-colors"
+                  className="px-2.5 py-1 rounded-md bg-[#ECE8DE] dark:bg-[#18181D] border border-black/10 dark:border-white/10 text-[11px] text-[#3F3D38] dark:text-[#C8C2B8] hover:border-[#D4AF37]/60 hover:text-[#735303] dark:hover:text-[#F5D061] whitespace-nowrap shrink-0 cursor-pointer transition-colors"
                 >
                   {q}
                 </button>
@@ -323,14 +323,14 @@ export function FloatingChatbotWidget({
             {/* Input */}
             <form
               onSubmit={handleSubmit}
-              className="p-3 bg-[#121216] flex items-center gap-2"
+              className="p-3 bg-white dark:bg-[#121216] flex items-center gap-2"
             >
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={tr('اسألني لو تهت في أي مكان...', 'Ask me anything about MAVIA...')}
-                className="flex-1 px-3 py-2 rounded-xl bg-[#09090B] border border-white/10 text-xs text-[#F5F0E6] placeholder-[#6B6661] focus:outline-none focus:border-[#D4AF37]"
+                className="flex-1 px-3 py-2 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 text-xs text-[#141418] dark:text-[#F5F0E6] placeholder-[#6E6A61] dark:placeholder-[#6B6661] focus:outline-none focus:border-[#D4AF37]"
               />
               <GoldChip
                 type="submit"
@@ -386,7 +386,7 @@ export function FloatingChatbotWidget({
 
           {/* Side floating label shown smoothly on hover/focus */}
           {supportHovered && (
-            <span className="pointer-events-none absolute left-full ml-2.5 px-2.5 py-1 rounded-lg bg-[#121216]/95 border border-emerald-400/50 text-emerald-200 text-[11px] font-semibold whitespace-nowrap shadow-lg">
+            <span className="pointer-events-none absolute left-full ml-2.5 px-2.5 py-1 rounded-lg bg-white/95 dark:bg-[#121216]/95 border border-emerald-400/50 text-emerald-800 dark:text-emerald-200 text-[11px] font-semibold whitespace-nowrap shadow-lg">
               {tr('الدعم الفني', 'Support')}
             </span>
           )}
@@ -439,7 +439,7 @@ export function FloatingChatbotWidget({
           </motion.div>
 
           {botHovered && !open && (
-            <span className="pointer-events-none absolute left-full ml-2.5 px-2.5 py-1 rounded-lg bg-[#121216]/95 border border-[#D4AF37]/60 text-[#F5D061] text-[11px] font-semibold whitespace-nowrap shadow-lg">
+            <span className="pointer-events-none absolute left-full ml-2.5 px-2.5 py-1 rounded-lg bg-white/95 dark:bg-[#121216]/95 border border-[#D4AF37]/60 text-[#735303] dark:text-[#F5D061] text-[11px] font-semibold whitespace-nowrap shadow-lg">
               {tr('الشات بوت الذكي', 'Smart Guide')}
             </span>
           )}

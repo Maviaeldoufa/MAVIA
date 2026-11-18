@@ -31,7 +31,7 @@ export function GoldChip({
       className={`relative overflow-hidden inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap shrink-0 cursor-pointer transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] disabled:opacity-50 disabled:cursor-not-allowed ${
         active
           ? 'text-[#09090B] hover:brightness-110 hover:shadow-[0_0_22px_rgba(245,208,97,0.6)] active:shadow-[0_0_28px_rgba(255,241,184,0.85)]'
-          : 'bg-[#151519] text-[#C8C2B8] border border-white/10 hover:border-[#F5D061]/70 hover:text-[#F5D061] hover:shadow-[0_0_18px_rgba(212,175,55,0.35)] active:shadow-[0_0_24px_rgba(245,208,97,0.6)]'
+          : 'bg-[#F5F2EA] dark:bg-[#151519] text-[#2F2D28] dark:text-[#C8C2B8] border border-black/10 dark:border-white/10 hover:border-[#B8860B] dark:hover:border-[#F5D061]/70 hover:text-[#735303] dark:hover:text-[#F5D061] hover:shadow-[0_0_18px_rgba(212,175,55,0.28)] active:shadow-[0_0_24px_rgba(245,208,97,0.6)]'
       } ${className}`}
     >
       {active && layoutId && (

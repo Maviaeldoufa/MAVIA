@@ -294,19 +294,19 @@ export function AdminAnalyticsPanel() {
   };
 
   return (
-    <section className="rounded-2xl bg-[#121216] border border-[#D4AF37]/35 p-6 space-y-5">
+    <section className="rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/35 p-6 space-y-5">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <Eye className="w-5 h-5 text-[#D4AF37]" />
-            <h2 className="font-display text-xl font-bold text-[#E5C158]">
+            <Eye className="w-5 h-5 text-[#9A7209] dark:text-[#D4AF37]" />
+            <h2 className="font-display text-xl font-bold text-[#856104] dark:text-[#E5C158]">
               {tr(
                 'مركز تحليلات ومراقبة المنصة (حصرية للأدمن)',
                 'Platform Analytics & Operations Center (Admin Only)'
               )}
             </h2>
           </div>
-          <p className="text-xs text-[#A8A29E]">
+          <p className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
             {tr(
               'إحصائيات الطلاب والامتحانات والزيارات، مكتب تذاكر الدعم، النسخ الاحتياطي، سجل الأخطاء، ووضع الصيانة.',
               'Visitor & academic metrics, student support desk, automated backups, error monitoring, and maintenance controls.'
@@ -361,11 +361,11 @@ export function AdminAnalyticsPanel() {
       {showConfig && (
         <form
           onSubmit={handleSaveConfig}
-          className="p-4 rounded-xl bg-[#09090B] border border-[#D4AF37]/30 space-y-3"
+          className="p-4 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-[#D4AF37]/30 space-y-3"
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className="block text-xs text-[#C8C2B8]">
+              <label className="block text-xs text-[#3F3D38] dark:text-[#C8C2B8]">
                 {tr('رقم الواتساب للدعم', 'Support WhatsApp Number')}
               </label>
               <input
@@ -374,11 +374,11 @@ export function AdminAnalyticsPanel() {
                 onChange={(e) =>
                   setConfig((p) => ({ ...p, whatsappNumber: e.target.value }))
                 }
-                className="w-full px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-sm text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
+                className="w-full px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
               />
             </div>
             <div className="space-y-1">
-              <label className="block text-xs text-[#C8C2B8]">
+              <label className="block text-xs text-[#3F3D38] dark:text-[#C8C2B8]">
                 {tr('رابط التليجرام للدعم', 'Support Telegram URL')}
               </label>
               <input
@@ -387,15 +387,15 @@ export function AdminAnalyticsPanel() {
                 onChange={(e) =>
                   setConfig((p) => ({ ...p, telegramUrl: e.target.value }))
                 }
-                className="w-full px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-sm text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
+                className="w-full px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
               />
             </div>
           </div>
           <div className="flex items-center justify-between gap-2">
             {configError ? (
-              <span className="text-xs text-red-300">{configError}</span>
+              <span className="text-xs text-red-700 dark:text-red-300">{configError}</span>
             ) : configSaved ? (
-              <span className="text-xs text-emerald-400">
+              <span className="text-xs text-emerald-600 dark:text-emerald-400">
                 {tr('تم حفظ إعدادات الدعم بنجاح.', 'Support settings saved.')}
               </span>
             ) : (
@@ -412,36 +412,36 @@ export function AdminAnalyticsPanel() {
       {activeTab === 'analytics' && analytics && (
         <div className="space-y-5">
           {/* Visitor Metrics */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 rounded-xl bg-[#0D0D10] border border-white/10 divide-y lg:divide-y-0 divide-x divide-x-reverse divide-white/10">
+          <div className="grid grid-cols-2 lg:grid-cols-4 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 divide-y lg:divide-y-0 divide-x divide-x-reverse divide-black/10 dark:divide-white/10">
             <div className="p-4">
-              <div className="text-xs text-[#A8A29E]">
+              <div className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
                 {tr('الزوار الفريدون', 'Unique Visitors')}
               </div>
-              <div className="font-mono text-2xl font-bold text-[#E5C158] tabular-nums mt-1">
+              <div className="font-mono text-2xl font-bold text-[#856104] dark:text-[#E5C158] tabular-nums mt-1">
                 {analytics.uniqueVisitorsCount}
               </div>
             </div>
             <div className="p-4">
-              <div className="text-xs text-[#A8A29E]">
+              <div className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
                 {tr('إجمالي الزيارات', 'Total Visits')}
               </div>
-              <div className="font-mono text-2xl font-bold text-[#F5F0E6] tabular-nums mt-1">
+              <div className="font-mono text-2xl font-bold text-[#141418] dark:text-[#F5F0E6] tabular-nums mt-1">
                 {analytics.totalVisits}
               </div>
             </div>
             <div className="p-4">
-              <div className="text-xs text-[#A8A29E]">
+              <div className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
                 {tr('زيارات اليوم', "Today's Visits")}
               </div>
-              <div className="font-mono text-2xl font-bold text-emerald-400 tabular-nums mt-1">
+              <div className="font-mono text-2xl font-bold text-emerald-600 dark:text-emerald-400 tabular-nums mt-1">
                 {analytics.todayVisits}
               </div>
             </div>
             <div className="p-4">
-              <div className="text-xs text-[#A8A29E]">
+              <div className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
                 {tr('زوار مسجلون بحسابات', 'Logged-in Visitors')}
               </div>
-              <div className="font-mono text-2xl font-bold text-[#D4AF37] tabular-nums mt-1">
+              <div className="font-mono text-2xl font-bold text-[#9A7209] dark:text-[#D4AF37] tabular-nums mt-1">
                 {analytics.registeredVisitorsCount}
               </div>
             </div>
@@ -450,33 +450,33 @@ export function AdminAnalyticsPanel() {
           {/* Academic & Operations Overview Metrics */}
           {analytics.overview && (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 text-xs">
-              <div className="p-3 rounded-xl bg-[#09090B] border border-white/10">
-                <div className="text-[#A8A29E]">{tr('الطلاب', 'Students')}</div>
-                <div className="font-mono text-lg font-bold text-[#F5F0E6] tabular-nums mt-0.5">
+              <div className="p-3 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10">
+                <div className="text-[#5C5850] dark:text-[#A8A29E]">{tr('الطلاب', 'Students')}</div>
+                <div className="font-mono text-lg font-bold text-[#141418] dark:text-[#F5F0E6] tabular-nums mt-0.5">
                   {analytics.overview.studentsCount}
                 </div>
               </div>
-              <div className="p-3 rounded-xl bg-[#09090B] border border-white/10">
-                <div className="text-[#A8A29E]">{tr('الكورسات / الملخصات', 'Courses / PDFs')}</div>
-                <div className="font-mono text-lg font-bold text-[#E5C158] tabular-nums mt-0.5">
+              <div className="p-3 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10">
+                <div className="text-[#5C5850] dark:text-[#A8A29E]">{tr('الكورسات / الملخصات', 'Courses / PDFs')}</div>
+                <div className="font-mono text-lg font-bold text-[#856104] dark:text-[#E5C158] tabular-nums mt-0.5">
                   {analytics.overview.coursesCount} / {analytics.overview.summariesCount}
                 </div>
               </div>
-              <div className="p-3 rounded-xl bg-[#09090B] border border-white/10">
-                <div className="text-[#A8A29E]">{tr('محاولات الاختبارات', 'Quiz Attempts')}</div>
-                <div className="font-mono text-lg font-bold text-[#F5F0E6] tabular-nums mt-0.5">
+              <div className="p-3 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10">
+                <div className="text-[#5C5850] dark:text-[#A8A29E]">{tr('محاولات الاختبارات', 'Quiz Attempts')}</div>
+                <div className="font-mono text-lg font-bold text-[#141418] dark:text-[#F5F0E6] tabular-nums mt-0.5">
                   {analytics.overview.totalSubmissions}
                 </div>
               </div>
-              <div className="p-3 rounded-xl bg-[#09090B] border border-white/10">
-                <div className="text-[#A8A29E]">{tr('متوسط درجات الاختبار', 'Avg Quiz Score')}</div>
-                <div className="font-mono text-lg font-bold text-[#D4AF37] tabular-nums mt-0.5">
+              <div className="p-3 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10">
+                <div className="text-[#5C5850] dark:text-[#A8A29E]">{tr('متوسط درجات الاختبار', 'Avg Quiz Score')}</div>
+                <div className="font-mono text-lg font-bold text-[#9A7209] dark:text-[#D4AF37] tabular-nums mt-0.5">
                   {analytics.overview.avgQuizScorePercent}%
                 </div>
               </div>
-              <div className="p-3 rounded-xl bg-[#09090B] border border-white/10">
-                <div className="text-[#A8A29E]">{tr('تذاكر / أخطاء', 'Tickets / Errors')}</div>
-                <div className="font-mono text-lg font-bold text-amber-300 tabular-nums mt-0.5">
+              <div className="p-3 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10">
+                <div className="text-[#5C5850] dark:text-[#A8A29E]">{tr('تذاكر / أخطاء', 'Tickets / Errors')}</div>
+                <div className="font-mono text-lg font-bold text-amber-800 dark:text-amber-300 tabular-nums mt-0.5">
                   {analytics.overview.openTicketsCount} / {analytics.overview.recentErrorsCount}
                 </div>
               </div>
@@ -485,31 +485,31 @@ export function AdminAnalyticsPanel() {
 
           {analytics.recentVisitors.length > 0 && (
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#C8C2B8]">
-                <Users className="w-3.5 h-3.5 text-[#D4AF37]" />
+              <div className="flex items-center gap-2 text-xs font-semibold text-[#3F3D38] dark:text-[#C8C2B8]">
+                <Users className="w-3.5 h-3.5 text-[#9A7209] dark:text-[#D4AF37]" />
                 <span>{tr('أحدث الزيارات المسجلة', 'Recent Platform Visits')}</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 max-h-56 overflow-y-auto">
                 {analytics.recentVisitors.map((v) => (
                   <div
                     key={v.visitorKey}
-                    className="p-3 rounded-xl bg-[#09090B] border border-white/10 flex items-center justify-between gap-2 text-xs"
+                    className="p-3 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 flex items-center justify-between gap-2 text-xs"
                   >
                     <div className="min-w-0 space-y-0.5">
-                      <div className="font-semibold text-[#F5F0E6] truncate flex items-center gap-1.5">
-                        <ShieldCheck className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                      <div className="font-semibold text-[#141418] dark:text-[#F5F0E6] truncate flex items-center gap-1.5">
+                        <ShieldCheck className="w-3.5 h-3.5 text-[#9A7209] dark:text-[#D4AF37] shrink-0" />
                         <span>
                           {v.userName || tr('زائر قبل تسجيل الدخول', 'Guest Visitor')}
                         </span>
                       </div>
-                      <div className="text-[11px] text-[#A8A29E]">
+                      <div className="text-[11px] text-[#5C5850] dark:text-[#A8A29E]">
                         {v.userYear ? formatYear(v.userYear) : tr('جلسة تصفح', 'Session')} ·{' '}
                         <span className="font-mono tabular-nums">
                           {new Date(v.lastVisitAt).toLocaleString()}
                         </span>
                       </div>
                     </div>
-                    <span className="font-mono text-[#E5C158] tabular-nums shrink-0">
+                    <span className="font-mono text-[#856104] dark:text-[#E5C158] tabular-nums shrink-0">
                       {v.visitCount}×
                     </span>
                   </div>
@@ -524,7 +524,7 @@ export function AdminAnalyticsPanel() {
       {activeTab === 'support' && (
         <div className="space-y-3">
           {tickets.length === 0 ? (
-            <div className="py-8 text-center rounded-xl bg-[#0D0D10] border border-white/10 text-xs text-[#A8A29E]">
+            <div className="py-8 text-center rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 text-xs text-[#5C5850] dark:text-[#A8A29E]">
               {tr('لا توجد تذاكر دعم فني من الطلاب حتى الآن.', 'No support tickets yet.')}
             </div>
           ) : (
@@ -532,12 +532,12 @@ export function AdminAnalyticsPanel() {
               {tickets.map((t) => (
                 <div
                   key={t.id}
-                  className="p-4 rounded-xl bg-[#0D0D10] border border-white/10 space-y-3"
+                  className="p-4 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 space-y-3"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div>
-                      <div className="font-semibold text-sm text-[#F5F0E6]">{t.subject}</div>
-                      <div className="text-[11px] text-[#A8A29E]">
+                      <div className="font-semibold text-sm text-[#141418] dark:text-[#F5F0E6]">{t.subject}</div>
+                      <div className="text-[11px] text-[#5C5850] dark:text-[#A8A29E]">
                         {t.userName} ({formatYear(t.userYear)}) · {t.userEmail || t.userId} ·{' '}
                         <span className="font-mono">{new Date(t.createdAt).toLocaleString()}</span>
                       </div>
@@ -553,7 +553,7 @@ export function AdminAnalyticsPanel() {
                           className={`px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer border transition-colors ${
                             t.status === st
                               ? 'bg-[#D4AF37] text-[#09090B] border-[#D4AF37]'
-                              : 'bg-[#151519] text-[#C8C2B8] border-white/10 hover:border-[#D4AF37]/40'
+                              : 'bg-[#F5F2EA] dark:bg-[#151519] text-[#3F3D38] dark:text-[#C8C2B8] border-black/10 dark:border-white/10 hover:border-[#D4AF37]/40'
                           }`}
                         >
                           {st === 'resolved'
@@ -566,7 +566,7 @@ export function AdminAnalyticsPanel() {
                     </div>
                   </div>
 
-                  <p className="text-xs text-[#C8C2B8] leading-relaxed">{t.description}</p>
+                  <p className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] leading-relaxed">{t.description}</p>
 
                   <div className="flex flex-wrap items-center gap-2">
                     <input
@@ -576,7 +576,7 @@ export function AdminAnalyticsPanel() {
                         setReplyDrafts((p) => ({ ...p, [t.id]: e.target.value }))
                       }
                       placeholder={tr('اكتب رداً للطالب...', 'Write a reply to the student...')}
-                      className="flex-1 min-w-[200px] px-3 py-1.5 rounded-lg bg-[#09090B] border border-white/10 text-xs text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+                      className="flex-1 min-w-[200px] px-3 py-1.5 rounded-lg bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 text-xs text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
                     />
                     <GoldChip
                       active={true}
@@ -605,26 +605,26 @@ export function AdminAnalyticsPanel() {
       {activeTab === 'system' && (
         <div className="space-y-5">
           {systemErr && (
-            <div className="p-3 rounded-xl bg-red-950/40 border border-red-500/40 text-xs text-red-200">
+            <div className="p-3 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-500/40 text-xs text-red-700 dark:text-red-200">
               {systemErr}
             </div>
           )}
           {systemMsg && (
-            <div className="p-3 rounded-xl bg-emerald-950/35 border border-emerald-500/40 text-xs text-emerald-200">
+            <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/35 border border-emerald-500/40 text-xs text-emerald-800 dark:text-emerald-200">
               {systemMsg}
             </div>
           )}
 
           {/* Maintenance Control */}
-          <div className="p-4 rounded-xl bg-[#0D0D10] border border-white/10 space-y-3">
+          <div className="p-4 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="flex items-center gap-2 font-display text-sm font-bold text-[#F5F0E6]">
-                <Wrench className="w-4 h-4 text-[#D4AF37]" />
+              <div className="flex items-center gap-2 font-display text-sm font-bold text-[#141418] dark:text-[#F5F0E6]">
+                <Wrench className="w-4 h-4 text-[#9A7209] dark:text-[#D4AF37]" />
                 <span>{tr('وضع الصيانة وحالة الخدمة', 'Maintenance Mode Control')}</span>
               </div>
               <span
                 className={`text-xs font-semibold inline-flex items-center gap-1 ${
-                  maintenance.enabled ? 'text-amber-300' : 'text-emerald-400'
+                  maintenance.enabled ? 'text-amber-800 dark:text-amber-300' : 'text-emerald-600 dark:text-emerald-400'
                 }`}
               >
                 {maintenance.enabled ? (
@@ -648,7 +648,7 @@ export function AdminAnalyticsPanel() {
                 setMaintenance((p) => ({ ...p, message: e.target.value }))
               }
               placeholder={tr('رسالة الصيانة الظاهرة للطلاب...', 'Maintenance message shown to students...')}
-              className="w-full px-3 py-2 rounded-lg bg-[#09090B] border border-white/10 text-xs text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+              className="w-full px-3 py-2 rounded-lg bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 text-xs text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
             />
 
             <div className="flex flex-wrap items-center gap-2">
@@ -666,7 +666,7 @@ export function AdminAnalyticsPanel() {
                 type="button"
                 disabled={systemBusy}
                 onClick={() => handleSaveMaintenance(maintenance.enabled)}
-                className="px-3 py-1.5 rounded-lg bg-[#151519] border border-white/10 text-xs text-[#C8C2B8] hover:text-[#E5C158] cursor-pointer"
+                className="px-3 py-1.5 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-xs text-[#3F3D38] dark:text-[#C8C2B8] hover:text-[#E5C158] cursor-pointer"
               >
                 {tr('حفظ الرسالة فقط', 'Save Message')}
               </button>
@@ -674,10 +674,10 @@ export function AdminAnalyticsPanel() {
           </div>
 
           {/* Backups & Recovery */}
-          <div className="p-4 rounded-xl bg-[#0D0D10] border border-white/10 space-y-3">
+          <div className="p-4 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="flex items-center gap-2 font-display text-sm font-bold text-[#F5F0E6]">
-                <Database className="w-4 h-4 text-[#D4AF37]" />
+              <div className="flex items-center gap-2 font-display text-sm font-bold text-[#141418] dark:text-[#F5F0E6]">
+                <Database className="w-4 h-4 text-[#9A7209] dark:text-[#D4AF37]" />
                 <span>{tr('النسخ الاحتياطي واستعادة قاعدة البيانات', 'Database Backups & Recovery')}</span>
               </div>
               <div className="flex flex-wrap items-center gap-2">
@@ -691,7 +691,7 @@ export function AdminAnalyticsPanel() {
                   <span>{tr('أخذ نسخة احتياطية الآن', 'Create Backup Now')}</span>
                 </GoldChip>
 
-                <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#151519] border border-[#D4AF37]/40 text-xs text-[#E5C158] hover:bg-[#D4AF37] hover:text-[#09090B] cursor-pointer transition-colors">
+                <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-[#D4AF37]/40 text-xs text-[#856104] dark:text-[#E5C158] hover:bg-[#D4AF37] hover:text-[#09090B] cursor-pointer transition-colors">
                   <Upload className="w-3.5 h-3.5" />
                   <span>{tr('استعادة من ملف JSON', 'Restore JSON')}</span>
                   <input
@@ -705,7 +705,7 @@ export function AdminAnalyticsPanel() {
             </div>
 
             {backups.length === 0 ? (
-              <p className="text-xs text-[#A8A29E]">
+              <p className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
                 {tr('لا توجد لقطات احتياطية محفوظة بعد.', 'No snapshots stored yet.')}
               </p>
             ) : (
@@ -713,18 +713,18 @@ export function AdminAnalyticsPanel() {
                 {backups.map((b) => (
                   <div
                     key={b.filename}
-                    className="px-3 py-2 rounded-lg bg-[#09090B] border border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs"
+                    className="px-3 py-2 rounded-lg bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs"
                   >
                     <div className="min-w-0">
-                      <div className="font-mono text-[#F5F0E6] truncate">{b.filename}</div>
-                      <div className="text-[11px] text-[#A8A29E] font-mono tabular-nums">
+                      <div className="font-mono text-[#141418] dark:text-[#F5F0E6] truncate">{b.filename}</div>
+                      <div className="text-[11px] text-[#5C5850] dark:text-[#A8A29E] font-mono tabular-nums">
                         {(b.size / 1024).toFixed(1)} KB · {new Date(b.createdAt).toLocaleString()}
                       </div>
                     </div>
                     <button
                       type="button"
                       onClick={() => handleDownloadBackup(b.filename)}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#151519] border border-white/10 text-[#E5C158] hover:border-[#D4AF37] cursor-pointer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-[#856104] dark:text-[#E5C158] hover:border-[#D4AF37] cursor-pointer"
                     >
                       <Download className="w-3 h-3" />
                       <span>{tr('تحميل', 'Download')}</span>
@@ -736,10 +736,10 @@ export function AdminAnalyticsPanel() {
           </div>
 
           {/* Error Monitoring Log */}
-          <div className="p-4 rounded-xl bg-[#0D0D10] border border-white/10 space-y-3">
+          <div className="p-4 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="flex items-center gap-2 font-display text-sm font-bold text-[#F5F0E6]">
-                <AlertOctagon className="w-4 h-4 text-red-400" />
+              <div className="flex items-center gap-2 font-display text-sm font-bold text-[#141418] dark:text-[#F5F0E6]">
+                <AlertOctagon className="w-4 h-4 text-red-600 dark:text-red-400" />
                 <span>
                   {tr('سجل مراقبة أخطاء التطبيق', 'Application Error Monitoring')} ({errors.length})
                 </span>
@@ -748,7 +748,7 @@ export function AdminAnalyticsPanel() {
                 <button
                   type="button"
                   onClick={handleClearErrors}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-red-950/50 border border-red-500/30 text-[11px] text-red-200 hover:bg-red-600 hover:text-white cursor-pointer"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-red-50 dark:bg-red-950/50 border border-red-500/30 text-[11px] text-red-700 dark:text-red-200 hover:bg-red-600 hover:text-white cursor-pointer"
                 >
                   <Trash2 className="w-3 h-3" />
                   <span>{tr('مسح السجل', 'Clear Log')}</span>
@@ -757,7 +757,7 @@ export function AdminAnalyticsPanel() {
             </div>
 
             {errors.length === 0 ? (
-              <p className="text-xs text-emerald-400">
+              <p className="text-xs text-emerald-600 dark:text-emerald-400">
                 {tr('لا توجد أخطاء مسجلة حالياً — المنصة مستقرة.', 'Zero errors recorded.')}
               </p>
             ) : (
@@ -765,19 +765,19 @@ export function AdminAnalyticsPanel() {
                 {errors.map((errItem) => (
                   <div
                     key={errItem.id}
-                    className="p-2.5 rounded-lg bg-[#09090B] border border-red-500/20 text-xs space-y-1"
+                    className="p-2.5 rounded-lg bg-[#F6F4EF] dark:bg-[#09090B] border border-red-500/20 text-xs space-y-1"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <span className="font-mono uppercase text-[10px] px-1.5 py-0.5 rounded bg-red-950/60 text-red-300">
+                      <span className="font-mono uppercase text-[10px] px-1.5 py-0.5 rounded bg-red-50 dark:bg-red-950/60 text-red-700 dark:text-red-300">
                         {errItem.source}
                       </span>
-                      <span className="font-mono text-[10px] text-[#A8A29E]">
+                      <span className="font-mono text-[10px] text-[#5C5850] dark:text-[#A8A29E]">
                         {new Date(errItem.createdAt).toLocaleString()}
                       </span>
                     </div>
-                    <div className="text-[#F5F0E6] break-words">{errItem.message}</div>
+                    <div className="text-[#141418] dark:text-[#F5F0E6] break-words">{errItem.message}</div>
                     {errItem.path && (
-                      <div className="font-mono text-[11px] text-[#A8A29E]">{errItem.path}</div>
+                      <div className="font-mono text-[11px] text-[#5C5850] dark:text-[#A8A29E]">{errItem.path}</div>
                     )}
                   </div>
                 ))}

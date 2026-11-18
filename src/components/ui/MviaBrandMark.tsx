@@ -224,7 +224,7 @@ export function MviaBrandMark({
       </motion.svg>
 
       {/* Foreground Unified MAVIA Wordmark with Engineer Hard Hat Directly on First Letter M */}
-      <span className="relative z-10 inline-flex items-baseline drop-shadow-[0_2px_8px_rgba(9,9,11,0.95)]">
+      <span className="relative z-10 inline-flex items-baseline drop-shadow-[0_1px_2px_rgba(20,20,24,0.18)] dark:drop-shadow-[0_2px_8px_rgba(9,9,11,0.95)]">
         <span className="relative inline-block">
           <motion.svg
             viewBox="0 0 64 42"
@@ -284,12 +284,12 @@ export function MviaBrandMark({
               strokeWidth="1.8"
             />
           </motion.svg>
-          <span className="bg-gradient-to-b from-[#FFF1B8] via-[#E5C158] to-[#C6931B] bg-clip-text text-transparent">
+          <span className="bg-gradient-to-b from-[#8A6206] via-[#B8860B] to-[#634602] dark:from-[#FFF1B8] dark:via-[#E5C158] dark:to-[#C6931B] bg-clip-text text-transparent">
             M
           </span>
         </span>
 
-        <span className="bg-gradient-to-b from-[#FFF1B8] via-[#E5C158] to-[#C6931B] bg-clip-text text-transparent">
+        <span className="bg-gradient-to-b from-[#8A6206] via-[#B8860B] to-[#634602] dark:from-[#FFF1B8] dark:via-[#E5C158] dark:to-[#C6931B] bg-clip-text text-transparent">
           AVIA
         </span>
       </span>

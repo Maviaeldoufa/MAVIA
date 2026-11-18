@@ -89,38 +89,38 @@ export function UserAdminNotesCard({
   };
 
   const cardContent = (
-    <div className="p-4 sm:p-5 rounded-xl bg-[#0D0D10] border border-[#D4AF37]/30 space-y-3.5">
+    <div className="p-4 sm:p-5 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-[#D4AF37]/30 space-y-3.5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <MessageSquareHeart className="w-4 h-4 text-[#D4AF37]" />
-          <h3 className="font-display text-sm font-bold text-[#E5C158]">
+          <MessageSquareHeart className="w-4 h-4 text-[#9A7209] dark:text-[#D4AF37]" />
+          <h3 className="font-display text-sm font-bold text-[#856104] dark:text-[#E5C158]">
             {tr('ملاحظات الإدارة على ملفك الشخصي', 'Admin Notes on Your Profile')}
           </h3>
           {notes.length > 0 && (
-            <span className="text-[11px] font-mono tabular-nums px-2 py-0.5 rounded-md bg-[#D4AF37]/15 text-[#F5D061]">
+            <span className="text-[11px] font-mono tabular-nums px-2 py-0.5 rounded-md bg-[#D4AF37]/15 text-[#735303] dark:text-[#F5D061]">
               {notes.length}
             </span>
           )}
         </div>
-        <span className="text-[11px] text-[#A8A29E] flex items-center gap-1">
-          <Sparkles className="w-3 h-3 text-[#D4AF37]" />
+        <span className="text-[11px] text-[#5C5850] dark:text-[#A8A29E] flex items-center gap-1">
+          <Sparkles className="w-3 h-3 text-[#9A7209] dark:text-[#D4AF37]" />
           <span>{tr('تفاعل بالرياكت فقط', 'Reactions Only')}</span>
         </span>
       </div>
 
       {errorMsg && (
-        <div className="p-2.5 rounded-lg bg-red-950/40 border border-red-500/40 text-xs text-red-200">
+        <div className="p-2.5 rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-500/40 text-xs text-red-700 dark:text-red-200">
           {errorMsg}
         </div>
       )}
 
       {loading ? (
-        <div className="py-4 flex items-center justify-center gap-2 text-xs text-[#A8A29E]">
-          <Loader2 className="w-4 h-4 animate-spin text-[#D4AF37]" />
+        <div className="py-4 flex items-center justify-center gap-2 text-xs text-[#5C5850] dark:text-[#A8A29E]">
+          <Loader2 className="w-4 h-4 animate-spin text-[#9A7209] dark:text-[#D4AF37]" />
           <span>{tr('جاري تحميل ملاحظات الإدارة...', 'Loading admin notes...')}</span>
         </div>
       ) : notes.length === 0 ? (
-        <p className="text-xs text-[#A8A29E]">
+        <p className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
           {tr(
             'لا توجد ملاحظات إدارية مضافة على ملفك الشخصي حالياً.',
             'No admin notes have been added to your profile yet.'
@@ -135,24 +135,24 @@ export function UserAdminNotesCard({
             return (
               <div
                 key={note.id}
-                className="p-3.5 rounded-xl bg-[#121216] border border-white/10 space-y-2.5"
+                className="p-3.5 rounded-xl bg-white dark:bg-[#121216] border border-black/10 dark:border-white/10 space-y-2.5"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2 text-[11px]">
-                  <span className="inline-flex items-center gap-1.5 font-semibold text-[#E5C158]">
+                  <span className="inline-flex items-center gap-1.5 font-semibold text-[#856104] dark:text-[#E5C158]">
                     <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
                     <span>{note.authorName}</span>
                   </span>
-                  <span className="font-mono tabular-nums text-[#A8A29E]">
+                  <span className="font-mono tabular-nums text-[#5C5850] dark:text-[#A8A29E]">
                     {formatDateTime(note.createdAt)}
                   </span>
                 </div>
 
-                <p className="text-xs sm:text-sm text-[#F5F0E6] leading-relaxed whitespace-pre-wrap">
+                <p className="text-xs sm:text-sm text-[#141418] dark:text-[#F5F0E6] leading-relaxed whitespace-pre-wrap">
                   {note.content}
                 </p>
 
                 {/* Reaction-only emoji bar (no text replies allowed) */}
-                <div className="pt-2 border-t border-white/10 flex flex-wrap items-center justify-between gap-2">
+                <div className="pt-2 border-t border-black/10 dark:border-white/10 flex flex-wrap items-center justify-between gap-2">
                   <div
                     className="flex flex-wrap items-center gap-1.5"
                     role="group"
@@ -170,8 +170,8 @@ export function UserAdminNotesCard({
                           aria-pressed={active}
                           className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs border transition-all cursor-pointer disabled:opacity-50 ${
                             active
-                              ? 'bg-[#D4AF37]/25 border-[#D4AF37] text-[#FFF1B8] scale-105 shadow-[0_0_12px_rgba(212,175,55,0.3)]'
-                              : 'bg-[#18181D] border-white/10 text-[#C8C2B8] hover:border-[#D4AF37]/50 hover:bg-[#1E1B14]'
+                              ? 'bg-[#D4AF37]/25 border-[#D4AF37] text-[#735303] dark:text-[#FFF1B8] scale-105 shadow-[0_0_12px_rgba(212,175,55,0.3)]'
+                              : 'bg-[#ECE8DE] dark:bg-[#18181D] border-black/10 dark:border-white/10 text-[#3F3D38] dark:text-[#C8C2B8] hover:border-[#D4AF37]/50 hover:bg-[#1E1B14]'
                           }`}
                         >
                           <span className="text-sm leading-none">{opt.emoji}</span>
@@ -186,7 +186,7 @@ export function UserAdminNotesCard({
                   </div>
 
                   {myReaction && (
-                    <span className="text-[11px] text-emerald-300 font-medium">
+                    <span className="text-[11px] text-emerald-700 dark:text-emerald-300 font-medium">
                       {tr('تم التفاعل بـ', 'Reacted with')} {myReaction.emoji}
                     </span>
                   )}

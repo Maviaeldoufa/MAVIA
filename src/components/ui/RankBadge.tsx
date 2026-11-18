@@ -19,9 +19,9 @@ const COLOR_STYLES: Record<
   }
 > = {
   gold: {
-    wrapper: 'bg-[#D4AF37]/15 border-[#D4AF37]/55 text-[#F5D061]',
-    icon: 'text-[#F5D061]',
-    solidBg: 'bg-[#D4AF37]/20 border-[#D4AF37]/60 text-[#F5D061]',
+    wrapper: 'bg-[#D4AF37]/15 border-[#D4AF37]/55 text-[#735303] dark:text-[#F5D061]',
+    icon: 'text-[#735303] dark:text-[#F5D061]',
+    solidBg: 'bg-[#D4AF37]/20 border-[#D4AF37]/60 text-[#735303] dark:text-[#F5D061]',
   },
   silver: {
     wrapper: 'bg-slate-400/15 border-slate-300/45 text-slate-100',
@@ -29,14 +29,14 @@ const COLOR_STYLES: Record<
     solidBg: 'bg-slate-400/20 border-slate-300/50 text-slate-100',
   },
   sky: {
-    wrapper: 'bg-sky-500/15 border-sky-400/45 text-sky-200',
-    icon: 'text-sky-300',
-    solidBg: 'bg-sky-500/20 border-sky-400/50 text-sky-200',
+    wrapper: 'bg-sky-500/15 border-sky-400/45 text-sky-800 dark:text-sky-200',
+    icon: 'text-sky-700 dark:text-sky-300',
+    solidBg: 'bg-sky-500/20 border-sky-400/50 text-sky-800 dark:text-sky-200',
   },
   emerald: {
-    wrapper: 'bg-emerald-500/15 border-emerald-400/45 text-emerald-200',
-    icon: 'text-emerald-300',
-    solidBg: 'bg-emerald-500/20 border-emerald-400/50 text-emerald-200',
+    wrapper: 'bg-emerald-500/15 border-emerald-400/45 text-emerald-800 dark:text-emerald-200',
+    icon: 'text-emerald-700 dark:text-emerald-300',
+    solidBg: 'bg-emerald-500/20 border-emerald-400/50 text-emerald-800 dark:text-emerald-200',
   },
   violet: {
     wrapper: 'bg-violet-500/15 border-violet-400/45 text-violet-200',
@@ -44,9 +44,9 @@ const COLOR_STYLES: Record<
     solidBg: 'bg-violet-500/20 border-violet-400/50 text-violet-200',
   },
   amber: {
-    wrapper: 'bg-amber-500/15 border-amber-400/45 text-amber-200',
-    icon: 'text-amber-300',
-    solidBg: 'bg-amber-500/20 border-amber-400/50 text-amber-200',
+    wrapper: 'bg-amber-500/15 border-amber-400/45 text-amber-800 dark:text-amber-200',
+    icon: 'text-amber-800 dark:text-amber-300',
+    solidBg: 'bg-amber-500/20 border-amber-400/50 text-amber-800 dark:text-amber-200',
   },
   rose: {
     wrapper: 'bg-rose-500/15 border-rose-400/45 text-rose-200',

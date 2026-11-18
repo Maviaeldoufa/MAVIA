@@ -39,7 +39,7 @@ export function PasswordInput({
         aria-label={toggleLabel}
         aria-pressed={visible}
         title={toggleLabel}
-        className="absolute end-2.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-[#A8A29E] hover:text-[#E5C158] focus:outline-none focus-visible:ring-1 focus-visible:ring-[#D4AF37] transition-colors cursor-pointer"
+        className="absolute end-2.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-[#5C5850] dark:text-[#A8A29E] hover:text-[#856104] dark:hover:text-[#E5C158] focus:outline-none focus-visible:ring-1 focus-visible:ring-[#D4AF37] transition-colors cursor-pointer"
       >
         {visible ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
       </button>

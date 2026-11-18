@@ -359,18 +359,18 @@ export function AdminComprehensiveExamPanel() {
     : 0;
 
   return (
-    <section className="rounded-2xl border border-[#D4AF37]/35 bg-[#121216] p-5 sm:p-6 space-y-5">
+    <section className="rounded-2xl border border-[#D4AF37]/35 bg-white dark:bg-[#121216] p-5 sm:p-6 space-y-5">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-black/10 dark:border-white/10 pb-4">
         <div className="flex items-start gap-3">
-          <div className="p-2.5 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[#F5D061] shrink-0">
+          <div className="p-2.5 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[#735303] dark:text-[#F5D061] shrink-0">
             <ClipboardCheck className="w-5 h-5" />
           </div>
           <div className="space-y-1">
-            <h2 className="font-display text-lg sm:text-xl font-bold text-[#F5F0E6]">
+            <h2 className="font-display text-lg sm:text-xl font-bold text-[#141418] dark:text-[#F5F0E6]">
               {tr('الامتحان الشامل والتصحيح اليدوي (للأدمن فقط)', 'Comprehensive Exam & Manual Grading (Admin Only)')}
             </h2>
-            <p className="text-xs text-[#A8A29E] leading-relaxed">
+            <p className="text-xs text-[#5C5850] dark:text-[#A8A29E] leading-relaxed">
               {tr(
                 'أضف امتحاناً شاملاً (اختياري · صح وغلط · مقالي) ليظهر كخبر في أعلى شاشة جميع الطلاب، وعند إزالة الامتحان يختفي الخبر وتبدأ التصحيح اليدوي وإرسال الدرجات.',
                 'Publish a comprehensive exam (MCQ · True/False · Essay) as a top announcement banner, remove it when done, and manually grade & send student scores.'
@@ -402,14 +402,14 @@ export function AdminComprehensiveExamPanel() {
       </div>
 
       {statusMsg && (
-        <div className="p-3.5 rounded-xl bg-emerald-950/50 border border-emerald-500/40 text-emerald-200 text-xs flex items-center gap-2">
+        <div className="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-500/40 text-emerald-800 dark:text-emerald-200 text-xs flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span>{statusMsg}</span>
         </div>
       )}
 
       {errorMsg && (
-        <div className="p-3.5 rounded-xl bg-red-950/50 border border-red-500/40 text-red-200 text-xs flex items-center gap-2">
+        <div className="p-3.5 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-500/40 text-red-700 dark:text-red-200 text-xs flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 shrink-0" />
           <span>{errorMsg}</span>
         </div>
@@ -418,9 +418,9 @@ export function AdminComprehensiveExamPanel() {
       {/* TAB 1: CREATE COMPREHENSIVE EXAM */}
       {activeTab === 'create' && (
         <form onSubmit={handleCreateExam} className="space-y-5">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 p-4 rounded-xl bg-[#0D0D10] border border-white/10">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 p-4 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10">
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-[#E5C158]">
+              <label className="block text-xs font-semibold text-[#856104] dark:text-[#E5C158]">
                 {tr('اسم المادة', 'Subject Name')}
               </label>
               <input
@@ -429,12 +429,12 @@ export function AdminComprehensiveExamPanel() {
                 value={subjectName}
                 onChange={(e) => setSubjectName(e.target.value)}
                 placeholder={tr('مثال: نظم المعلومات الجغرافية GIS', 'e.g. Geographic Information Systems')}
-                className="w-full px-3.5 py-2 rounded-lg bg-[#151519] border border-white/15 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+                className="w-full px-3.5 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-[#E5C158]">
+              <label className="block text-xs font-semibold text-[#856104] dark:text-[#E5C158]">
                 {tr('المدة الزمنية للامتحان (بالدقائق)', 'Exam Duration (Minutes)')}
               </label>
               <input
@@ -444,18 +444,18 @@ export function AdminComprehensiveExamPanel() {
                 required
                 value={durationMinutes}
                 onChange={(e) => setDurationMinutes(Math.max(1, Number(e.target.value) || 30))}
-                className="w-full px-3.5 py-2 rounded-lg bg-[#151519] border border-white/15 text-sm text-[#F5F0E6] font-mono tabular-nums focus:outline-none focus:border-[#D4AF37]"
+                className="w-full px-3.5 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-sm text-[#141418] dark:text-[#F5F0E6] font-mono tabular-nums focus:outline-none focus:border-[#D4AF37]"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-[#A8A29E]">
+              <label className="block text-xs font-semibold text-[#5C5850] dark:text-[#A8A29E]">
                 {tr('الفرقة المستهدفة', 'Target Year')}
               </label>
               <select
                 value={targetYear}
                 onChange={(e) => setTargetYear(Number(e.target.value))}
-                className="w-full px-3.5 py-2 rounded-lg bg-[#151519] border border-white/15 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+                className="w-full px-3.5 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
               >
                 <option value={0}>{tr('جميع الدفعات', 'All Academic Years')}</option>
                 <option value={1}>{formatYear(1)}</option>
@@ -469,7 +469,7 @@ export function AdminComprehensiveExamPanel() {
           {/* Questions Builder */}
           <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <h3 className="text-sm font-bold text-[#F5F0E6]">
+              <h3 className="text-sm font-bold text-[#141418] dark:text-[#F5F0E6]">
                 {tr('أسئلة الامتحان الشامل', 'Comprehensive Exam Questions')} ({questions.length})
               </h3>
               <div className="flex flex-wrap items-center gap-2">
@@ -511,20 +511,20 @@ export function AdminComprehensiveExamPanel() {
               return (
                 <div
                   key={qIdx}
-                  className="p-4 rounded-xl bg-[#0D0D10] border border-white/10 space-y-3"
+                  className="p-4 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 space-y-3"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-xs font-bold text-[#D4AF37] tabular-nums">
+                      <span className="font-mono text-xs font-bold text-[#9A7209] dark:text-[#D4AF37] tabular-nums">
                         #{qIdx + 1}
                       </span>
-                      <span className="px-2.5 py-0.5 rounded-md bg-[#18181D] border border-[#D4AF37]/30 text-xs font-semibold text-[#F5D061]">
+                      <span className="px-2.5 py-0.5 rounded-md bg-[#ECE8DE] dark:bg-[#18181D] border border-[#D4AF37]/30 text-xs font-semibold text-[#735303] dark:text-[#F5D061]">
                         {typeTitle}
                       </span>
                     </div>
 
                     <div className="flex items-center gap-3">
-                      <label className="flex items-center gap-1.5 text-xs text-[#C8C2B8]">
+                      <label className="flex items-center gap-1.5 text-xs text-[#3F3D38] dark:text-[#C8C2B8]">
                         <span>{tr('الدرجة:', 'Points:')}</span>
                         <input
                           type="number"
@@ -536,7 +536,7 @@ export function AdminComprehensiveExamPanel() {
                             next[qIdx].points = Math.max(1, Number(e.target.value) || 1);
                             setQuestions(next);
                           }}
-                          className="w-16 px-2 py-1 rounded-md bg-[#151519] border border-white/15 text-xs text-[#F5F0E6] font-mono tabular-nums"
+                          className="w-16 px-2 py-1 rounded-md bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs text-[#141418] dark:text-[#F5F0E6] font-mono tabular-nums"
                         />
                       </label>
 
@@ -544,7 +544,7 @@ export function AdminComprehensiveExamPanel() {
                         <button
                           type="button"
                           onClick={() => removeQuestion(qIdx)}
-                          className="text-xs text-red-400 hover:text-red-300 inline-flex items-center gap-1 cursor-pointer"
+                          className="text-xs text-red-600 dark:text-red-400 hover:text-red-300 inline-flex items-center gap-1 cursor-pointer"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                           <span>{tr('حذف', 'Delete')}</span>
@@ -563,7 +563,7 @@ export function AdminComprehensiveExamPanel() {
                       setQuestions(next);
                     }}
                     placeholder={tr('اكتب نص السؤال هنا...', 'Enter question prompt...')}
-                    className="w-full px-3.5 py-2 rounded-lg bg-[#151519] border border-white/10 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+                    className="w-full px-3.5 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
                   />
 
                   {q.type === 'mcq' && (
@@ -591,7 +591,7 @@ export function AdminComprehensiveExamPanel() {
                               setQuestions(next);
                             }}
                             placeholder={tr(`الخيار ${optIdx + 1}`, `Option ${optIdx + 1}`)}
-                            className="flex-1 px-3 py-1.5 rounded-lg bg-[#151519] border border-white/10 text-xs text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+                            className="flex-1 px-3 py-1.5 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-xs text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
                           />
                         </div>
                       ))}
@@ -599,7 +599,7 @@ export function AdminComprehensiveExamPanel() {
                   )}
 
                   {q.type === 'true_false' && (
-                    <div className="flex flex-wrap items-center gap-4 text-xs text-[#C8C2B8]">
+                    <div className="flex flex-wrap items-center gap-4 text-xs text-[#3F3D38] dark:text-[#C8C2B8]">
                       <span>{tr('الإجابة المرجعية (للمراجعة أثناء التصحيح اليدوي):', 'Reference Key:')}</span>
                       {['صح', 'خطأ'].map((label, optIdx) => (
                         <label key={label} className="inline-flex items-center gap-1.5 cursor-pointer">
@@ -633,7 +633,7 @@ export function AdminComprehensiveExamPanel() {
                         ? tr('نموذج الإجابة / معيار التصحيح (اختياري — يظهر للطالب بعد التصحيح)', 'Model answer / grading note (optional)')
                         : tr('توضيح الإجابة (اختياري — يظهر للطالب عند مراجعة أخطائه)', 'Explanation shown to student after grading (optional)')
                     }
-                    className="w-full px-3 py-1.5 rounded-lg bg-[#151519] border border-white/10 text-xs text-[#C8C2B8] focus:outline-none focus:border-[#D4AF37]"
+                    className="w-full px-3 py-1.5 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-xs text-[#3F3D38] dark:text-[#C8C2B8] focus:outline-none focus:border-[#D4AF37]"
                   />
                 </div>
               );
@@ -657,7 +657,7 @@ export function AdminComprehensiveExamPanel() {
       {activeTab === 'manage' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-xs text-[#A8A29E]">
+            <span className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
               {tr(
                 'عند إزالة الامتحان من الأعلى يختفي الخبر فوراً لدى جميع الطلاب وتبقى التسليمات للتصحيح اليدوي.',
                 'Deactivating removes the top banner immediately while keeping student submissions for grading.'
@@ -670,8 +670,8 @@ export function AdminComprehensiveExamPanel() {
           </div>
 
           {exams.length === 0 ? (
-            <div className="p-8 rounded-xl bg-[#0D0D10] border border-white/10 text-center space-y-3">
-              <p className="text-sm text-[#A8A29E]">
+            <div className="p-8 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 text-center space-y-3">
+              <p className="text-sm text-[#5C5850] dark:text-[#A8A29E]">
                 {tr('لا توجد امتحانات شاملة مضافة حالياً.', 'No comprehensive exams created yet.')}
               </p>
               <GoldChip active={true} onClick={() => setActiveTab('create')} className="text-xs px-4 py-2">
@@ -684,30 +684,30 @@ export function AdminComprehensiveExamPanel() {
               {exams.map((exam) => (
                 <div
                   key={exam.id}
-                  className="p-4 sm:p-5 rounded-xl bg-[#0D0D10] border border-white/10 space-y-4"
+                  className="p-4 sm:p-5 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 space-y-4"
                 >
                   <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                     <div className="space-y-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="font-display text-base font-bold text-[#F5F0E6]">
+                        <h3 className="font-display text-base font-bold text-[#141418] dark:text-[#F5F0E6]">
                           {exam.subjectName}
                         </h3>
                         {exam.isActive ? (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-xs font-semibold">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-500/40 text-emerald-700 dark:text-emerald-300 text-xs font-semibold">
                             <Megaphone className="w-3 h-3" />
                             <span>{tr('الخبر ظاهر بالمنصة', 'Banner Active')}</span>
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-[#18181D] border border-white/15 text-[#A8A29E] text-xs font-semibold">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-[#ECE8DE] dark:bg-[#18181D] border border-black/15 dark:border-white/15 text-[#5C5850] dark:text-[#A8A29E] text-xs font-semibold">
                             <EyeOff className="w-3 h-3" />
                             <span>{tr('تمت إزالة الخبر', 'Banner Hidden')}</span>
                           </span>
                         )}
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-2 text-xs text-[#A8A29E] font-mono tabular-nums">
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-[#5C5850] dark:text-[#A8A29E] font-mono tabular-nums">
                         <span className="inline-flex items-center gap-1">
-                          <Clock className="w-3.5 h-3.5 text-[#D4AF37]" />
+                          <Clock className="w-3.5 h-3.5 text-[#9A7209] dark:text-[#D4AF37]" />
                           {exam.durationMinutes} {tr('دقيقة', 'min')}
                         </span>
                         <span aria-hidden="true">·</span>
@@ -719,11 +719,11 @@ export function AdminComprehensiveExamPanel() {
                             : formatYear(exam.targetYear)}
                         </span>
                         <span aria-hidden="true">·</span>
-                        <span className="text-amber-300">
+                        <span className="text-amber-800 dark:text-amber-300">
                           {tr(`بانتظار التصحيح: ${exam.pendingCount}`, `Pending: ${exam.pendingCount}`)}
                         </span>
                         <span aria-hidden="true">·</span>
-                        <span className="text-emerald-300">
+                        <span className="text-emerald-700 dark:text-emerald-300">
                           {tr(`تم التصحيح: ${exam.gradedCount}`, `Graded: ${exam.gradedCount}`)}
                         </span>
                       </div>
@@ -761,7 +761,7 @@ export function AdminComprehensiveExamPanel() {
                           <button
                             type="button"
                             onClick={() => setConfirmDeleteId(null)}
-                            className="px-2.5 py-1.5 rounded-lg bg-[#18181D] text-[#C8C2B8] text-xs cursor-pointer"
+                            className="px-2.5 py-1.5 rounded-lg bg-[#ECE8DE] dark:bg-[#18181D] text-[#3F3D38] dark:text-[#C8C2B8] text-xs cursor-pointer"
                           >
                             {tr('إلغاء', 'Cancel')}
                           </button>
@@ -770,7 +770,7 @@ export function AdminComprehensiveExamPanel() {
                         <button
                           type="button"
                           onClick={() => setConfirmDeleteId(exam.id)}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-950/40 border border-red-500/30 text-red-300 hover:bg-red-600 hover:text-white text-xs font-semibold transition-colors cursor-pointer"
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-500/30 text-red-700 dark:text-red-300 hover:bg-red-600 hover:text-white text-xs font-semibold transition-colors cursor-pointer"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                           <span>{tr('حذف نهائي', 'Delete')}</span>
@@ -780,17 +780,17 @@ export function AdminComprehensiveExamPanel() {
                   </div>
 
                   {/* Submissions List for Manual Grading */}
-                  <div className="border-t border-white/10 pt-3 space-y-2.5">
-                    <div className="text-xs font-semibold text-[#E5C158]">
+                  <div className="border-t border-black/10 dark:border-white/10 pt-3 space-y-2.5">
+                    <div className="text-xs font-semibold text-[#856104] dark:text-[#E5C158]">
                       {tr('تسليمات الطلاب للتصحيح اليدوي:', 'Student Submissions for Manual Grading:')}
                     </div>
 
                     {exam.submissions.length === 0 ? (
-                      <div className="p-3 rounded-lg bg-[#151519] text-xs text-[#A8A29E]">
+                      <div className="p-3 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] text-xs text-[#5C5850] dark:text-[#A8A29E]">
                         {tr('لم يقم أي طالب بتسليم هذا الامتحان بعد.', 'No student submissions yet.')}
                       </div>
                     ) : (
-                      <div className="divide-y divide-white/5 rounded-xl border border-white/10 bg-[#151519] overflow-hidden">
+                      <div className="divide-y divide-black/5 dark:divide-white/5 rounded-xl border border-black/10 dark:border-white/10 bg-[#F5F2EA] dark:bg-[#151519] overflow-hidden">
                         {exam.submissions.map((sub) => {
                           const isGraded = sub.status === 'graded';
                           return (
@@ -800,27 +800,27 @@ export function AdminComprehensiveExamPanel() {
                             >
                               <div className="space-y-0.5 min-w-0">
                                 <div className="flex flex-wrap items-center gap-2">
-                                  <span className="text-sm font-bold text-[#F5F0E6]">
+                                  <span className="text-sm font-bold text-[#141418] dark:text-[#F5F0E6]">
                                     {sub.studentName}
                                   </span>
-                                  <span className="text-xs text-[#A8A29E]">
+                                  <span className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
                                     · {formatYear(sub.studentYear)}
                                   </span>
                                   {isGraded ? (
-                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-xs font-semibold font-mono tabular-nums">
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-500/40 text-emerald-700 dark:text-emerald-300 text-xs font-semibold font-mono tabular-nums">
                                       <CheckCircle2 className="w-3 h-3" />
                                       <span>
                                         {sub.totalScore} / {sub.maxScore}
                                       </span>
                                     </span>
                                   ) : (
-                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-950/80 border border-amber-500/40 text-amber-200 text-xs font-semibold">
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-950/80 border border-amber-500/40 text-amber-800 dark:text-amber-200 text-xs font-semibold">
                                       <Hourglass className="w-3 h-3" />
                                       <span>{tr('في انتظار التصحيح', 'Pending Grading')}</span>
                                     </span>
                                   )}
                                 </div>
-                                <div className="text-xs text-[#A8A29E] font-mono tabular-nums">
+                                <div className="text-xs text-[#5C5850] dark:text-[#A8A29E] font-mono tabular-nums">
                                   {tr('تم التسليم:', 'Submitted:')}{' '}
                                   {new Date(sub.submittedAt).toLocaleString()}
                                 </div>
@@ -860,17 +860,17 @@ export function AdminComprehensiveExamPanel() {
         >
           <form
             onSubmit={handleSaveManualGrades}
-            className="w-full max-w-4xl max-h-[92vh] flex flex-col rounded-2xl bg-[#121216] border border-[#D4AF37]/45 shadow-[0_24px_80px_rgba(0,0,0,0.9)] overflow-hidden"
+            className="w-full max-w-4xl max-h-[92vh] flex flex-col rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/45 shadow-[0_24px_80px_rgba(0,0,0,0.9)] overflow-hidden"
           >
             {/* Modal Header */}
-            <div className="px-5 py-4 border-b border-white/10 bg-[#0D0D10] flex items-center justify-between gap-3 shrink-0">
+            <div className="px-5 py-4 border-b border-black/10 dark:border-white/10 bg-[#EFECE4] dark:bg-[#0D0D10] flex items-center justify-between gap-3 shrink-0">
               <div className="space-y-0.5 min-w-0">
-                <h3 className="font-display text-base sm:text-lg font-bold text-[#F5D061] truncate">
+                <h3 className="font-display text-base sm:text-lg font-bold text-[#735303] dark:text-[#F5D061] truncate">
                   {tr('التصحيح اليدوي:', 'Manual Grading:')} {gradingContext.submission.studentName}
                 </h3>
-                <div className="text-xs text-[#A8A29E] font-mono tabular-nums">
+                <div className="text-xs text-[#5C5850] dark:text-[#A8A29E] font-mono tabular-nums">
                   {gradingContext.exam.subjectName} · {tr('المجموع:', 'Total:')}{' '}
-                  <strong className="text-[#E5C158]">
+                  <strong className="text-[#856104] dark:text-[#E5C158]">
                     {liveGradingTotal} / {liveGradingMax}
                   </strong>
                 </div>
@@ -880,7 +880,7 @@ export function AdminComprehensiveExamPanel() {
                 type="button"
                 onClick={() => setGradingContext(null)}
                 aria-label={tr('إغلاق', 'Close')}
-                className="p-2 rounded-lg text-[#A8A29E] hover:text-white hover:bg-white/10 cursor-pointer"
+                className="p-2 rounded-lg text-[#5C5850] dark:text-[#A8A29E] hover:text-[#141418] dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -913,32 +913,32 @@ export function AdminComprehensiveExamPanel() {
                 return (
                   <div
                     key={ans.questionId}
-                    className="p-4 rounded-xl bg-[#0D0D10] border border-white/10 space-y-3"
+                    className="p-4 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 space-y-3"
                   >
                     <div className="flex flex-wrap items-start justify-between gap-2">
-                      <div className="text-sm font-semibold text-[#F5F0E6] flex-1 min-w-0">
-                        <span className={`font-mono text-[#D4AF37] tabular-nums ${isEn ? 'mr-2' : 'ml-2'}`}>
+                      <div className="text-sm font-semibold text-[#141418] dark:text-[#F5F0E6] flex-1 min-w-0">
+                        <span className={`font-mono text-[#9A7209] dark:text-[#D4AF37] tabular-nums ${isEn ? 'mr-2' : 'ml-2'}`}>
                           {idx + 1}.
                         </span>
                         {ans.questionText}
                       </div>
-                      <span className="font-mono text-xs text-[#E5C158] tabular-nums shrink-0">
+                      <span className="font-mono text-xs text-[#856104] dark:text-[#E5C158] tabular-nums shrink-0">
                         {tr('الحد الأقصى:', 'Max:')} {ans.maxPoints}
                       </span>
                     </div>
 
-                    <div className="p-3 rounded-lg bg-[#151519] border border-white/10 space-y-1">
-                      <div className="text-xs text-[#A8A29E]">
+                    <div className="p-3 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 space-y-1">
+                      <div className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
                         {tr('إجابة الطالب:', 'Student Answer:')}
                       </div>
-                      <div className="text-sm text-[#F5F0E6] whitespace-pre-wrap leading-relaxed">
+                      <div className="text-sm text-[#141418] dark:text-[#F5F0E6] whitespace-pre-wrap leading-relaxed">
                         {studentAnswerDisplay}
                       </div>
                     </div>
 
                     {origQ?.modelAnswer && (
-                      <div className="text-xs text-[#C8C2B8]">
-                        <strong className="text-[#D4AF37]">
+                      <div className="text-xs text-[#3F3D38] dark:text-[#C8C2B8]">
+                        <strong className="text-[#9A7209] dark:text-[#D4AF37]">
                           {tr('المرجع المحفوظ لديك:', 'Saved Reference:')}
                         </strong>{' '}
                         {origQ.modelAnswer}
@@ -963,7 +963,7 @@ export function AdminComprehensiveExamPanel() {
                           className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer transition-colors ${
                             draft.isCorrect
                               ? 'bg-emerald-600 border-emerald-500 text-white'
-                              : 'bg-[#151519] border-white/15 text-emerald-300 hover:border-emerald-500/60'
+                              : 'bg-[#F5F2EA] dark:bg-[#151519] border-black/15 dark:border-white/15 text-emerald-700 dark:text-emerald-300 hover:border-emerald-500/60'
                           }`}
                         >
                           <CheckCircle2 className="w-3.5 h-3.5" />
@@ -985,7 +985,7 @@ export function AdminComprehensiveExamPanel() {
                           className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer transition-colors ${
                             !draft.isCorrect
                               ? 'bg-red-600 border-red-500 text-white'
-                              : 'bg-[#151519] border-white/15 text-red-300 hover:border-red-500/60'
+                              : 'bg-[#F5F2EA] dark:bg-[#151519] border-black/15 dark:border-white/15 text-red-700 dark:text-red-300 hover:border-red-500/60'
                           }`}
                         >
                           <XCircle className="w-3.5 h-3.5" />
@@ -994,7 +994,7 @@ export function AdminComprehensiveExamPanel() {
                       </div>
 
                       <div className="sm:col-span-2 space-y-1">
-                        <label className="block text-xs text-[#A8A29E]">
+                        <label className="block text-xs text-[#5C5850] dark:text-[#A8A29E]">
                           {tr('الدرجة الممنوحة', 'Awarded')}
                         </label>
                         <input
@@ -1017,12 +1017,12 @@ export function AdminComprehensiveExamPanel() {
                               },
                             }));
                           }}
-                          className="w-full px-2.5 py-1.5 rounded-lg bg-[#151519] border border-white/15 text-xs text-[#F5F0E6] font-mono tabular-nums focus:outline-none focus:border-[#D4AF37]"
+                          className="w-full px-2.5 py-1.5 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs text-[#141418] dark:text-[#F5F0E6] font-mono tabular-nums focus:outline-none focus:border-[#D4AF37]"
                         />
                       </div>
 
                       <div className="sm:col-span-5 space-y-1">
-                        <label className="block text-xs text-[#A8A29E]">
+                        <label className="block text-xs text-[#5C5850] dark:text-[#A8A29E]">
                           {tr('الإجابة الصحيحة (تظهر للطالب عند الخطأ)', 'Correct Answer (Shown to student)')}
                         </label>
                         <input
@@ -1038,7 +1038,7 @@ export function AdminComprehensiveExamPanel() {
                             }))
                           }
                           placeholder={tr('اكتب الإجابة الصحيحة...', 'Correct answer text...')}
-                          className="w-full px-3 py-1.5 rounded-lg bg-[#151519] border border-white/15 text-xs text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+                          className="w-full px-3 py-1.5 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
                         />
                       </div>
                     </div>
@@ -1059,14 +1059,14 @@ export function AdminComprehensiveExamPanel() {
                         'ملاحظة أو توضيح الخطأ للطالب على هذا السؤال (اختياري)',
                         'Optional feedback explaining the mistake on this question'
                       )}
-                      className="w-full px-3 py-1.5 rounded-lg bg-[#151519] border border-white/10 text-xs text-[#C8C2B8] focus:outline-none focus:border-[#D4AF37]"
+                      className="w-full px-3 py-1.5 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-xs text-[#3F3D38] dark:text-[#C8C2B8] focus:outline-none focus:border-[#D4AF37]"
                     />
                   </div>
                 );
               })}
 
               <div className="space-y-1.5 pt-2">
-                <label className="block text-xs font-semibold text-[#E5C158]">
+                <label className="block text-xs font-semibold text-[#856104] dark:text-[#E5C158]">
                   {tr('ملاحظة عامة للطالب (اختياري)', 'Overall Note to Student (Optional)')}
                 </label>
                 <textarea
@@ -1077,14 +1077,14 @@ export function AdminComprehensiveExamPanel() {
                     'اكتب تقييمك العام أو نصيحتك للطالب...',
                     'Write an overall comment or advice...'
                   )}
-                  className="w-full px-3.5 py-2 rounded-xl bg-[#0D0D10] border border-white/15 text-xs text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+                  className="w-full px-3.5 py-2 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/15 dark:border-white/15 text-xs text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
                 />
               </div>
             </div>
 
             {/* Footer */}
-            <div className="px-5 py-4 border-t border-white/10 bg-[#0D0D10] flex flex-wrap items-center justify-between gap-3 shrink-0">
-              <div className="text-xs font-mono text-[#E5C158] tabular-nums">
+            <div className="px-5 py-4 border-t border-black/10 dark:border-white/10 bg-[#EFECE4] dark:bg-[#0D0D10] flex flex-wrap items-center justify-between gap-3 shrink-0">
+              <div className="text-xs font-mono text-[#856104] dark:text-[#E5C158] tabular-nums">
                 {tr('الدرجة النهائية للطالب:', 'Final Score:')}{' '}
                 <strong className="text-base">
                   {liveGradingTotal} / {liveGradingMax}
@@ -1095,7 +1095,7 @@ export function AdminComprehensiveExamPanel() {
                 <button
                   type="button"
                   onClick={() => setGradingContext(null)}
-                  className="px-4 py-2 rounded-lg bg-[#18181D] text-xs text-[#C8C2B8] hover:text-white cursor-pointer"
+                  className="px-4 py-2 rounded-lg bg-[#ECE8DE] dark:bg-[#18181D] text-xs text-[#3F3D38] dark:text-[#C8C2B8] hover:text-white cursor-pointer"
                 >
                   {tr('إلغاء', 'Cancel')}
                 </button>

@@ -57,17 +57,17 @@ export function ServiceStatusModal({ open, onClose }: ServiceStatusModalProps) {
       aria-label={tr('حالة الخدمة والصيانة — MAVIA', 'Service Status & Maintenance')}
       className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4"
     >
-      <div className="w-full max-w-lg rounded-2xl bg-[#121216] border border-[#D4AF37]/40 p-5 sm:p-6 space-y-5 shadow-[0_24px_80px_rgba(0,0,0,0.85)]">
-        <div className="flex items-start justify-between gap-3 border-b border-white/10 pb-4">
+      <div className="w-full max-w-lg rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/40 p-5 sm:p-6 space-y-5 shadow-[0_24px_80px_rgba(0,0,0,0.85)]">
+        <div className="flex items-start justify-between gap-3 border-b border-black/10 dark:border-white/10 pb-4">
           <div className="flex items-center gap-2.5">
-            <div className="p-2.5 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[#E5C158]">
+            <div className="p-2.5 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[#856104] dark:text-[#E5C158]">
               <Activity className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="font-display text-lg font-bold text-[#E5C158]">
+              <h2 className="font-display text-lg font-bold text-[#856104] dark:text-[#E5C158]">
                 {tr('حالة الخدمة وصيانة المنصة', 'Service Status & Maintenance')}
               </h2>
-              <p className="text-xs text-[#A8A29E]">
+              <p className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
                 {tr('مراقبة مباشرة لتوافر الخادم والخدمات الأساسية', 'Live availability check for core platform services')}
               </p>
             </div>
@@ -76,18 +76,18 @@ export function ServiceStatusModal({ open, onClose }: ServiceStatusModalProps) {
             type="button"
             onClick={onClose}
             aria-label={tr('إغلاق', 'Close')}
-            className="p-2 rounded-lg bg-[#18181D] border border-white/10 text-[#C8C2B8] hover:text-[#F5D061] cursor-pointer"
+            className="p-2 rounded-lg bg-[#ECE8DE] dark:bg-[#18181D] border border-black/10 dark:border-white/10 text-[#3F3D38] dark:text-[#C8C2B8] hover:text-[#F5D061] cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {loading && !status ? (
-          <div className="py-8 text-center text-xs text-[#A8A29E]">
+          <div className="py-8 text-center text-xs text-[#5C5850] dark:text-[#A8A29E]">
             {tr('جاري فحص حالة الخادم...', 'Checking server health...')}
           </div>
         ) : error ? (
-          <div className="p-4 rounded-xl bg-red-950/35 border border-red-500/40 text-xs text-red-200">
+          <div className="p-4 rounded-xl bg-red-50 dark:bg-red-950/35 border border-red-500/40 text-xs text-red-700 dark:text-red-200">
             {error}
           </div>
         ) : status ? (
@@ -95,14 +95,14 @@ export function ServiceStatusModal({ open, onClose }: ServiceStatusModalProps) {
             <div
               className={`p-4 rounded-xl border flex items-start gap-3 ${
                 status.status === 'maintenance'
-                  ? 'bg-amber-950/30 border-amber-500/40 text-amber-100'
-                  : 'bg-emerald-950/25 border-emerald-500/35 text-emerald-100'
+                  ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-500/40 text-amber-900 dark:text-amber-100'
+                  : 'bg-emerald-50 dark:bg-emerald-950/25 border-emerald-500/35 text-emerald-900 dark:text-emerald-100'
               }`}
             >
               {status.status === 'maintenance' ? (
-                <Wrench className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+                <Wrench className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
               ) : (
-                <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
               )}
               <div className="space-y-1 text-xs sm:text-sm">
                 <div className="font-bold">
@@ -117,19 +117,19 @@ export function ServiceStatusModal({ open, onClose }: ServiceStatusModalProps) {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
-              <div className="p-3 rounded-xl bg-[#0D0D10] border border-white/10 flex items-center justify-between">
-                <span className="text-[#C8C2B8]">{tr('واجهة البرمجة (API)', 'API Server')}</span>
-                <span className="text-emerald-400 font-semibold">{tr('يعمل', 'Operational')}</span>
+              <div className="p-3 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 flex items-center justify-between">
+                <span className="text-[#3F3D38] dark:text-[#C8C2B8]">{tr('واجهة البرمجة (API)', 'API Server')}</span>
+                <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{tr('يعمل', 'Operational')}</span>
               </div>
-              <div className="p-3 rounded-xl bg-[#0D0D10] border border-white/10 flex items-center justify-between gap-2">
-                <span className="text-[#C8C2B8]">
+              <div className="p-3 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 flex items-center justify-between gap-2">
+                <span className="text-[#3F3D38] dark:text-[#C8C2B8]">
                   {tr('قاعدة البيانات والتخزين', 'Database & Storage')}
                 </span>
                 <span
                   className={
                     status.services.supabaseConfigured && status.services.storageMode === 'supabase'
-                      ? 'text-emerald-400 font-semibold'
-                      : 'text-amber-300 font-semibold'
+                      ? 'text-emerald-600 dark:text-emerald-400 font-semibold'
+                      : 'text-amber-800 dark:text-amber-300 font-semibold'
                   }
                 >
                   {status.services.supabaseConfigured && status.services.storageMode === 'supabase'
@@ -137,17 +137,17 @@ export function ServiceStatusModal({ open, onClose }: ServiceStatusModalProps) {
                     : tr('محلي (بانتظار مفاتيح Supabase)', 'Local (Supabase Keys Needed)')}
                 </span>
               </div>
-              <div className="p-3 rounded-xl bg-[#0D0D10] border border-white/10 flex items-center justify-between">
-                <span className="text-[#C8C2B8]">{tr('شات الدفعة والمزامنة', 'Batch Chat Sync')}</span>
-                <span className="text-emerald-400 font-semibold">
+              <div className="p-3 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 flex items-center justify-between">
+                <span className="text-[#3F3D38] dark:text-[#C8C2B8]">{tr('شات الدفعة والمزامنة', 'Batch Chat Sync')}</span>
+                <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
                   {status.services.websocket === 'polling'
                     ? tr('مزامنة REST', 'REST Polling')
                     : tr('مباشر (WS)', 'Live (WS)')}
                 </span>
               </div>
-              <div className="p-3 rounded-xl bg-[#0D0D10] border border-white/10 flex items-center justify-between">
-                <span className="text-[#C8C2B8]">{tr('المساعد الذكي (AI)', 'AI Assistant')}</span>
-                <span className={status.services.aiConfigured ? 'text-emerald-400 font-semibold' : 'text-amber-300 font-semibold'}>
+              <div className="p-3 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 flex items-center justify-between">
+                <span className="text-[#3F3D38] dark:text-[#C8C2B8]">{tr('المساعد الذكي (AI)', 'AI Assistant')}</span>
+                <span className={status.services.aiConfigured ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-amber-800 dark:text-amber-300 font-semibold'}>
                   {status.services.aiConfigured
                     ? tr('مهيأ', 'Configured')
                     : tr('بحاجة لمفتاح', 'Key Needed')}
@@ -155,19 +155,19 @@ export function ServiceStatusModal({ open, onClose }: ServiceStatusModalProps) {
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-[#A8A29E] font-mono tabular-nums">
+            <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-[#5C5850] dark:text-[#A8A29E] font-mono tabular-nums">
               <span>Uptime: {formatUptime(status.uptimeSeconds)}</span>
               <span>{new Date(status.timestamp).toLocaleString()}</span>
             </div>
           </div>
         ) : null}
 
-        <div className="flex items-center justify-between pt-2 border-t border-white/10">
+        <div className="flex items-center justify-between pt-2 border-t border-black/10 dark:border-white/10">
           <button
             type="button"
             onClick={loadStatus}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 text-xs text-[#E5C158] hover:text-[#F5D061] cursor-pointer"
+            className="inline-flex items-center gap-1.5 text-xs text-[#856104] dark:text-[#E5C158] hover:text-[#F5D061] cursor-pointer"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             <span>{tr('تحديث الحالة', 'Refresh')}</span>

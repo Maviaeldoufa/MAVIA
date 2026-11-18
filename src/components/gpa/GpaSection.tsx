@@ -165,10 +165,10 @@ export function GpaSection() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="font-display text-2xl sm:text-3xl font-bold text-[#F5F0E6]">
+          <h1 className="font-display text-2xl sm:text-3xl font-bold text-[#141418] dark:text-[#F5F0E6]">
             {tr('حاسبة الـ GPA وجدول الدرجات', 'GPA Calculator & Grades Table')}
           </h1>
-          <p className="text-xs sm:text-sm text-[#A8A29E]">
+          <p className="text-xs sm:text-sm text-[#5C5850] dark:text-[#A8A29E]">
             {tr(
               'نظام 8 مواد: 7 مواد تُحسب داخل الـ GPA ومادة واحدة خارج الـ GPA (تستطيع تبديل حالة أي مادة بضغطة واحدة)',
               '8-course system: 7 subjects counted inside GPA + 1 non-GPA subject (toggle any subject with one click)'
@@ -206,7 +206,7 @@ export function GpaSection() {
       </div>
 
       {savedNotice && (
-        <div className="p-3 rounded-xl bg-emerald-950/50 border border-emerald-500/40 text-emerald-200 text-xs">
+        <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-500/40 text-emerald-800 dark:text-emerald-200 text-xs">
           {tr(
             'تم حفظ جدول درجاتك في حسابك بنجاح.',
             'Your grades table has been saved to your account.'
@@ -215,70 +215,70 @@ export function GpaSection() {
       )}
 
       {error && (
-        <div role="alert" className="p-3 rounded-xl bg-red-950/50 border border-red-500/40 text-red-200 text-xs">
+        <div role="alert" className="p-3 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-500/40 text-red-700 dark:text-red-200 text-xs">
           {error}
         </div>
       )}
 
       {/* 4-column KPI strip */}
       <div
-        className={`grid grid-cols-2 lg:grid-cols-4 rounded-2xl bg-[#121216] border border-[#D4AF37]/30 divide-y lg:divide-y-0 divide-x ${
+        className={`grid grid-cols-2 lg:grid-cols-4 rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/30 divide-y lg:divide-y-0 divide-x ${
           isEn ? '' : 'divide-x-reverse'
-        } divide-white/10`}
+        } divide-black/10 dark:divide-white/10`}
       >
         <div className="p-5">
-          <div className="text-xs text-[#A8A29E]">
+          <div className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
             {tr('المعدل الفصلي (GPA)', 'Semester GPA')}
           </div>
-          <div className="font-mono text-3xl font-bold text-[#E5C158] tabular-nums mt-1">
+          <div className="font-mono text-3xl font-bold text-[#856104] dark:text-[#E5C158] tabular-nums mt-1">
             {summary.gpa.toFixed(2)}
-            <span className="text-sm text-[#A8A29E] font-normal"> / 4.00</span>
+            <span className="text-sm text-[#5C5850] dark:text-[#A8A29E] font-normal"> / 4.00</span>
           </div>
-          <div className="text-[11px] text-[#A8A29E] mt-1 tabular-nums">
+          <div className="text-[11px] text-[#5C5850] dark:text-[#A8A29E] mt-1 tabular-nums">
             {summary.includedCount} {tr('مواد داخل GPA', 'in GPA')} ·{' '}
             {summary.excludedCount} {tr('خارج GPA', 'outside GPA')}
           </div>
         </div>
         <div className="p-5">
-          <div className="text-xs text-[#A8A29E]">
+          <div className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
             {tr('المتوسط المئوي (لمواد GPA)', 'Percentage Avg (GPA Courses)')}
           </div>
-          <div className="font-mono text-3xl font-bold text-[#F5F0E6] tabular-nums mt-1">
+          <div className="font-mono text-3xl font-bold text-[#141418] dark:text-[#F5F0E6] tabular-nums mt-1">
             {summary.averagePercentage}%
           </div>
         </div>
         <div className="p-5">
-          <div className="text-xs text-[#A8A29E]">
+          <div className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
             {tr('ساعات GPA المحتسبة', 'Counted GPA Credits')}
           </div>
-          <div className="font-mono text-3xl font-bold text-[#F5F0E6] tabular-nums mt-1">
+          <div className="font-mono text-3xl font-bold text-[#141418] dark:text-[#F5F0E6] tabular-nums mt-1">
             {summary.gpaCredits}
-            <span className="text-sm text-[#A8A29E] font-normal">
+            <span className="text-sm text-[#5C5850] dark:text-[#A8A29E] font-normal">
               {' '}
               {tr('من', 'of')} {summary.totalCredits}
             </span>
           </div>
         </div>
         <div className="p-5">
-          <div className="text-xs text-[#A8A29E]">
+          <div className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
             {tr('الساعات المجتازة', 'Passed Credits')}
           </div>
-          <div className="font-mono text-3xl font-bold text-emerald-400 tabular-nums mt-1">
+          <div className="font-mono text-3xl font-bold text-emerald-600 dark:text-emerald-400 tabular-nums mt-1">
             {summary.passedCredits}
           </div>
         </div>
       </div>
 
       {/* Interactive Spreadsheet Table */}
-      <section className="rounded-2xl bg-[#121216] border border-white/10 p-4 sm:p-6">
+      <section className="rounded-2xl bg-white dark:bg-[#121216] border border-black/10 dark:border-white/10 p-4 sm:p-6">
         {loading ? (
-          <div className="py-10 text-center text-sm text-[#A8A29E]">
+          <div className="py-10 text-center text-sm text-[#5C5850] dark:text-[#A8A29E]">
             {tr('جاري تحميل جدول الدرجات...', 'Loading grades table...')}
           </div>
         ) : entries.length === 0 ? (
           <div className="py-12 text-center space-y-3">
-            <Calculator className="w-8 h-8 text-[#D4AF37] mx-auto" />
-            <p className="text-sm text-[#A8A29E]">
+            <Calculator className="w-8 h-8 text-[#9A7209] dark:text-[#D4AF37] mx-auto" />
+            <p className="text-sm text-[#5C5850] dark:text-[#A8A29E]">
               {tr(
                 'جدول المواد فارغ حالياً. أضف مادتك الأولى لحساب المعدل.',
                 'Course table is empty. Add your first course to compute GPA.'
@@ -297,7 +297,7 @@ export function GpaSection() {
               } border-collapse min-w-[920px]`}
             >
               <thead>
-                <tr className="border-b border-white/10 text-xs text-[#A8A29E]">
+                <tr className="border-b border-black/10 dark:border-white/10 text-xs text-[#5C5850] dark:text-[#A8A29E]">
                   <th className="py-3 px-2 font-semibold w-10 text-center">#</th>
                   <th className="py-3 px-2 font-semibold">
                     {tr('اسم المادة الدراسية', 'Course Name')}
@@ -335,7 +335,7 @@ export function GpaSection() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5 text-sm">
+              <tbody className="divide-y divide-black/5 dark:divide-white/5 text-sm">
                 {entries.map((row, idx) => {
                   const grade = evaluateCourseGrade(row);
                   const isIncluded = row.includeInGpa !== false;
@@ -344,10 +344,10 @@ export function GpaSection() {
                     <tr
                       key={row.id}
                       className={`transition-colors ${
-                        isIncluded ? 'hover:bg-white/[0.02]' : 'bg-white/[0.015] opacity-80'
+                        isIncluded ? 'hover:bg-black/[0.025] dark:hover:bg-white/[0.02]' : 'bg-black/[0.025] dark:bg-white/[0.015] opacity-80'
                       }`}
                     >
-                      <td className="py-2.5 px-2 text-center font-mono text-xs text-[#A8A29E] tabular-nums">
+                      <td className="py-2.5 px-2 text-center font-mono text-xs text-[#5C5850] dark:text-[#A8A29E] tabular-nums">
                         {idx + 1}
                       </td>
                       <td className="py-2.5 px-2">
@@ -355,7 +355,7 @@ export function GpaSection() {
                           type="text"
                           value={row.name}
                           onChange={(e) => updateRow(row.id, 'name', e.target.value)}
-                          className="w-full px-3 py-1.5 rounded-lg bg-[#09090B] border border-white/10 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+                          className="w-full px-3 py-1.5 rounded-lg bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
                         />
                       </td>
                       <td className="py-2.5 px-2 text-center">
@@ -376,7 +376,7 @@ export function GpaSection() {
                           onChange={(e) =>
                             updateRow(row.id, 'credits', Number(e.target.value))
                           }
-                          className="w-full px-2 py-1.5 rounded-lg bg-[#09090B] border border-white/10 text-center font-mono tabular-nums text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+                          className="w-full px-2 py-1.5 rounded-lg bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 text-center font-mono tabular-nums text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
                         />
                       </td>
                       <td className="py-2.5 px-2">
@@ -388,7 +388,7 @@ export function GpaSection() {
                           onChange={(e) =>
                             updateRow(row.id, 'coursework', Number(e.target.value))
                           }
-                          className="w-full px-2 py-1.5 rounded-lg bg-[#09090B] border border-white/10 text-center font-mono tabular-nums text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+                          className="w-full px-2 py-1.5 rounded-lg bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 text-center font-mono tabular-nums text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
                         />
                       </td>
                       <td className="py-2.5 px-2">
@@ -400,7 +400,7 @@ export function GpaSection() {
                           onChange={(e) =>
                             updateRow(row.id, 'midterm', Number(e.target.value))
                           }
-                          className="w-full px-2 py-1.5 rounded-lg bg-[#09090B] border border-white/10 text-center font-mono tabular-nums text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+                          className="w-full px-2 py-1.5 rounded-lg bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 text-center font-mono tabular-nums text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
                         />
                       </td>
                       <td className="py-2.5 px-2">
@@ -412,19 +412,19 @@ export function GpaSection() {
                           onChange={(e) =>
                             updateRow(row.id, 'finalExam', Number(e.target.value))
                           }
-                          className="w-full px-2 py-1.5 rounded-lg bg-[#09090B] border border-white/10 text-center font-mono tabular-nums text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+                          className="w-full px-2 py-1.5 rounded-lg bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 text-center font-mono tabular-nums text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
                         />
                       </td>
-                      <td className="py-2.5 px-2 text-center font-mono tabular-nums font-semibold text-[#F5F0E6]">
+                      <td className="py-2.5 px-2 text-center font-mono tabular-nums font-semibold text-[#141418] dark:text-[#F5F0E6]">
                         {grade.total}
                       </td>
                       <td
                         className={`py-2.5 px-2 text-center font-mono font-bold ${
                           grade.letter === 'F'
-                            ? 'text-red-400'
+                            ? 'text-red-600 dark:text-red-400'
                             : grade.letter.startsWith('A')
-                            ? 'text-[#E5C158]'
-                            : 'text-emerald-400'
+                            ? 'text-[#856104] dark:text-[#E5C158]'
+                            : 'text-emerald-600 dark:text-emerald-400'
                         }`}
                       >
                         {isIncluded
@@ -433,7 +433,7 @@ export function GpaSection() {
                           ? tr('ناجح', 'Pass')
                           : tr('راسب', 'Fail')}
                       </td>
-                      <td className="py-2.5 px-2 text-center font-mono tabular-nums text-[#C8C2B8]">
+                      <td className="py-2.5 px-2 text-center font-mono tabular-nums text-[#3F3D38] dark:text-[#C8C2B8]">
                         {isIncluded
                           ? grade.points.toFixed(1)
                           : tr('خارج GPA', 'Non-GPA')}
@@ -442,7 +442,7 @@ export function GpaSection() {
                         <button
                           type="button"
                           onClick={() => removeRow(row.id)}
-                          className="p-1.5 rounded-lg text-red-400 hover:bg-red-950/60 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-950/60 transition-colors cursor-pointer"
                           aria-label={tr('حذف المادة', 'Delete course')}
                         >
                           <Trash2 className="w-4 h-4" />

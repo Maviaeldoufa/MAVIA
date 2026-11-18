@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   --font-display: "Changa", "Cairo", sans-serif;
@@ -18,6 +19,11 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background-color: #F6F4EF;
+    color: #141418;
+  }
+
+  html.dark {
     background-color: #09090B;
     color: #F7F3EB;
   }
@@ -35,23 +41,40 @@
 
   input::placeholder,
   textarea::placeholder {
+    color: #6e6a61;
+    opacity: 1;
+  }
+
+  html.dark input::placeholder,
+  html.dark textarea::placeholder {
     color: #b8b1a7;
     opacity: 1;
   }
 
-  /* Custom subtle obsidian scrollbar */
+  /* Custom subtle scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: #0D0D10;
+    background: #ebe6db;
   }
   ::-webkit-scrollbar-thumb {
-    background: #27272E;
+    background: #c5bdb0;
     border-radius: 3px;
   }
   ::-webkit-scrollbar-thumb:hover {
+    background: #b8860b;
+  }
+
+  html.dark ::-webkit-scrollbar-track {
+    background: #0D0D10;
+  }
+  html.dark ::-webkit-scrollbar-thumb {
+    background: #27272E;
+    border-radius: 3px;
+  }
+  html.dark ::-webkit-scrollbar-thumb:hover {
     background: #D4AF37;
   }
 }
@@ -74,15 +97,15 @@
   line-height: 1.55;
 }
 
-.text-\[\#A8A29E\] {
+html.dark .text-\[\#A8A29E\] {
   color: #c9c2b8;
 }
 
-.text-\[\#C8C2B8\] {
+html.dark .text-\[\#C8C2B8\] {
   color: #dfd9cf;
 }
 
-.text-\[\#71717A\] {
+html.dark .text-\[\#71717A\] {
   color: #a8a8b3;
 }
 

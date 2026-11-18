@@ -19,8 +19,6 @@ import {
   GraduationCap,
   ImageOff,
   ImagePlus,
-  Maximize2,
-  Minimize2,
   Play,
   Plus,
   Shuffle,
@@ -46,6 +44,7 @@ import type {
 import { apiRequest, resolveApiUrl } from '../../utils/api';
 import { CountdownTimer } from '../ui/CountdownTimer';
 import { GoldChip } from '../ui/GoldChip';
+import { buildPdfViewerHref } from '../ui/PdfViewerPage';
 import { CourseAiTutorTab } from './CourseAiTutorTab';
 import { QuizBuilder, QuizRunner } from './QuizRunner';
 
@@ -90,12 +89,6 @@ export function CourseDetailModal({
   const [activeQuiz, setActiveQuiz] = useState<Quiz | null>(null);
   const [reviewSubmission, setReviewSubmission] =
     useState<QuizSubmission | null>(null);
-
-  // PDF preview + fullscreen state
-  const [previewPdfUrl, setPreviewPdfUrl] = useState<string | null>(null);
-  const [previewPdfTitle, setPreviewPdfTitle] = useState<string>('');
-  const [isPdfFullscreen, setIsPdfFullscreen] = useState(false);
-  const pdfContainerRef = useRef<HTMLDivElement | null>(null);
 
   // Admin Folder Creation state
   const [showFolderForm, setShowFolderForm] = useState(false);
@@ -166,16 +159,6 @@ export function CourseDetailModal({
     setAssignFilePreview(url);
     return () => URL.revokeObjectURL(url);
   }, [assignFile, assignMode]);
-
-  useEffect(() => {
-    const onFsChange = () => {
-      if (!document.fullscreenElement) {
-        // Keep modal-fullscreen controllable manually even if browser ESC exits native FS
-      }
-    };
-    document.addEventListener('fullscreenchange', onFsChange);
-    return () => document.removeEventListener('fullscreenchange', onFsChange);
-  }, []);
 
   const recordFolderView = async (folderId: string) => {
     try {
@@ -313,30 +296,6 @@ export function CourseDetailModal({
             lessonTitle: `اختبار: ${quiz.title}`,
           }),
         });
-      } catch {
-        // Ignore
-      }
-    }
-  };
-
-  const openPdfPreview = (url: string, title: string, enterFullscreen = false) => {
-    setPreviewPdfUrl(url);
-    setPreviewPdfTitle(title);
-    setIsPdfFullscreen(enterFullscreen);
-  };
-
-  const togglePdfFullscreen = async () => {
-    const next = !isPdfFullscreen;
-    setIsPdfFullscreen(next);
-    if (next && pdfContainerRef.current?.requestFullscreen) {
-      try {
-        await pdfContainerRef.current.requestFullscreen();
-      } catch {
-        // Fallback fixed full-viewport CSS handles fullscreen gracefully
-      }
-    } else if (!next && document.fullscreenElement) {
-      try {
-        await document.exitFullscreen();
       } catch {
         // Ignore
       }
@@ -664,7 +623,7 @@ export function CourseDetailModal({
     if (diff === 'easy') {
       return {
         label: tr('سهل', 'Easy'),
-        cls: 'bg-emerald-950/80 text-emerald-300 border-emerald-500/40',
+        cls: 'bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border-emerald-500/40',
       };
     }
     if (diff === 'hard') {
@@ -676,7 +635,7 @@ export function CourseDetailModal({
     if (diff === 'medium') {
       return {
         label: tr('متوسط', 'Medium'),
-        cls: 'bg-amber-950/80 text-amber-300 border-amber-500/40',
+        cls: 'bg-amber-50 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border-amber-500/40',
       };
     }
     return null;
@@ -685,10 +644,10 @@ export function CourseDetailModal({
   const renderSummaryForm = () => (
     <form
       onSubmit={handleUploadSummary}
-      className="p-4 rounded-xl bg-[#09090B] border border-[#D4AF37]/30 space-y-3"
+      className="p-4 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-[#D4AF37]/30 space-y-3"
     >
       <div className="flex items-center justify-between gap-2">
-        <h4 className="font-display text-sm font-bold text-[#E5C158]">
+        <h4 className="font-display text-sm font-bold text-[#856104] dark:text-[#E5C158]">
           {sumCategory === 'book'
             ? tr('إضافة كتاب المادة (PDF من الجهاز)', 'Add Course Textbook (PDF from Device)')
             : tr('إضافة ملخص أو رفع ملف PDF من جهازك', 'Add Summary or Upload PDF File')}
@@ -696,13 +655,13 @@ export function CourseDetailModal({
         <button
           type="button"
           onClick={() => setShowSummaryForm(false)}
-          className="text-xs text-[#A8A29E] hover:text-white cursor-pointer"
+          className="text-xs text-[#5C5850] dark:text-[#A8A29E] hover:text-white cursor-pointer"
         >
           {tr('إغلاق', 'Close')}
         </button>
       </div>
       {formError && (
-        <div className="p-2.5 rounded-lg bg-red-950/50 border border-red-500/40 text-red-200 text-xs">
+        <div className="p-2.5 rounded-lg bg-red-50 dark:bg-red-950/50 border border-red-500/40 text-red-700 dark:text-red-200 text-xs">
           {formError}
         </div>
       )}
@@ -737,12 +696,12 @@ export function CourseDetailModal({
               ? tr('اسم كتاب المادة (مثال: الكتاب المرجعي للعملي)', 'Course textbook title...')
               : tr('عنوان الملخص أو المحاضرة', 'Summary title')
           }
-          className="px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+          className="px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
         />
         <select
           value={sumFolderId || selectedFolderId || ''}
           onChange={(e) => setSumFolderId(e.target.value)}
-          className="px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+          className="px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
         >
           <option value="">
             {tr('بدون مجلد (رئيسي في المادة)', 'No Folder (Course Root)')}
@@ -763,22 +722,22 @@ export function CourseDetailModal({
             'وصف مختصر للمحتوى...',
             'Short description...'
           )}
-          className="w-full px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+          className="w-full px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
         />
         <div className="space-y-1">
-          <label className="block text-[11px] text-[#A8A29E]">
+          <label className="block text-[11px] text-[#5C5850] dark:text-[#A8A29E]">
             {tr('مؤقت تنزيل اختياري للملف:', 'Optional release countdown:')}
           </label>
           <input
             type="datetime-local"
             value={sumReleaseAt}
             onChange={(e) => setSumReleaseAt(e.target.value)}
-            className="w-full px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-sm text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
+            className="w-full px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
           />
         </div>
       </div>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <label className="flex items-center gap-2.5 px-3.5 py-2 rounded-lg bg-[#151519] border border-dashed border-[#D4AF37]/50 text-xs text-[#E5C158] cursor-pointer hover:bg-[#1C1C22] transition-colors">
+        <label className="flex items-center gap-2.5 px-3.5 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-dashed border-[#D4AF37]/50 text-xs text-[#856104] dark:text-[#E5C158] cursor-pointer hover:bg-[#1C1C22] transition-colors">
           <FileUp className="w-4 h-4 shrink-0" />
           <span className="truncate max-w-[240px]">
             {pdfFile
@@ -807,7 +766,7 @@ export function CourseDetailModal({
   const renderSummariesList = (items: SummaryItem[], emptyMessage?: string) => {
     if (items.length === 0) {
       return (
-        <div className="py-8 text-center text-sm text-[#A8A29E] rounded-xl bg-[#0D0D10] border border-white/10">
+        <div className="py-8 text-center text-sm text-[#5C5850] dark:text-[#A8A29E] rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10">
           {emptyMessage ||
             tr('لا توجد ملخصات مضافة هنا حتى الآن.', 'No summaries added here yet.')}
         </div>
@@ -819,39 +778,42 @@ export function CourseDetailModal({
         {items.map((sum) => (
           <div
             key={sum.id}
-            className="p-4 rounded-xl bg-[#0D0D10] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+            className="p-4 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
           >
             <div className="space-y-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 {sum.category === 'book' && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[10px] font-bold text-[#F5D061]">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[10px] font-bold text-[#735303] dark:text-[#F5D061]">
                     <BookOpen className="w-3 h-3" />
                     <span>{tr('كتاب المادة', 'Course Book')}</span>
                   </span>
                 )}
                 {sum.fileUrl ? (
                   <a
-                    href={resolveApiUrl(sum.fileUrl)}
+                    href={buildPdfViewerHref(sum.fileUrl, sum.title, sum.fileName)}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => {
                       handleLessonProgress(sum);
                       recordSummaryView(sum.id);
                     }}
-                    className="font-semibold text-sm text-[#F5F0E6] hover:text-[#F5D061] underline decoration-[#D4AF37]/40 underline-offset-4 inline-flex items-center gap-1.5"
-                    title={tr('اضغط لفتح الـ PDF في تبويب جديدة', 'Click to open PDF in a new tab')}
+                    className="font-semibold text-sm text-[#141418] dark:text-[#F5F0E6] hover:text-[#F5D061] underline decoration-[#D4AF37]/40 underline-offset-4 inline-flex items-center gap-1.5"
+                    title={tr(
+                      'اضغط لمعاينة الـ PDF في صفحة منفصلة',
+                      'Click to preview PDF in a separate page'
+                    )}
                   >
                     <span>{sum.title}</span>
-                    <ExternalLink className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                    <ExternalLink className="w-3.5 h-3.5 text-[#9A7209] dark:text-[#D4AF37] shrink-0" />
                   </a>
                 ) : (
-                  <h4 className="font-semibold text-sm text-[#F5F0E6]">
+                  <h4 className="font-semibold text-sm text-[#141418] dark:text-[#F5F0E6]">
                     {sum.title}
                   </h4>
                 )}
               </div>
-              <p className="text-xs text-[#C8C2B8]">{sum.description}</p>
-              <div className="flex flex-wrap items-center gap-2 text-[11px] text-[#A8A29E]">
+              <p className="text-xs text-[#3F3D38] dark:text-[#C8C2B8]">{sum.description}</p>
+              <div className="flex flex-wrap items-center gap-2 text-[11px] text-[#5C5850] dark:text-[#A8A29E]">
                 <span>
                   {tr('بواسطة', 'By')} {sum.createdBy}
                 </span>
@@ -859,14 +821,14 @@ export function CourseDetailModal({
                   <>
                     <span aria-hidden="true">·</span>
                     <a
-                      href={resolveApiUrl(sum.fileUrl)}
+                      href={buildPdfViewerHref(sum.fileUrl, sum.title, sum.fileName)}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => {
                         handleLessonProgress(sum);
                         recordSummaryView(sum.id);
                       }}
-                      className="text-[#D4AF37] hover:text-[#F5D061] truncate max-w-[200px] underline"
+                      className="text-[#9A7209] dark:text-[#D4AF37] hover:text-[#F5D061] truncate max-w-[200px] underline"
                     >
                       {sum.fileName}
                     </a>
@@ -881,7 +843,7 @@ export function CourseDetailModal({
                   </>
                 )}
                 <span aria-hidden="true">·</span>
-                <span className="inline-flex items-center gap-1 text-[#E5C158] font-mono tabular-nums">
+                <span className="inline-flex items-center gap-1 text-[#856104] dark:text-[#E5C158] font-mono tabular-nums">
                   <Eye className="w-3.5 h-3.5" />
                   <span>{sum.viewsCount ?? 0}</span>
                 </span>
@@ -919,30 +881,18 @@ export function CourseDetailModal({
               {sum.fileUrl && (
                 <>
                   <a
-                    href={resolveApiUrl(sum.fileUrl)}
+                    href={buildPdfViewerHref(sum.fileUrl, sum.title, sum.fileName)}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => {
                       handleLessonProgress(sum);
                       recordSummaryView(sum.id);
                     }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[#F5D061] hover:bg-[#D4AF37] hover:text-[#09090B] transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[#735303] dark:text-[#F5D061] hover:bg-[#D4AF37] hover:text-[#09090B] transition-colors"
                   >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                    <span>{tr('فتح تبويب جديدة', 'New Tab')}</span>
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>{tr('معاينة PDF', 'Preview PDF')}</span>
                   </a>
-                  <GoldChip
-                    active={previewPdfUrl === sum.fileUrl && isPdfFullscreen}
-                    onClick={() => {
-                      openPdfPreview(sum.fileUrl!, sum.title, true);
-                      handleLessonProgress(sum);
-                      recordSummaryView(sum.id);
-                    }}
-                    className="text-xs px-3 py-1.5"
-                  >
-                    <Maximize2 className="w-3.5 h-3.5" />
-                    <span>{tr('ملئ الشاشة', 'Fullscreen')}</span>
-                  </GoldChip>
                   <a
                     href={resolveApiUrl(sum.fileUrl)}
                     download={sum.fileName || 'summary.pdf'}
@@ -950,7 +900,7 @@ export function CourseDetailModal({
                       handleLessonProgress(sum);
                       recordSummaryView(sum.id);
                     }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#151519] border border-white/10 text-[#F5F0E6] hover:border-[#D4AF37]/60 hover:text-[#F5D061] transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-[#141418] dark:text-[#F5F0E6] hover:border-[#D4AF37]/60 hover:text-[#F5D061] transition-colors"
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>{tr('تحميل', 'Download')}</span>
@@ -961,7 +911,7 @@ export function CourseDetailModal({
                 <button
                   type="button"
                   onClick={() => handleDeleteSummary(sum.id)}
-                  className="p-2 rounded-lg bg-red-950/50 border border-red-500/30 text-red-300 hover:bg-red-600 hover:text-white transition-colors cursor-pointer"
+                  className="p-2 rounded-lg bg-red-50 dark:bg-red-950/50 border border-red-500/30 text-red-700 dark:text-red-300 hover:bg-red-600 hover:text-white transition-colors cursor-pointer"
                   aria-label={tr('حذف الملف', 'Delete file')}
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -977,7 +927,7 @@ export function CourseDetailModal({
   const renderQuizzesList = (items: Quiz[]) => {
     if (items.length === 0) {
       return (
-        <div className="py-8 text-center text-sm text-[#A8A29E] rounded-xl bg-[#0D0D10] border border-white/10">
+        <div className="py-8 text-center text-sm text-[#5C5850] dark:text-[#A8A29E] rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10">
           {tr('لا توجد اختبارات مضافة هنا حتى الآن.', 'No quizzes added here yet.')}
         </div>
       );
@@ -1002,11 +952,11 @@ export function CourseDetailModal({
           return (
             <div
               key={quiz.id}
-              className="p-4 rounded-xl bg-[#0D0D10] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+              className="p-4 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
             >
               <div className="space-y-1.5 min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h4 className="font-semibold text-sm text-[#F5F0E6]">
+                  <h4 className="font-semibold text-sm text-[#141418] dark:text-[#F5F0E6]">
                     {quiz.title}
                   </h4>
                   {quiz.generatedByAi && (
@@ -1023,8 +973,8 @@ export function CourseDetailModal({
                     </span>
                   )}
                 </div>
-                <div className="flex flex-wrap items-center gap-2 text-xs text-[#A8A29E] tabular-nums">
-                  <span className="inline-flex items-center gap-1 text-[#E5C158]">
+                <div className="flex flex-wrap items-center gap-2 text-xs text-[#5C5850] dark:text-[#A8A29E] tabular-nums">
+                  <span className="inline-flex items-center gap-1 text-[#856104] dark:text-[#E5C158]">
                     <Clock className="w-3.5 h-3.5" />
                     <span>
                       {quiz.durationMinutes} {tr('دقيقة', 'min')}
@@ -1042,7 +992,7 @@ export function CourseDetailModal({
                   {quiz.randomizeQuestions !== false && (
                     <>
                       <span aria-hidden="true">·</span>
-                      <span className="inline-flex items-center gap-1 text-[#D4AF37]">
+                      <span className="inline-flex items-center gap-1 text-[#9A7209] dark:text-[#D4AF37]">
                         <Shuffle className="w-3 h-3" />
                         <span>{tr('بنك عشوائي', 'Random Bank')}</span>
                       </span>
@@ -1051,7 +1001,7 @@ export function CourseDetailModal({
                   {bestSub && (
                     <>
                       <span aria-hidden="true">·</span>
-                      <span className="text-emerald-300 font-semibold">
+                      <span className="text-emerald-700 dark:text-emerald-300 font-semibold">
                         {tr('أعلى درجة:', 'Best:')}{' '}
                         {bestSub.score}/{bestSub.maxScore}
                       </span>
@@ -1097,7 +1047,7 @@ export function CourseDetailModal({
                   <button
                     type="button"
                     onClick={() => handleDeleteQuiz(quiz.id)}
-                    className="p-2 rounded-lg bg-red-950/50 border border-red-500/30 text-red-300 hover:bg-red-600 hover:text-white transition-colors cursor-pointer"
+                    className="p-2 rounded-lg bg-red-50 dark:bg-red-950/50 border border-red-500/30 text-red-700 dark:text-red-300 hover:bg-red-600 hover:text-white transition-colors cursor-pointer"
                     aria-label={tr('حذف الاختبار', 'Delete quiz')}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -1114,10 +1064,10 @@ export function CourseDetailModal({
   const renderAiQuizGeneratorPanel = () => (
     <form
       onSubmit={handleGenerateAiQuiz}
-      className="p-4 sm:p-5 rounded-xl bg-gradient-to-br from-[#D4AF37]/10 via-[#09090B] to-[#121216] border border-[#D4AF37]/40 space-y-4"
+      className="p-4 sm:p-5 rounded-xl bg-gradient-to-br from-[#D4AF37]/15 via-[#FBF8EE] to-white dark:from-[#D4AF37]/10 dark:via-[#09090B] dark:to-[#121216] border border-[#D4AF37]/40 space-y-4"
     >
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 text-[#F5D061]">
+        <div className="flex items-center gap-2 text-[#735303] dark:text-[#F5D061]">
           <Sparkles className="w-4 h-4" />
           <h4 className="font-display text-sm sm:text-base font-bold">
             {isAdmin
@@ -1134,13 +1084,13 @@ export function CourseDetailModal({
         <button
           type="button"
           onClick={() => setShowAiQuizPanel(false)}
-          className="text-xs text-[#A8A29E] hover:text-white cursor-pointer"
+          className="text-xs text-[#5C5850] dark:text-[#A8A29E] hover:text-[#141418] dark:hover:text-white cursor-pointer"
         >
           {tr('إغلاق', 'Close')}
         </button>
       </div>
 
-      <p className="text-xs text-[#C8C2B8]">
+      <p className="text-xs text-[#3F3D38] dark:text-[#C8C2B8]">
         {tr(
           'يقرأ الذكاء الاصطناعي كتاب المادة والملخصات والتكليفات داخل هذا المجلد وينشئ أسئلة اختيار من متعدد تفاعلية بالمستوى الذي تحدده.',
           'AI reads the textbook, summaries, and assignments inside this folder and generates interactive MCQ questions at your chosen difficulty.'
@@ -1148,13 +1098,13 @@ export function CourseDetailModal({
       </p>
 
       {aiQuizError && (
-        <div className="p-2.5 rounded-lg bg-red-950/50 border border-red-500/40 text-red-200 text-xs">
+        <div className="p-2.5 rounded-lg bg-red-50 dark:bg-red-950/50 border border-red-500/40 text-red-700 dark:text-red-200 text-xs">
           {aiQuizError}
         </div>
       )}
 
       <div className="space-y-2">
-        <label className="block text-xs font-semibold text-[#E5C158]">
+        <label className="block text-xs font-semibold text-[#856104] dark:text-[#E5C158]">
           {tr('اختر مستوى الامتحان:', 'Choose Difficulty Level:')}
         </label>
         <div className="flex flex-wrap items-center gap-2">
@@ -1192,11 +1142,11 @@ export function CourseDetailModal({
             value={aiCustomTitle}
             onChange={(e) => setAiCustomTitle(e.target.value)}
             placeholder={tr('عنوان الامتحان (اختياري)', 'Custom exam title (optional)')}
-            className="px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+            className="px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
           />
         )}
         <div className="space-y-1">
-          <label className="block text-[11px] text-[#A8A29E]">
+          <label className="block text-[11px] text-[#5C5850] dark:text-[#A8A29E]">
             {tr('عدد الأسئلة', 'Questions Count')}
           </label>
           <input
@@ -1207,11 +1157,11 @@ export function CourseDetailModal({
             onChange={(e) =>
               setAiQuestionCount(Math.min(20, Math.max(3, Number(e.target.value) || 5)))
             }
-            className="w-full px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-sm text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
+            className="w-full px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
           />
         </div>
         <div className="space-y-1">
-          <label className="block text-[11px] text-[#A8A29E]">
+          <label className="block text-[11px] text-[#5C5850] dark:text-[#A8A29E]">
             {tr('المدة (بالدقائق)', 'Duration (minutes)')}
           </label>
           <input
@@ -1222,7 +1172,7 @@ export function CourseDetailModal({
             onChange={(e) =>
               setAiDurationMinutes(Math.max(1, Number(e.target.value) || 10))
             }
-            className="w-full px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-sm text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
+            className="w-full px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
           />
         </div>
       </div>
@@ -1247,10 +1197,10 @@ export function CourseDetailModal({
       {/* Add Assignment / Submission Form (Image, PDF, or Text) */}
       <form
         onSubmit={handleAddAssignment}
-        className="p-4 sm:p-5 rounded-xl bg-[#09090B] border border-[#D4AF37]/35 space-y-4"
+        className="p-4 sm:p-5 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-[#D4AF37]/35 space-y-4"
       >
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h4 className="font-display text-sm sm:text-base font-bold text-[#E5C158] flex items-center gap-2">
+          <h4 className="font-display text-sm sm:text-base font-bold text-[#856104] dark:text-[#E5C158] flex items-center gap-2">
             <ClipboardList className="w-4 h-4" />
             <span>
               {isAdmin
@@ -1261,7 +1211,7 @@ export function CourseDetailModal({
         </div>
 
         {assignError && (
-          <div className="p-2.5 rounded-lg bg-red-950/50 border border-red-500/40 text-red-200 text-xs">
+          <div className="p-2.5 rounded-lg bg-red-50 dark:bg-red-950/50 border border-red-500/40 text-red-700 dark:text-red-200 text-xs">
             {assignError}
           </div>
         )}
@@ -1312,12 +1262,12 @@ export function CourseDetailModal({
           value={assignTitle}
           onChange={(e) => setAssignTitle(e.target.value)}
           placeholder={tr('عنوان التكليف (مثال: شيت المحاضرة الثالثة)', 'Assignment title...')}
-          className="w-full px-3.5 py-2.5 rounded-xl bg-[#151519] border border-white/10 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+          className="w-full px-3.5 py-2.5 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
         />
 
         {assignMode === 'image' && (
           <div className="flex flex-wrap items-center gap-3">
-            <label className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-[#151519] border border-dashed border-[#D4AF37]/60 text-xs font-semibold text-[#F5D061] cursor-pointer hover:bg-[#1C1C22] transition-colors">
+            <label className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-dashed border-[#D4AF37]/60 text-xs font-semibold text-[#735303] dark:text-[#F5D061] cursor-pointer hover:bg-[#1C1C22] transition-colors">
               <ImagePlus className="w-4 h-4 shrink-0" />
               <span className="truncate max-w-[240px]">
                 {assignFile
@@ -1342,7 +1292,7 @@ export function CourseDetailModal({
         )}
 
         {assignMode === 'pdf' && (
-          <label className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-[#151519] border border-dashed border-[#D4AF37]/60 text-xs font-semibold text-[#F5D061] cursor-pointer hover:bg-[#1C1C22] transition-colors">
+          <label className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-dashed border-[#D4AF37]/60 text-xs font-semibold text-[#735303] dark:text-[#F5D061] cursor-pointer hover:bg-[#1C1C22] transition-colors">
             <FileUp className="w-4 h-4 shrink-0" />
             <span className="truncate max-w-[260px]">
               {assignFile
@@ -1368,7 +1318,7 @@ export function CourseDetailModal({
               ? tr('اكتب نص التكليف أو الإجابة كاملة هنا...', 'Write the full assignment text here...')
               : tr('ملاحظات أو وصف اختياري للتكليف...', 'Optional notes or instructions...')
           }
-          className="w-full px-3.5 py-2.5 rounded-xl bg-[#151519] border border-white/10 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+          className="w-full px-3.5 py-2.5 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
         />
 
         <div className="flex justify-end">
@@ -1382,7 +1332,7 @@ export function CourseDetailModal({
 
       {/* Assignments List */}
       {visibleAssignments.length === 0 ? (
-        <div className="py-8 text-center text-sm text-[#A8A29E] rounded-xl bg-[#0D0D10] border border-white/10">
+        <div className="py-8 text-center text-sm text-[#5C5850] dark:text-[#A8A29E] rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10">
           {tr('لا توجد تكليفات مضافة هنا حتى الآن.', 'No assignments added here yet.')}
         </div>
       ) : (
@@ -1392,12 +1342,12 @@ export function CourseDetailModal({
             return (
               <div
                 key={assign.id}
-                className="p-4 rounded-xl bg-[#0D0D10] border border-white/10 space-y-3"
+                className="p-4 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 space-y-3"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="space-y-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="px-2 py-0.5 rounded-md bg-[#151519] border border-[#D4AF37]/30 text-[10px] font-bold text-[#E5C158]">
+                      <span className="px-2 py-0.5 rounded-md bg-[#F5F2EA] dark:bg-[#151519] border border-[#D4AF37]/30 text-[10px] font-bold text-[#856104] dark:text-[#E5C158]">
                         {assign.type === 'pdf'
                           ? 'PDF'
                           : assign.type === 'image'
@@ -1406,21 +1356,25 @@ export function CourseDetailModal({
                       </span>
                       {assign.type === 'pdf' && assign.fileUrl ? (
                         <a
-                          href={resolveApiUrl(assign.fileUrl)}
+                          href={buildPdfViewerHref(
+                            assign.fileUrl,
+                            assign.title,
+                            assign.fileName
+                          )}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="font-semibold text-sm text-[#F5F0E6] hover:text-[#F5D061] underline decoration-[#D4AF37]/40 underline-offset-4 inline-flex items-center gap-1.5"
+                          className="font-semibold text-sm text-[#141418] dark:text-[#F5F0E6] hover:text-[#F5D061] underline decoration-[#D4AF37]/40 underline-offset-4 inline-flex items-center gap-1.5"
                         >
                           <span>{assign.title}</span>
-                          <ExternalLink className="w-3.5 h-3.5 text-[#D4AF37]" />
+                          <ExternalLink className="w-3.5 h-3.5 text-[#9A7209] dark:text-[#D4AF37]" />
                         </a>
                       ) : (
-                        <h4 className="font-semibold text-sm text-[#F5F0E6]">
+                        <h4 className="font-semibold text-sm text-[#141418] dark:text-[#F5F0E6]">
                           {assign.title}
                         </h4>
                       )}
                     </div>
-                    <div className="text-[11px] text-[#A8A29E]">
+                    <div className="text-[11px] text-[#5C5850] dark:text-[#A8A29E]">
                       {tr('بواسطة', 'By')} {assign.createdBy}
                       {assign.fileName ? ` · ${assign.fileName}` : ''}
                     </div>
@@ -1430,22 +1384,26 @@ export function CourseDetailModal({
                     {assign.type === 'pdf' && assign.fileUrl && (
                       <>
                         <a
-                          href={resolveApiUrl(assign.fileUrl)}
+                          href={buildPdfViewerHref(
+                            assign.fileUrl,
+                            assign.title,
+                            assign.fileName
+                          )}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[#F5D061] hover:bg-[#D4AF37] hover:text-[#09090B] transition-colors"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[#735303] dark:text-[#F5D061] hover:bg-[#D4AF37] hover:text-[#09090B] transition-colors"
                         >
-                          <ExternalLink className="w-3.5 h-3.5" />
-                          <span>{tr('فتح تبويب جديدة', 'New Tab')}</span>
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>{tr('معاينة PDF', 'Preview PDF')}</span>
                         </a>
-                        <GoldChip
-                          active={previewPdfUrl === assign.fileUrl && isPdfFullscreen}
-                          onClick={() => openPdfPreview(assign.fileUrl!, assign.title, true)}
-                          className="text-xs px-3 py-1.5"
+                        <a
+                          href={resolveApiUrl(assign.fileUrl)}
+                          download={assign.fileName || 'assignment.pdf'}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-[#141418] dark:text-[#F5F0E6] hover:border-[#D4AF37]/60 hover:text-[#F5D061] transition-colors"
                         >
-                          <Maximize2 className="w-3.5 h-3.5" />
-                          <span>{tr('ملئ الشاشة', 'Fullscreen')}</span>
-                        </GoldChip>
+                          <Download className="w-3.5 h-3.5" />
+                          <span>{tr('تحميل', 'Download')}</span>
+                        </a>
                       </>
                     )}
                     {assign.type === 'image' && assign.fileUrl && (
@@ -1453,7 +1411,7 @@ export function CourseDetailModal({
                         href={resolveApiUrl(assign.fileUrl)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[#F5D061] hover:bg-[#D4AF37] hover:text-[#09090B] transition-colors"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[#735303] dark:text-[#F5D061] hover:bg-[#D4AF37] hover:text-[#09090B] transition-colors"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
                         <span>{tr('فتح الصورة', 'Open Image')}</span>
@@ -1463,7 +1421,7 @@ export function CourseDetailModal({
                       <button
                         type="button"
                         onClick={() => handleDeleteAssignment(assign.id)}
-                        className="p-2 rounded-lg bg-red-950/50 border border-red-500/30 text-red-300 hover:bg-red-600 hover:text-white transition-colors cursor-pointer"
+                        className="p-2 rounded-lg bg-red-50 dark:bg-red-950/50 border border-red-500/30 text-red-700 dark:text-red-300 hover:bg-red-600 hover:text-white transition-colors cursor-pointer"
                         aria-label={tr('حذف التكليف', 'Delete assignment')}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -1473,7 +1431,7 @@ export function CourseDetailModal({
                 </div>
 
                 {assign.contentText && (
-                  <p className="text-xs sm:text-sm text-[#E7E2D8] whitespace-pre-wrap leading-relaxed p-3 rounded-lg bg-[#151519] border border-white/5">
+                  <p className="text-xs sm:text-sm text-[#2A2823] dark:text-[#E7E2D8] whitespace-pre-wrap leading-relaxed p-3 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/5 dark:border-white/5">
                     {assign.contentText}
                   </p>
                 )}
@@ -1483,7 +1441,7 @@ export function CourseDetailModal({
                     href={resolveApiUrl(assign.fileUrl)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block rounded-lg overflow-hidden border border-white/10 bg-[#09090B] max-h-64"
+                    className="block rounded-lg overflow-hidden border border-black/10 dark:border-white/10 bg-[#F6F4EF] dark:bg-[#09090B] max-h-64"
                   >
                     <img
                       src={resolveApiUrl(assign.fileUrl)}
@@ -1506,37 +1464,37 @@ export function CourseDetailModal({
       aria-modal="true"
       className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4"
     >
-      <div className="w-full max-w-4xl max-h-[92vh] overflow-y-auto rounded-2xl bg-[#121216] border border-[#D4AF37]/30 p-4 sm:p-6 space-y-5">
+      <div className="w-full max-w-4xl max-h-[92vh] overflow-y-auto rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/30 p-4 sm:p-6 space-y-5">
         {loading || !course ? (
-          <div className="py-12 text-center text-sm text-[#A8A29E]">
+          <div className="py-12 text-center text-sm text-[#5C5850] dark:text-[#A8A29E]">
             {tr('جاري تحميل تفاصيل المادة...', 'Loading course details...')}
           </div>
         ) : (
           <>
             {course.coverUrl && (
-              <div className="relative h-36 sm:h-44 w-full rounded-xl overflow-hidden border border-[#D4AF37]/30 bg-[#09090B]">
+              <div className="relative h-36 sm:h-44 w-full rounded-xl overflow-hidden border border-[#D4AF37]/30 bg-[#F6F4EF] dark:bg-[#09090B]">
                 <img
                   src={resolveApiUrl(course.coverUrl)}
                   alt={course.title}
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#121216]/80 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-white/80 dark:from-[#121216]/80 via-transparent to-transparent" />
               </div>
             )}
 
-            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 border-b border-white/10 pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 border-b border-black/10 dark:border-white/10 pb-4">
               <div className="space-y-1 min-w-0">
-                <div className="flex flex-wrap items-center gap-2 text-xs text-[#D4AF37]">
+                <div className="flex flex-wrap items-center gap-2 text-xs text-[#9A7209] dark:text-[#D4AF37]">
                   <span className="font-mono">{course.code}</span>
                   <span aria-hidden="true">·</span>
                   <span>{formatYear(course.year)}</span>
                   <span aria-hidden="true">·</span>
                   <span>{course.instructor}</span>
                 </div>
-                <h2 className="font-display text-xl sm:text-2xl font-bold text-[#F5F0E6]">
+                <h2 className="font-display text-xl sm:text-2xl font-bold text-[#141418] dark:text-[#F5F0E6]">
                   {course.title}
                 </h2>
-                <p className="text-xs sm:text-sm text-[#C8C2B8]">
+                <p className="text-xs sm:text-sm text-[#3F3D38] dark:text-[#C8C2B8]">
                   {course.description}
                 </p>
               </div>
@@ -1562,7 +1520,7 @@ export function CourseDetailModal({
                   type="button"
                   onClick={onClose}
                   aria-label={tr('إغلاق', 'Close')}
-                  className="p-2 rounded-lg bg-[#18181D] border border-white/10 text-[#C8C2B8] hover:text-[#F5D061] hover:border-[#D4AF37]/50 cursor-pointer shrink-0"
+                  className="p-2 rounded-lg bg-[#ECE8DE] dark:bg-[#18181D] border border-black/10 dark:border-white/10 text-[#3F3D38] dark:text-[#C8C2B8] hover:text-[#F5D061] hover:border-[#D4AF37]/50 cursor-pointer shrink-0"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -1674,79 +1632,6 @@ export function CourseDetailModal({
               </div>
             )}
 
-            {/* Shared PDF Preview & Fullscreen Pane */}
-            {previewPdfUrl && !activeQuiz && (
-              <div
-                ref={pdfContainerRef}
-                className={
-                  isPdfFullscreen
-                    ? 'fixed inset-0 z-[80] bg-[#09090B] flex flex-col'
-                    : 'rounded-xl overflow-hidden border border-[#D4AF37]/40 bg-[#09090B]'
-                }
-              >
-                <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 border-b border-white/10 bg-[#121216] text-xs shrink-0">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <FileText className="w-4 h-4 text-[#D4AF37] shrink-0" />
-                    <span className="text-[#E5C158] font-semibold truncate">
-                      {previewPdfTitle || tr('معاينة ملف PDF', 'PDF Preview')}
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <a
-                      href={resolveApiUrl(previewPdfUrl)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[#F5D061] hover:bg-[#D4AF37] hover:text-[#09090B] transition-colors"
-                    >
-                      <ExternalLink className="w-3.5 h-3.5" />
-                      <span>{tr('فتح في تبويب جديدة', 'Open in New Tab')}</span>
-                    </a>
-                    <button
-                      type="button"
-                      onClick={() => void togglePdfFullscreen()}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#18181D] border border-white/15 text-[#F5F0E6] hover:border-[#D4AF37] hover:text-[#F5D061] cursor-pointer"
-                    >
-                      {isPdfFullscreen ? (
-                        <>
-                          <Minimize2 className="w-3.5 h-3.5" />
-                          <span>{tr('تصغير', 'Exit Fullscreen')}</span>
-                        </>
-                      ) : (
-                        <>
-                          <Maximize2 className="w-3.5 h-3.5" />
-                          <span>{tr('ملئ الشاشة', 'Fullscreen')}</span>
-                        </>
-                      )}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setPreviewPdfUrl(null);
-                        setIsPdfFullscreen(false);
-                        if (document.fullscreenElement) {
-                          void document.exitFullscreen().catch(() => {});
-                        }
-                      }}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-red-950/60 border border-red-500/30 text-red-200 hover:bg-red-600 hover:text-white cursor-pointer"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                      <span>{tr('إغلاق', 'Close')}</span>
-                    </button>
-                  </div>
-                </div>
-                <iframe
-                  src={resolveApiUrl(previewPdfUrl)}
-                  title={previewPdfTitle || 'PDF Preview'}
-                  allowFullScreen
-                  className={
-                    isPdfFullscreen
-                      ? 'w-full flex-1 bg-white'
-                      : 'w-full h-[380px] sm:h-[440px] bg-white'
-                  }
-                />
-              </div>
-            )}
-
             {/* ACTIVE QUIZ VIEW */}
             {activeQuiz ? (
               <QuizRunner
@@ -1766,42 +1651,42 @@ export function CourseDetailModal({
                     {activeFolder ? (
                       /* INSIDE SPECIFIC FOLDER VIEW: Books, Summaries, AI Quiz, Smart Tutor, Assignments */
                       <div className="space-y-5">
-                        <div className="rounded-2xl overflow-hidden bg-[#0D0D10] border border-[#D4AF37]/35">
+                        <div className="rounded-2xl overflow-hidden bg-[#EFECE4] dark:bg-[#0D0D10] border border-[#D4AF37]/35">
                           {activeFolder.coverUrl && (
-                            <div className="relative h-36 w-full bg-[#09090B]">
+                            <div className="relative h-36 w-full bg-[#F6F4EF] dark:bg-[#09090B]">
                               <img
                                 src={resolveApiUrl(activeFolder.coverUrl)}
                                 alt={activeFolder.name}
                                 className="w-full h-full object-cover"
                               />
-                              <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D10] via-transparent to-transparent" />
+                              <div className="absolute inset-0 bg-gradient-to-t from-[#EFECE4] dark:from-[#0D0D10] via-transparent to-transparent" />
                             </div>
                           )}
 
                           <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                             <div className="space-y-1.5">
-                              <div className="flex flex-wrap items-center gap-2 text-xs text-[#D4AF37]">
+                              <div className="flex flex-wrap items-center gap-2 text-xs text-[#9A7209] dark:text-[#D4AF37]">
                                 <FolderOpen className="w-4 h-4" />
                                 <span>{tr('محتوى المجلد', 'Folder Contents')}</span>
                                 <span
-                                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#151519] border border-white/10 font-mono text-[#E5C158] tabular-nums"
+                                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 font-mono text-[#856104] dark:text-[#E5C158] tabular-nums"
                                   title={tr('عدد الأشخاص الذين دخلوا المجلد', 'Total folder visitors')}
                                 >
                                   <Eye className="w-3.5 h-3.5" />
                                   <span>{activeFolder.viewsCount ?? 0}</span>
                                 </span>
                                 {(activeFolder.isTrending || (activeFolder.viewsCount ?? 0) > 20) && (
-                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/20 border border-amber-400/50 text-[11px] font-bold text-amber-300">
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/20 border border-amber-400/50 text-[11px] font-bold text-amber-800 dark:text-amber-300">
                                     <Flame className="w-3.5 h-3.5" />
                                     <span>{tr('رائج · الأكثر إقبالاً', 'Trending · Most Popular')}</span>
                                   </span>
                                 )}
                               </div>
-                              <h3 className="font-display text-lg font-bold text-[#F5F0E6]">
+                              <h3 className="font-display text-lg font-bold text-[#141418] dark:text-[#F5F0E6]">
                                 {activeFolder.name}
                               </h3>
                               {activeFolder.description && (
-                                <p className="text-xs text-[#C8C2B8]">
+                                <p className="text-xs text-[#3F3D38] dark:text-[#C8C2B8]">
                                   {activeFolder.description}
                                 </p>
                               )}
@@ -1836,7 +1721,7 @@ export function CourseDetailModal({
                         </div>
 
                         {/* Folder Internal Navigation Bar: All 5 Requested Pillars */}
-                        <div className="flex flex-wrap items-center gap-2 p-2.5 rounded-xl bg-[#0D0D10] border border-white/10">
+                        <div className="flex flex-wrap items-center gap-2 p-2.5 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10">
                           <GoldChip
                             active={folderSubTab === 'all'}
                             onClick={() => setFolderSubTab('all')}
@@ -1899,7 +1784,7 @@ export function CourseDetailModal({
                         {(folderSubTab === 'all' || folderSubTab === 'books') && (
                           <div className="space-y-3">
                             <div className="flex flex-wrap items-center justify-between gap-2">
-                              <h4 className="font-display text-base font-bold text-[#E5C158] flex items-center gap-2">
+                              <h4 className="font-display text-base font-bold text-[#856104] dark:text-[#E5C158] flex items-center gap-2">
                                 <BookOpen className="w-4 h-4" />
                                 <span>
                                   {tr('كتاب المادة', 'Course Book')} ({visibleBooks.length})
@@ -1932,9 +1817,9 @@ export function CourseDetailModal({
 
                         {/* 2. Summaries Section ("الملخصات") */}
                         {(folderSubTab === 'all' || folderSubTab === 'summaries') && (
-                          <div className="space-y-3 pt-2 border-t border-white/10">
+                          <div className="space-y-3 pt-2 border-t border-black/10 dark:border-white/10">
                             <div className="flex flex-wrap items-center justify-between gap-2">
-                              <h4 className="font-display text-base font-bold text-[#E5C158] flex items-center gap-2">
+                              <h4 className="font-display text-base font-bold text-[#856104] dark:text-[#E5C158] flex items-center gap-2">
                                 <FileText className="w-4 h-4" />
                                 <span>
                                   {tr('الملخصات', 'Folder Summaries')} ({visibleNotes.length})
@@ -1967,9 +1852,9 @@ export function CourseDetailModal({
 
                         {/* 3. AI Interactive Exam Section ("امتحان تفاعلي AI: سهل / متوسط / صعب") */}
                         {(folderSubTab === 'all' || folderSubTab === 'quizzes') && (
-                          <div className="space-y-3 pt-2 border-t border-white/10">
+                          <div className="space-y-3 pt-2 border-t border-black/10 dark:border-white/10">
                             <div className="flex flex-wrap items-center justify-between gap-2">
-                              <h4 className="font-display text-base font-bold text-[#E5C158] flex items-center gap-2">
+                              <h4 className="font-display text-base font-bold text-[#856104] dark:text-[#E5C158] flex items-center gap-2">
                                 <Sparkles className="w-4 h-4" />
                                 <span>
                                   {tr('الامتحان التفاعلي بالذكاء الاصطناعي والاختبارات', 'AI Interactive Exams & Quizzes')} ({visibleQuizzes.length})
@@ -2021,7 +1906,7 @@ export function CourseDetailModal({
 
                         {/* 4. Smart Tutor Section ("مدرسك الذكي") */}
                         {folderSubTab === 'tutor' && (
-                          <div className="pt-2 border-t border-white/10">
+                          <div className="pt-2 border-t border-black/10 dark:border-white/10">
                             <CourseAiTutorTab
                               course={course}
                               summaries={visibleSummaries}
@@ -2034,16 +1919,16 @@ export function CourseDetailModal({
 
                         {/* Quick Tutor Card when in "all" view */}
                         {folderSubTab === 'all' && (
-                          <div className="p-4 rounded-xl bg-[#0D0D10] border border-[#D4AF37]/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                          <div className="p-4 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-[#D4AF37]/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                             <div className="flex items-center gap-3">
-                              <div className="p-2.5 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[#F5D061]">
+                              <div className="p-2.5 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[#735303] dark:text-[#F5D061]">
                                 <GraduationCap className="w-5 h-5" />
                               </div>
                               <div>
-                                <h4 className="font-display text-sm font-bold text-[#F5F0E6]">
+                                <h4 className="font-display text-sm font-bold text-[#141418] dark:text-[#F5F0E6]">
                                   {tr('مدرسك الذكي لهذا المجلد', 'Smart Tutor for this Folder')}
                                 </h4>
-                                <p className="text-xs text-[#A8A29E]">
+                                <p className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
                                   {tr(
                                     'اشرح أي جزئية من كتاب المادة والملخصات داخل هذا المجلد بمستواك الدراسي.',
                                     'Get tailored explanations grounded in this folder’s book and summaries.'
@@ -2064,9 +1949,9 @@ export function CourseDetailModal({
 
                         {/* 5. Assignments Section ("خانة التكليفات") */}
                         {(folderSubTab === 'all' || folderSubTab === 'assignments') && (
-                          <div className="space-y-3 pt-2 border-t border-white/10">
+                          <div className="space-y-3 pt-2 border-t border-black/10 dark:border-white/10">
                             <div className="flex items-center justify-between gap-2">
-                              <h4 className="font-display text-base font-bold text-[#E5C158] flex items-center gap-2">
+                              <h4 className="font-display text-base font-bold text-[#856104] dark:text-[#E5C158] flex items-center gap-2">
                                 <ClipboardList className="w-4 h-4" />
                                 <span>
                                   {tr('خانة التكليفات (صورة / PDF / نص)', 'Assignments (Image / PDF / Text)')} ({visibleAssignments.length})
@@ -2091,16 +1976,16 @@ export function CourseDetailModal({
                         {isAdmin && showFolderForm && (
                           <form
                             onSubmit={handleCreateFolder}
-                            className="p-4 rounded-xl bg-[#09090B] border border-[#D4AF37]/30 space-y-3"
+                            className="p-4 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-[#D4AF37]/30 space-y-3"
                           >
-                            <h4 className="font-display text-sm font-bold text-[#E5C158]">
+                            <h4 className="font-display text-sm font-bold text-[#856104] dark:text-[#E5C158]">
                               {tr(
                                 'إنشاء مجلد مخصص مع رفع صورة من الجهاز',
                                 'Create Custom Folder with Device Image'
                               )}
                             </h4>
                             {folderError && (
-                              <div className="p-2.5 rounded-lg bg-red-950/50 border border-red-500/40 text-red-200 text-xs">
+                              <div className="p-2.5 rounded-lg bg-red-50 dark:bg-red-950/50 border border-red-500/40 text-red-700 dark:text-red-200 text-xs">
                                 {folderError}
                               </div>
                             )}
@@ -2114,7 +1999,7 @@ export function CourseDetailModal({
                                   'اسم المجلد (مثال: مراجعات الميدتيرم)',
                                   'Folder name...'
                                 )}
-                                className="px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+                                className="px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
                               />
                               <input
                                 type="datetime-local"
@@ -2124,7 +2009,7 @@ export function CourseDetailModal({
                                   'مؤقت تنزيل اختياري',
                                   'Optional countdown timer'
                                 )}
-                                className="px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-sm text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
+                                className="px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
                               />
                             </div>
                             <input
@@ -2135,11 +2020,11 @@ export function CourseDetailModal({
                                 'وصف محتوى المجلد (اختياري)',
                                 'Folder description (optional)'
                               )}
-                              className="w-full px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+                              className="w-full px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
                             />
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                               <div className="flex items-center gap-3 flex-wrap">
-                                <label className="flex items-center gap-2.5 px-3.5 py-2 rounded-lg bg-[#151519] border border-dashed border-[#D4AF37]/50 text-xs text-[#E5C158] cursor-pointer hover:bg-[#1C1C22] transition-colors">
+                                <label className="flex items-center gap-2.5 px-3.5 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-dashed border-[#D4AF37]/50 text-xs text-[#856104] dark:text-[#E5C158] cursor-pointer hover:bg-[#1C1C22] transition-colors">
                                   <ImagePlus className="w-4 h-4 shrink-0" />
                                   <span className="truncate max-w-[240px]">
                                     {folderCover
@@ -2181,9 +2066,9 @@ export function CourseDetailModal({
                         )}
 
                         {folders.length === 0 ? (
-                          <div className="py-10 px-4 text-center space-y-3 rounded-xl bg-[#0D0D10] border border-white/10">
-                            <Folder className="w-8 h-8 text-[#D4AF37] mx-auto opacity-80" />
-                            <p className="text-sm text-[#A8A29E]">
+                          <div className="py-10 px-4 text-center space-y-3 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10">
+                            <Folder className="w-8 h-8 text-[#9A7209] dark:text-[#D4AF37] mx-auto opacity-80" />
+                            <p className="text-sm text-[#5C5850] dark:text-[#A8A29E]">
                               {tr(
                                 'لا توجد مجلدات مخصصة داخل هذه المادة بعد. يمكنك إنشاء مجلد بصورة من جهازك.',
                                 'No custom folders inside this course yet.'
@@ -2233,10 +2118,10 @@ export function CourseDetailModal({
                                   }}
                                   whileHover={{ scale: 1.02 }}
                                   whileTap={{ scale: 0.985 }}
-                                  className={`group relative rounded-xl overflow-hidden border bg-[#0D0D10] flex flex-col justify-between transition-all duration-200 cursor-pointer hover:border-[#F5D061] hover:shadow-[0_0_28px_rgba(212,175,55,0.45),inset_0_0_20px_rgba(212,175,55,0.08)] ${
+                                  className={`group relative rounded-xl overflow-hidden border bg-[#EFECE4] dark:bg-[#0D0D10] flex flex-col justify-between transition-all duration-200 cursor-pointer hover:border-[#F5D061] hover:shadow-[0_0_28px_rgba(212,175,55,0.45),inset_0_0_20px_rgba(212,175,55,0.08)] ${
                                     isFolderLit
                                       ? 'border-[#FFF1B8] brightness-110 shadow-[0_0_36px_rgba(255,241,184,0.65),0_0_64px_rgba(212,175,55,0.45)]'
-                                      : 'border-white/10'
+                                      : 'border-black/10 dark:border-white/10'
                                   }`}
                                 >
                                   <span
@@ -2248,7 +2133,7 @@ export function CourseDetailModal({
                                     }`}
                                   />
                                   {folder.coverUrl && (
-                                    <div className="relative h-36 w-full bg-[#09090B] border-b border-white/10">
+                                    <div className="relative h-36 w-full bg-[#F6F4EF] dark:bg-[#09090B] border-b border-black/10 dark:border-white/10">
                                       <img
                                         src={resolveApiUrl(folder.coverUrl)}
                                         alt={folder.name}
@@ -2260,7 +2145,7 @@ export function CourseDetailModal({
                                           onClick={(e) => e.stopPropagation()}
                                           className="absolute top-2.5 end-2.5 flex items-center gap-1.5"
                                         >
-                                          <label className="px-2 py-1 rounded-md bg-[#09090B]/85 border border-[#D4AF37]/40 text-[11px] text-[#E5C158] hover:bg-[#D4AF37] hover:text-[#09090B] cursor-pointer transition-colors inline-flex items-center gap-1">
+                                          <label className="px-2 py-1 rounded-md bg-white/90 dark:bg-[#09090B]/85 border border-[#D4AF37]/40 text-[11px] text-[#856104] dark:text-[#E5C158] hover:bg-[#D4AF37] hover:text-[#09090B] cursor-pointer transition-colors inline-flex items-center gap-1">
                                             <ImagePlus className="w-3 h-3" />
                                             <span>{tr('تغيير', 'Change')}</span>
                                             <input
@@ -2280,7 +2165,7 @@ export function CourseDetailModal({
                                             onClick={() =>
                                               handleDeleteFolderCover(folder.id)
                                             }
-                                            className="px-2 py-1 rounded-md bg-red-950/90 border border-red-500/40 text-[11px] text-red-200 hover:bg-red-600 hover:text-white cursor-pointer transition-colors inline-flex items-center gap-1"
+                                            className="px-2 py-1 rounded-md bg-red-50 dark:bg-red-950/90 border border-red-500/40 text-[11px] text-red-700 dark:text-red-200 hover:bg-red-600 hover:text-white cursor-pointer transition-colors inline-flex items-center gap-1"
                                           >
                                             <ImageOff className="w-3 h-3" />
                                             <span>
@@ -2295,15 +2180,15 @@ export function CourseDetailModal({
                                   <div className="p-4 space-y-3">
                                     <div className="flex items-start justify-between gap-2">
                                       <div className="flex items-center gap-2.5 min-w-0">
-                                        <div className="w-8 h-8 rounded-lg bg-[#D4AF37]/12 border border-[#D4AF37]/30 flex items-center justify-center text-[#E5C158] shrink-0 transition-all duration-200 group-hover:bg-[#D4AF37]/25 group-hover:border-[#F5D061] group-hover:shadow-[0_0_14px_rgba(245,208,97,0.6)]">
+                                        <div className="w-8 h-8 rounded-lg bg-[#D4AF37]/12 border border-[#D4AF37]/30 flex items-center justify-center text-[#856104] dark:text-[#E5C158] shrink-0 transition-all duration-200 group-hover:bg-[#D4AF37]/25 group-hover:border-[#F5D061] group-hover:shadow-[0_0_14px_rgba(245,208,97,0.6)]">
                                           <FolderOpen className="w-4 h-4" />
                                         </div>
                                         <div className="space-y-1 min-w-0">
-                                          <h4 className="font-display text-base font-bold text-[#F5F0E6] group-hover:text-[#F5D061] transition-colors truncate">
+                                          <h4 className="font-display text-base font-bold text-[#141418] dark:text-[#F5F0E6] group-hover:text-[#F5D061] transition-colors truncate">
                                             {folder.name}
                                           </h4>
                                           {folder.description && (
-                                            <p className="text-xs text-[#C8C2B8] line-clamp-2">
+                                            <p className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] line-clamp-2">
                                               {folder.description}
                                             </p>
                                           )}
@@ -2320,7 +2205,7 @@ export function CourseDetailModal({
                                                 'رفع صورة غلاف',
                                                 'Upload cover'
                                               )}
-                                              className="p-1.5 rounded-lg text-[#D4AF37] hover:bg-[#D4AF37]/15 cursor-pointer"
+                                              className="p-1.5 rounded-lg text-[#9A7209] dark:text-[#D4AF37] hover:bg-[#D4AF37]/15 cursor-pointer"
                                             >
                                               <ImagePlus className="w-4 h-4" />
                                               <input
@@ -2345,7 +2230,7 @@ export function CourseDetailModal({
                                               'حذف المجلد',
                                               'Delete folder'
                                             )}
-                                            className="p-1.5 rounded-lg text-red-400 hover:bg-red-950/50 cursor-pointer"
+                                            className="p-1.5 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-950/50 cursor-pointer"
                                           >
                                             <Trash2 className="w-4 h-4" />
                                           </button>
@@ -2356,14 +2241,14 @@ export function CourseDetailModal({
                                     {/* Eye Counter + Trending Badge (>20 views) */}
                                     <div className="flex flex-wrap items-center gap-2">
                                       <span
-                                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#151519] border border-white/10 text-xs font-mono text-[#E5C158] tabular-nums"
+                                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-xs font-mono text-[#856104] dark:text-[#E5C158] tabular-nums"
                                         title={tr('عدد الأشخاص الذين دخلوا المجلد', 'Users who entered this folder')}
                                       >
                                         <Eye className="w-3.5 h-3.5" />
                                         <span>{viewsCount}</span>
                                       </span>
                                       {isTrending && (
-                                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-amber-500/20 border border-amber-400/50 text-xs font-bold text-amber-300">
+                                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-amber-500/20 border border-amber-400/50 text-xs font-bold text-amber-800 dark:text-amber-300">
                                           <Flame className="w-3.5 h-3.5" />
                                           <span>{tr('رائج · الأكثر إقبالاً', 'Trending · Popular')}</span>
                                         </span>
@@ -2378,8 +2263,8 @@ export function CourseDetailModal({
                                       />
                                     )}
 
-                                    <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/10">
-                                      <span className="text-[11px] text-[#A8A29E] tabular-nums">
+                                    <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-black/10 dark:border-white/10">
+                                      <span className="text-[11px] text-[#5C5850] dark:text-[#A8A29E] tabular-nums">
                                         {folderSumCount} {tr('ملفات', 'Files')} ·{' '}
                                         {folderQuizCount} {tr('اختبارات', 'Exams')} ·{' '}
                                         {folderAssignCount} {tr('تكليفات', 'Tasks')}
@@ -2410,8 +2295,8 @@ export function CourseDetailModal({
                 {activeTab === 'summaries' && (
                   <div className="space-y-4">
                     {activeFolder && (
-                      <div className="p-3 rounded-xl bg-[#0D0D10] border border-[#D4AF37]/35 flex flex-wrap items-center justify-between gap-2">
-                        <span className="text-xs text-[#E5C158]">
+                      <div className="p-3 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-[#D4AF37]/35 flex flex-wrap items-center justify-between gap-2">
+                        <span className="text-xs text-[#856104] dark:text-[#E5C158]">
                           {tr('تصفية حسب المجلد:', 'Filtered by folder:')}{' '}
                           <strong>{activeFolder.name}</strong>
                         </span>
@@ -2432,8 +2317,8 @@ export function CourseDetailModal({
                 {activeTab === 'quizzes' && (
                   <div className="space-y-4">
                     {activeFolder && (
-                      <div className="p-3 rounded-xl bg-[#0D0D10] border border-[#D4AF37]/35 flex flex-wrap items-center justify-between gap-2">
-                        <span className="text-xs text-[#E5C158]">
+                      <div className="p-3 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-[#D4AF37]/35 flex flex-wrap items-center justify-between gap-2">
+                        <span className="text-xs text-[#856104] dark:text-[#E5C158]">
                           {tr('اختبارات مجلد:', 'Folder exams:')}{' '}
                           <strong>{activeFolder.name}</strong>
                         </span>

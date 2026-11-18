@@ -614,8 +614,8 @@ export function BatchChatTab() {
 
   return (
     <div className="space-y-4">
-      <div className="p-3 rounded-xl bg-amber-950/25 border border-amber-500/35 text-xs text-amber-200 flex items-center gap-2">
-        <Scale className="w-4 h-4 text-amber-400 shrink-0" />
+      <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/25 border border-amber-500/35 text-xs text-amber-800 dark:text-amber-200 flex items-center gap-2">
+        <Scale className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
         <span>
           {tr(
             'التزم بالاحترام في الشات — يمكنك إرسال رسائل نصية، تسجيل ريكورد مباشر، أو رفع ملفات صوتية بصيغة MP3 متوافقة مع واتساب وتيليجرام ومواقع التواصل.',
@@ -625,13 +625,13 @@ export function BatchChatTab() {
       </div>
 
       {modFeedback && (
-        <div className="p-3 rounded-xl bg-emerald-950/50 border border-emerald-500/40 text-emerald-200 text-xs">
+        <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-500/40 text-emerald-800 dark:text-emerald-200 text-xs">
           {modFeedback}
         </div>
       )}
 
       {shareFeedback && (
-        <div className="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/35 text-emerald-200 text-xs">
+        <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/35 text-emerald-800 dark:text-emerald-200 text-xs">
           {shareFeedback}
         </div>
       )}
@@ -639,7 +639,7 @@ export function BatchChatTab() {
       {chatError && (
         <div
           role="alert"
-          className="p-3 rounded-xl bg-red-950/50 border border-red-500/40 text-red-200 text-xs"
+          className="p-3 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-500/40 text-red-700 dark:text-red-200 text-xs"
         >
           {chatError}
         </div>
@@ -660,7 +660,7 @@ export function BatchChatTab() {
           ))}
         </div>
 
-        <div className="flex items-center gap-2 text-xs text-[#A8A29E] shrink-0">
+        <div className="flex items-center gap-2 text-xs text-[#5C5850] dark:text-[#A8A29E] shrink-0">
           <span
             className={`w-2 h-2 rounded-full ${
               connected || restReady ? 'bg-emerald-400' : 'bg-amber-500'
@@ -674,7 +674,7 @@ export function BatchChatTab() {
               : tr('جاري الاتصال...', 'Connecting...')}
           </span>
           <span aria-hidden="true">·</span>
-          <span className="font-mono tabular-nums text-[#E5C158]">
+          <span className="font-mono tabular-nums text-[#856104] dark:text-[#E5C158]">
             {onlineCount} {tr('متواجد الآن', 'online')}
           </span>
         </div>
@@ -683,10 +683,10 @@ export function BatchChatTab() {
       {/* Chat Messages Feed */}
       <div
         ref={scrollRef}
-        className="h-[400px] overflow-y-auto rounded-xl bg-[#09090B] border border-white/10 p-4 space-y-3"
+        className="h-[400px] overflow-y-auto rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 p-4 space-y-3"
       >
         {messages.length === 0 ? (
-          <div className="h-full flex items-center justify-center text-sm text-[#A8A29E]">
+          <div className="h-full flex items-center justify-center text-sm text-[#5C5850] dark:text-[#A8A29E]">
             {tr(
               'لا توجد رسائل في غرفة الدفعة بعد — ابدأ المحادثة أو أرسل رسالة صوتية لزملائك!',
               'No messages in this batch room yet — start chatting or send a voice note!'
@@ -723,11 +723,11 @@ export function BatchChatTab() {
                 <div
                   className={`max-w-[90%] sm:max-w-[78%] rounded-xl px-4 py-2.5 border space-y-2 ${
                     isMine
-                      ? 'bg-[#D4AF37]/15 border-[#D4AF37]/40 text-[#F5F0E6]'
-                      : 'bg-[#151519] border-white/10 text-[#F5F0E6]'
+                      ? 'bg-[#D4AF37]/15 border-[#D4AF37]/40 text-[#141418] dark:text-[#F5F0E6]'
+                      : 'bg-[#F5F2EA] dark:bg-[#151519] border-black/10 dark:border-white/10 text-[#141418] dark:text-[#F5F0E6]'
                   }`}
                 >
-                  <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-[#D4AF37]">
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-[#9A7209] dark:text-[#D4AF37]">
                     <div className="flex items-center gap-1.5">
                       <span className="font-semibold">{msg.userName}</span>
                       {msg.rankBadge ? (
@@ -739,12 +739,12 @@ export function BatchChatTab() {
                         />
                       ) : null}
                       {msg.userRole === 'teacher' && (
-                        <span className="text-[11px] font-medium text-sky-300">
+                        <span className="text-[11px] font-medium text-sky-700 dark:text-sky-300">
                           {tr('معلم', 'Teacher')}
                         </span>
                       )}
                       <span aria-hidden="true">·</span>
-                      <span className="text-[#A8A29E]">
+                      <span className="text-[#5C5850] dark:text-[#A8A29E]">
                         {formatYear(msg.userYear)}
                       </span>
                     </div>
@@ -759,7 +759,7 @@ export function BatchChatTab() {
                           'حظر هذا الطالب مؤقتاً',
                           'Temporarily suspend student'
                         )}
-                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-red-950/70 border border-red-500/40 text-[10px] text-red-200 hover:bg-red-600 hover:text-white transition-colors cursor-pointer"
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-red-50 dark:bg-red-950/70 border border-red-500/40 text-[10px] text-red-700 dark:text-red-200 hover:bg-red-600 hover:text-white transition-colors cursor-pointer"
                       >
                         <Ban className="w-3 h-3" />
                         <span>{tr('حظر مؤقت', 'Suspend')}</span>
@@ -776,15 +776,15 @@ export function BatchChatTab() {
                   {msg.audioUrl && (() => {
                     const audioFmt = getAudioFormatInfo(msg);
                     return (
-                      <div className="p-2.5 rounded-lg bg-[#09090B]/80 border border-white/10 space-y-2">
-                        <div className="flex items-center justify-between gap-2 text-[11px] text-[#C8C2B8]">
+                      <div className="p-2.5 rounded-lg bg-[#F6F4EF]/90 dark:bg-[#09090B]/80 border border-black/10 dark:border-white/10 space-y-2">
+                        <div className="flex items-center justify-between gap-2 text-[11px] text-[#3F3D38] dark:text-[#C8C2B8]">
                           <span className="inline-flex items-center gap-1.5 truncate">
-                            <Volume2 className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                            <Volume2 className="w-3.5 h-3.5 text-[#9A7209] dark:text-[#D4AF37] shrink-0" />
                             <span className="truncate">
                               {msg.audioName || tr('تسجيل صوتي', 'Voice Note')}
                             </span>
                           </span>
-                          <span className="font-mono tabular-nums text-[10px] text-[#A8A29E] shrink-0">
+                          <span className="font-mono tabular-nums text-[10px] text-[#5C5850] dark:text-[#A8A29E] shrink-0">
                             {audioFmt.label}
                             {msg.audioDurationSeconds
                               ? ` · ${formatDuration(msg.audioDurationSeconds)}`
@@ -805,7 +805,7 @@ export function BatchChatTab() {
                             type="button"
                             disabled={sharingMsgId === msg.id}
                             onClick={() => handleShareAudio(msg)}
-                            className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[#151519] border border-[#D4AF37]/35 text-[#E5C158] hover:bg-[#D4AF37] hover:text-[#09090B] transition-colors cursor-pointer disabled:opacity-50"
+                            className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[#F5F2EA] dark:bg-[#151519] border border-[#D4AF37]/35 text-[#856104] dark:text-[#E5C158] hover:bg-[#D4AF37] hover:text-[#09090B] transition-colors cursor-pointer disabled:opacity-50"
                           >
                             <Share2 className="w-3 h-3" />
                             <span>{tr('مشاركة الملف', 'Share File')}</span>
@@ -815,7 +815,7 @@ export function BatchChatTab() {
                             href={whatsappHref}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-emerald-950/60 border border-emerald-500/35 text-emerald-200 hover:bg-emerald-600 hover:text-white transition-colors"
+                            className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-500/35 text-emerald-800 dark:text-emerald-200 hover:bg-emerald-600 hover:text-white transition-colors"
                           >
                             <span>{tr('واتساب', 'WhatsApp')}</span>
                           </a>
@@ -824,7 +824,7 @@ export function BatchChatTab() {
                             href={telegramHref}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-sky-950/60 border border-sky-500/35 text-sky-200 hover:bg-sky-600 hover:text-white transition-colors"
+                            className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-sky-950/60 border border-sky-500/35 text-sky-800 dark:text-sky-200 hover:bg-sky-600 hover:text-white transition-colors"
                           >
                             <span>{tr('تيليجرام', 'Telegram')}</span>
                           </a>
@@ -832,7 +832,7 @@ export function BatchChatTab() {
                           <a
                             href={resolvedAudioUrl}
                             download={msg.audioName || `mvia-voice.${audioFmt.ext}`}
-                            className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[#151519] border border-white/10 text-[#C8C2B8] hover:border-[#D4AF37] hover:text-[#E5C158] transition-colors"
+                            className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-[#3F3D38] dark:text-[#C8C2B8] hover:border-[#D4AF37] hover:text-[#E5C158] transition-colors"
                           >
                             <Download className="w-3 h-3" />
                             <span>{tr(`تنزيل ${audioFmt.label}`, `Download ${audioFmt.label}`)}</span>
@@ -850,8 +850,8 @@ export function BatchChatTab() {
 
       {/* Live Recording Bar */}
       {isRecording && (
-        <div className="p-3 rounded-xl bg-red-950/40 border border-red-500/45 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5 text-xs text-red-100">
+        <div className="p-3 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-500/45 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 text-xs text-red-800 dark:text-red-100">
             <span
               className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"
               aria-hidden="true"
@@ -859,7 +859,7 @@ export function BatchChatTab() {
             <span className="font-semibold">
               {tr('جاري تسجيل الريكورد الآن...', 'Recording voice message...')}
             </span>
-            <span className="font-mono tabular-nums text-red-200 font-bold">
+            <span className="font-mono tabular-nums text-red-700 dark:text-red-200 font-bold">
               {formatDuration(recordingSeconds)}
             </span>
           </div>
@@ -868,7 +868,7 @@ export function BatchChatTab() {
             <button
               type="button"
               onClick={handleCancelRecording}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#151519] border border-white/15 text-xs text-[#C8C2B8] hover:text-white cursor-pointer"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-xs text-[#3F3D38] dark:text-[#C8C2B8] hover:text-white cursor-pointer"
             >
               <Trash2 className="w-3.5 h-3.5" />
               <span>{tr('إلغاء', 'Cancel')}</span>
@@ -887,9 +887,9 @@ export function BatchChatTab() {
 
       {/* Pending Audio Preview Bar (Before Sending) */}
       {pendingAudio && !isRecording && (
-        <div className="p-3 rounded-xl bg-[#121216] border border-[#D4AF37]/40 space-y-2">
+        <div className="p-3 rounded-xl bg-white dark:bg-[#121216] border border-[#D4AF37]/40 space-y-2">
           <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-            <div className="flex items-center gap-2 text-[#E5C158] font-semibold">
+            <div className="flex items-center gap-2 text-[#856104] dark:text-[#E5C158] font-semibold">
               <FileAudio className="w-4 h-4" />
               <span>
                 {pendingAudio.isRecording
@@ -897,7 +897,7 @@ export function BatchChatTab() {
                   : `${pendingAudio.filename} (${formatBytes(pendingAudio.blob.size)})`}
               </span>
               {pendingAudio.durationSeconds > 0 && (
-                <span className="font-mono tabular-nums text-[#C8C2B8]">
+                <span className="font-mono tabular-nums text-[#3F3D38] dark:text-[#C8C2B8]">
                   · {formatDuration(pendingAudio.durationSeconds)}
                 </span>
               )}
@@ -906,7 +906,7 @@ export function BatchChatTab() {
               type="button"
               onClick={clearPendingAudio}
               disabled={uploadingAudio}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-red-950/60 border border-red-500/35 text-xs text-red-200 hover:bg-red-600 hover:text-white cursor-pointer disabled:opacity-50"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-red-50 dark:bg-red-950/60 border border-red-500/35 text-xs text-red-700 dark:text-red-200 hover:bg-red-600 hover:text-white cursor-pointer disabled:opacity-50"
             >
               <Trash2 className="w-3.5 h-3.5" />
               <span>{tr('حذف الصوت', 'Discard')}</span>
@@ -943,7 +943,7 @@ export function BatchChatTab() {
           className={`inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl border text-xs font-semibold transition-colors cursor-pointer shrink-0 disabled:opacity-50 ${
             isRecording
               ? 'bg-red-600 border-red-500 text-white'
-              : 'bg-[#151519] border-white/10 text-[#E5C158] hover:border-[#D4AF37]/60'
+              : 'bg-[#F5F2EA] dark:bg-[#151519] border-black/10 dark:border-white/10 text-[#856104] dark:text-[#E5C158] hover:border-[#D4AF37]/60'
           }`}
         >
           {isRecording ? (
@@ -965,7 +965,7 @@ export function BatchChatTab() {
           disabled={isRecording || uploadingAudio}
           title={tr('إرفاق ملف صوتي (MP3, WAV, M4A, OGG)', 'Attach audio file')}
           aria-label={tr('إرفاق ملف صوتي', 'Attach audio file')}
-          className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-[#151519] border border-white/10 text-xs font-semibold text-[#C8C2B8] hover:text-[#E5C158] hover:border-[#D4AF37]/60 transition-colors cursor-pointer shrink-0 disabled:opacity-50"
+          className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-xs font-semibold text-[#3F3D38] dark:text-[#C8C2B8] hover:text-[#E5C158] hover:border-[#D4AF37]/60 transition-colors cursor-pointer shrink-0 disabled:opacity-50"
         >
           <FileAudio className="w-4 h-4" />
           <span className="hidden md:inline">{tr('ملف صوتي', 'Audio File')}</span>
@@ -984,7 +984,7 @@ export function BatchChatTab() {
                   'Write a message to your batch...'
                 )
           }
-          className="flex-1 min-w-[160px] px-4 py-2.5 rounded-xl bg-[#09090B] border border-white/10 text-sm text-[#F5F0E6] placeholder-[#6B6661] focus:outline-none focus:border-[#D4AF37]"
+          className="flex-1 min-w-[160px] px-4 py-2.5 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] placeholder-[#6E6A61] dark:placeholder-[#6B6661] focus:outline-none focus:border-[#D4AF37]"
         />
 
         <GoldChip

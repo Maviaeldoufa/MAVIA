@@ -180,21 +180,21 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
       aria-labelledby="support-center-title"
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-3 sm:p-5"
     >
-      <div className="w-full max-w-4xl max-h-[90vh] flex flex-col rounded-2xl bg-[#121216] border border-[#D4AF37]/35 shadow-[0_24px_80px_rgba(0,0,0,0.85)] overflow-hidden">
+      <div className="w-full max-w-4xl max-h-[90vh] flex flex-col rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/35 shadow-[0_24px_80px_rgba(0,0,0,0.85)] overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-4 border-b border-white/10 bg-[#0D0D10]">
+        <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-4 border-b border-black/10 dark:border-white/10 bg-[#EFECE4] dark:bg-[#0D0D10]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/40 flex items-center justify-center text-[#E5C158]">
+            <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/40 flex items-center justify-center text-[#856104] dark:text-[#E5C158]">
               <Headset className="w-5 h-5" />
             </div>
             <div>
               <h2
                 id="support-center-title"
-                className="font-display text-lg sm:text-xl font-bold text-[#F5F0E6]"
+                className="font-display text-lg sm:text-xl font-bold text-[#141418] dark:text-[#F5F0E6]"
               >
                 {tr('مركز الدعم الفني والتواصل الإداري', 'Technical Support & Administration')}
               </h2>
-              <p className="text-xs text-[#A8A29E]">
+              <p className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
                 {canManageNumbers
                   ? tr(
                       'بصفتك أدمن يمكنك إضافة أو تعديل رقم الواتساب بجانب كل اسم مباشرة.',
@@ -212,7 +212,7 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
             type="button"
             onClick={onClose}
             aria-label={tr('إغلاق نافذة الدعم الفني', 'Close support center')}
-            className="w-10 h-10 rounded-xl bg-[#18181D] border border-white/10 text-[#C8C2B8] hover:text-white hover:border-[#D4AF37]/50 flex items-center justify-center cursor-pointer shrink-0"
+            className="w-10 h-10 rounded-xl bg-[#ECE8DE] dark:bg-[#18181D] border border-black/10 dark:border-white/10 text-[#3F3D38] dark:text-[#C8C2B8] hover:text-[#141418] dark:hover:text-white hover:border-[#D4AF37]/50 flex items-center justify-center cursor-pointer shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
@@ -221,7 +221,7 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
         {/* Body */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5">
           {statusMsg && (
-            <div className="p-3 rounded-xl bg-emerald-950/35 border border-emerald-500/40 text-xs text-emerald-200 flex items-center gap-2">
+            <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/35 border border-emerald-500/40 text-xs text-emerald-800 dark:text-emerald-200 flex items-center gap-2">
               <Check className="w-4 h-4 shrink-0" />
               <span>{statusMsg}</span>
             </div>
@@ -229,18 +229,18 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
 
           {/* Platform Leader Card (ليدر المنصة — للضرورة) */}
           {leader && !loading && !errorMsg && (
-            <div className="p-4 rounded-2xl bg-gradient-to-l from-[#1C1810] via-[#141316] to-[#121216] border border-[#D4AF37]/45 space-y-3">
+            <div className="p-4 rounded-2xl bg-gradient-to-l from-[#FBF4DE] via-[#F9F6EE] to-white dark:from-[#1C1810] dark:via-[#141316] dark:to-[#121216] border border-[#D4AF37]/45 space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/20 border border-[#D4AF37]/50 flex items-center justify-center text-[#F5D061] shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/20 border border-[#D4AF37]/50 flex items-center justify-center text-[#735303] dark:text-[#F5D061] shrink-0">
                     <Crown className="w-5 h-5" />
                   </div>
                   <div className="min-w-0 space-y-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-xs font-bold text-[#E5C158]">
+                      <span className="text-xs font-bold text-[#856104] dark:text-[#E5C158]">
                         {lang === 'ar' ? leader.titleAr : leader.titleEn}
                       </span>
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/20 border border-amber-400/50 text-[11px] font-bold text-amber-200">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/20 border border-amber-400/50 text-[11px] font-bold text-amber-800 dark:text-amber-200">
                         <AlertTriangle className="w-3 h-3 shrink-0" />
                         <span>
                           {lang === 'ar' ? leader.urgencyNoteAr : leader.urgencyNoteEn}
@@ -249,7 +249,7 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-sm sm:text-base font-bold text-[#F5F0E6] truncate">
+                      <span className="text-sm sm:text-base font-bold text-[#141418] dark:text-[#F5F0E6] truncate">
                         {leader.displayName}
                       </span>
 
@@ -266,7 +266,7 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
                             `واتساب ${leader.displayName}`,
                             `WhatsApp ${leader.displayName}`
                           )}
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#25D366]/15 border border-[#25D366]/55 text-[#4ADE80] hover:bg-[#25D366] hover:text-[#052E16] text-xs font-bold transition-all"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#25D366]/15 border border-[#25D366]/55 text-[#15803D] dark:text-[#4ADE80] hover:bg-[#25D366] hover:text-[#052E16] text-xs font-bold transition-all"
                         >
                           <WhatsAppMark className="w-4 h-4 shrink-0" />
                           <span>{tr('واتساب', 'WhatsApp')}</span>
@@ -274,7 +274,7 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
                       ) : (
                         <span
                           title={tr('لم يُضف رقم واتساب بعد', 'No WhatsApp number yet')}
-                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-white/5 border border-white/10 text-[11px] text-[#A8A29E] opacity-70"
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-[11px] text-[#5C5850] dark:text-[#A8A29E] opacity-70"
                         >
                           <WhatsAppMark className="w-3.5 h-3.5 grayscale" />
                           <span>{tr('غير مضاف', 'Not set')}</span>
@@ -290,7 +290,7 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
                     onClick={() =>
                       startEditingNumber({ kind: 'leader', name: leader.displayName })
                     }
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/45 text-xs font-bold text-[#F5D061] hover:bg-[#D4AF37] hover:text-[#09090B] transition-colors cursor-pointer shrink-0"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/45 text-xs font-bold text-[#735303] dark:text-[#F5D061] hover:bg-[#D4AF37] hover:text-[#09090B] transition-colors cursor-pointer shrink-0"
                   >
                     {leader.hasWhatsapp ? (
                       <>
@@ -310,7 +310,7 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
               {isEditing('leader') && (
                 <form
                   onSubmit={handleSavePhoneNumber}
-                  className="pt-3 border-t border-white/10 flex flex-col sm:flex-row items-stretch sm:items-center gap-2"
+                  className="pt-3 border-t border-black/10 dark:border-white/10 flex flex-col sm:flex-row items-stretch sm:items-center gap-2"
                 >
                   <input
                     type="text"
@@ -320,7 +320,7 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
                     onChange={(e) => setPhoneInput(e.target.value)}
                     placeholder="01012345678"
                     aria-label={tr('رقم واتساب ليدر المنصة', 'Platform Leader WhatsApp Number')}
-                    className="flex-1 px-3 py-2 rounded-xl bg-[#09090B] border border-[#D4AF37]/40 text-xs text-[#F5F0E6] font-mono"
+                    className="flex-1 px-3 py-2 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-[#D4AF37]/40 text-xs text-[#141418] dark:text-[#F5F0E6] font-mono"
                   />
                   <div className="flex items-center gap-2">
                     <button
@@ -333,13 +333,13 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
                     <button
                       type="button"
                       onClick={() => setEditingTarget(null)}
-                      className="px-3 py-2 rounded-xl bg-[#18181D] border border-white/15 text-xs text-[#C8C2B8] cursor-pointer"
+                      className="px-3 py-2 rounded-xl bg-[#ECE8DE] dark:bg-[#18181D] border border-black/15 dark:border-white/15 text-xs text-[#3F3D38] dark:text-[#C8C2B8] cursor-pointer"
                     >
                       {tr('إلغاء', 'Cancel')}
                     </button>
                   </div>
                   {phoneError && (
-                    <p className="text-[11px] text-red-300 w-full">{phoneError}</p>
+                    <p className="text-[11px] text-red-700 dark:text-red-300 w-full">{phoneError}</p>
                   )}
                 </form>
               )}
@@ -347,7 +347,7 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
           )}
 
           {/* Switcher Tabs */}
-          <div className="flex flex-wrap items-center gap-2 border-b border-white/10 pb-3">
+          <div className="flex flex-wrap items-center gap-2 border-b border-black/10 dark:border-white/10 pb-3">
             <button
               type="button"
               onClick={() => {
@@ -357,7 +357,7 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
               className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold border transition-colors cursor-pointer ${
                 activeTab === 'supportTeam'
                   ? 'bg-[#D4AF37] text-[#09090B] border-[#D4AF37]'
-                  : 'bg-[#0D0D10] text-[#C8C2B8] border-white/10 hover:border-[#D4AF37]/40'
+                  : 'bg-[#EFECE4] dark:bg-[#0D0D10] text-[#3F3D38] dark:text-[#C8C2B8] border-black/10 dark:border-white/10 hover:border-[#D4AF37]/40'
               }`}
             >
               <Headset className="w-4 h-4" />
@@ -365,8 +365,8 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
               <span
                 className={`px-1.5 py-0.5 rounded text-[10px] font-mono tabular-nums ${
                   activeTab === 'supportTeam'
-                    ? 'bg-[#09090B]/20 text-[#09090B]'
-                    : 'bg-white/10 text-[#E5C158]'
+                    ? 'bg-black/5 dark:bg-[#09090B]/20 text-[#09090B]'
+                    : 'bg-black/10 dark:bg-white/10 text-[#856104] dark:text-[#E5C158]'
                 }`}
               >
                 {supportTeam.length}/7
@@ -382,7 +382,7 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
               className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold border transition-colors cursor-pointer ${
                 activeTab === 'ranks'
                   ? 'bg-[#D4AF37] text-[#09090B] border-[#D4AF37]'
-                  : 'bg-[#0D0D10] text-[#C8C2B8] border-white/10 hover:border-[#D4AF37]/40'
+                  : 'bg-[#EFECE4] dark:bg-[#0D0D10] text-[#3F3D38] dark:text-[#C8C2B8] border-black/10 dark:border-white/10 hover:border-[#D4AF37]/40'
               }`}
             >
               <Users className="w-4 h-4" />
@@ -391,12 +391,12 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
           </div>
 
           {loading ? (
-            <div className="py-12 text-center space-y-2 text-xs text-[#A8A29E]">
-              <Loader2 className="w-6 h-6 animate-spin text-[#D4AF37] mx-auto" />
+            <div className="py-12 text-center space-y-2 text-xs text-[#5C5850] dark:text-[#A8A29E]">
+              <Loader2 className="w-6 h-6 animate-spin text-[#9A7209] dark:text-[#D4AF37] mx-auto" />
               <p>{tr('جاري تحميل أقسام الدعم والمسؤولين...', 'Loading support departments...')}</p>
             </div>
           ) : errorMsg ? (
-            <div className="p-4 rounded-xl bg-red-950/30 border border-red-500/40 text-xs text-red-200 flex items-center justify-between gap-3">
+            <div className="p-4 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-500/40 text-xs text-red-700 dark:text-red-200 flex items-center justify-between gap-3">
               <span>{errorMsg}</span>
               <button
                 type="button"
@@ -409,16 +409,16 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
           ) : activeTab === 'supportTeam' ? (
             <div className="space-y-4">
               {supportTeam.length === 0 ? (
-                <div className="py-10 px-4 rounded-2xl bg-[#0D0D10] border border-white/10 text-center space-y-3">
+                <div className="py-10 px-4 rounded-2xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 text-center space-y-3">
                   <Headset className="w-8 h-8 text-[#D4AF37]/60 mx-auto" />
                   <div className="space-y-1">
-                    <p className="text-sm font-semibold text-[#F5F0E6]">
+                    <p className="text-sm font-semibold text-[#141418] dark:text-[#F5F0E6]">
                       {tr(
                         'لم يتم تفعيل أعضاء فريق الدعم الفني بعد',
                         'No Technical Support Team members are active yet'
                       )}
                     </p>
-                    <p className="text-xs text-[#A8A29E] max-w-md mx-auto">
+                    <p className="text-xs text-[#5C5850] dark:text-[#A8A29E] max-w-md mx-auto">
                       {tr(
                         'يقوم الأدمن باختيار 7 أعضاء لفريق الدعم الفني من لوحة الإدارة. يمكنك التواصل مع ليدر المنصة أعلاه عند الضرورة أو تصفح الأقسام الإدارية.',
                         'The Admin selects up to 7 support team members from the Admin panel. You can contact the Platform Leader above if urgent or view Administrative Ranks.'
@@ -429,7 +429,7 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
                     <button
                       type="button"
                       onClick={() => setActiveTab('ranks')}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-xs font-semibold text-[#E5C158] hover:bg-[#D4AF37]/25 cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-xs font-semibold text-[#856104] dark:text-[#E5C158] hover:bg-[#D4AF37]/25 cursor-pointer"
                     >
                       <Users className="w-3.5 h-3.5" />
                       <span>{tr('عرض الأقسام الإدارية', 'View Administrative Ranks')}</span>
@@ -438,7 +438,7 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
                 </div>
               ) : (
                 <>
-                  <div className="text-xs text-[#C8C2B8]">
+                  <div className="text-xs text-[#3F3D38] dark:text-[#C8C2B8]">
                     {canManageNumbers
                       ? tr(
                           'أعضاء فريق الدعم الفني (7 مقاعد) — اضغط على "إضافة رقم" أو "تعديل الرقم" بجانب أي اسم:',
@@ -457,18 +457,18 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
                       return (
                         <div
                           key={member.id}
-                          className="p-4 rounded-xl bg-[#0D0D10] border border-white/10 hover:border-[#D4AF37]/45 transition-colors space-y-2.5 flex flex-col justify-between"
+                          className="p-4 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 hover:border-[#D4AF37]/45 transition-colors space-y-2.5 flex flex-col justify-between"
                         >
                           <div className="space-y-2">
                             <div className="flex items-center justify-between gap-2">
-                              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#D4AF37]/15 border border-[#D4AF37]/30 text-[10px] font-mono tabular-nums text-[#F5D061] font-bold">
+                              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#D4AF37]/15 border border-[#D4AF37]/30 text-[10px] font-mono tabular-nums text-[#735303] dark:text-[#F5D061] font-bold">
                                 #{member.slotNumber}
                               </span>
-                              <Headset className="w-4 h-4 text-[#D4AF37] shrink-0" />
+                              <Headset className="w-4 h-4 text-[#9A7209] dark:text-[#D4AF37] shrink-0" />
                             </div>
 
                             <div className="flex items-center justify-between gap-2">
-                              <span className="text-sm font-bold text-[#F5F0E6] truncate">
+                              <span className="text-sm font-bold text-[#141418] dark:text-[#F5F0E6] truncate">
                                 {member.displayName}
                               </span>
 
@@ -493,7 +493,7 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
                               ) : (
                                 <span
                                   title={tr('لم يُضف رقم واتساب بعد', 'No WhatsApp number yet')}
-                                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-white/5 border border-white/10 text-[10px] text-[#A8A29E] opacity-75 shrink-0"
+                                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-[10px] text-[#5C5850] dark:text-[#A8A29E] opacity-75 shrink-0"
                                 >
                                   <WhatsAppMark className="w-3.5 h-3.5 grayscale" />
                                 </span>
@@ -501,18 +501,18 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
                             </div>
 
                             {member.specialty ? (
-                              <p className="text-xs text-[#A8A29E] line-clamp-2 leading-snug">
+                              <p className="text-xs text-[#5C5850] dark:text-[#A8A29E] line-clamp-2 leading-snug">
                                 {member.specialty}
                               </p>
                             ) : (
-                              <p className="text-xs text-[#A8A29E]">
+                              <p className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
                                 {tr('دعم فني ومساعدة الطلاب', 'Technical & Student Support')}
                               </p>
                             )}
                           </div>
 
                           {canManageNumbers ? (
-                            <div className="pt-2 border-t border-white/10 space-y-2">
+                            <div className="pt-2 border-t border-black/10 dark:border-white/10 space-y-2">
                               <button
                                 type="button"
                                 onClick={() =>
@@ -524,8 +524,8 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
                                 }
                                 className={`w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors cursor-pointer ${
                                   member.hasWhatsapp
-                                    ? 'bg-[#18181D] border-white/15 text-[#E5C158] hover:border-[#D4AF37]/50'
-                                    : 'bg-[#D4AF37]/15 border-[#D4AF37]/45 text-[#F5D061] hover:bg-[#D4AF37] hover:text-[#09090B]'
+                                    ? 'bg-[#ECE8DE] dark:bg-[#18181D] border-black/15 dark:border-white/15 text-[#856104] dark:text-[#E5C158] hover:border-[#D4AF37]/50'
+                                    : 'bg-[#D4AF37]/15 border-[#D4AF37]/45 text-[#735303] dark:text-[#F5D061] hover:bg-[#D4AF37] hover:text-[#09090B]'
                                 }`}
                               >
                                 {member.hasWhatsapp ? (
@@ -550,10 +550,10 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
                                     value={phoneInput}
                                     onChange={(e) => setPhoneInput(e.target.value)}
                                     placeholder="01012345678"
-                                    className="w-full px-2.5 py-1.5 rounded-lg bg-[#09090B] border border-[#D4AF37]/40 text-xs text-[#F5F0E6] font-mono"
+                                    className="w-full px-2.5 py-1.5 rounded-lg bg-[#F6F4EF] dark:bg-[#09090B] border border-[#D4AF37]/40 text-xs text-[#141418] dark:text-[#F5F0E6] font-mono"
                                   />
                                   {phoneError && (
-                                    <p className="text-[11px] text-red-300">{phoneError}</p>
+                                    <p className="text-[11px] text-red-700 dark:text-red-300">{phoneError}</p>
                                   )}
                                   <div className="flex items-center gap-1.5">
                                     <button
@@ -566,7 +566,7 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
                                     <button
                                       type="button"
                                       onClick={() => setEditingTarget(null)}
-                                      className="px-2.5 py-1.5 rounded-lg bg-[#18181D] border border-white/15 text-[11px] text-[#C8C2B8] cursor-pointer"
+                                      className="px-2.5 py-1.5 rounded-lg bg-[#ECE8DE] dark:bg-[#18181D] border border-black/15 dark:border-white/15 text-[11px] text-[#3F3D38] dark:text-[#C8C2B8] cursor-pointer"
                                     >
                                       {tr('إلغاء', 'Cancel')}
                                     </button>
@@ -579,13 +579,13 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
                               href={member.whatsappUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center justify-center gap-2 w-full px-3 py-2 rounded-lg bg-emerald-600/20 border border-emerald-500/45 text-emerald-200 hover:bg-emerald-600 hover:text-white text-xs font-bold transition-colors"
+                              className="inline-flex items-center justify-center gap-2 w-full px-3 py-2 rounded-lg bg-emerald-600/20 border border-emerald-500/45 text-emerald-800 dark:text-emerald-200 hover:bg-emerald-600 hover:text-white text-xs font-bold transition-colors"
                             >
                               <WhatsAppMark className="w-4 h-4 shrink-0" />
                               <span>{tr('تواصل مباشر على واتساب', 'Chat on WhatsApp')}</span>
                             </a>
                           ) : (
-                            <div className="text-[11px] text-[#A8A29E] pt-1">
+                            <div className="text-[11px] text-[#5C5850] dark:text-[#A8A29E] pt-1">
                               {tr('لم يتم إضافة رقم واتساب بعد', 'WhatsApp number not added yet')}
                             </div>
                           )}
@@ -597,7 +597,7 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
               )}
             </div>
           ) : ranks.length === 0 ? (
-            <div className="py-10 text-center space-y-2 text-sm text-[#A8A29E]">
+            <div className="py-10 text-center space-y-2 text-sm text-[#5C5850] dark:text-[#A8A29E]">
               <Headset className="w-8 h-8 text-[#D4AF37]/60 mx-auto" />
               <p>
                 {tr(
@@ -610,7 +610,7 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
               {/* Rank Categories List */}
               <div className="lg:col-span-5 space-y-2">
-                <div className="text-xs font-semibold text-[#C8C2B8] mb-2">
+                <div className="text-xs font-semibold text-[#3F3D38] dark:text-[#C8C2B8] mb-2">
                   {tr('أقسام الرتب الإدارية', 'Administrative Ranks')}
                 </div>
                 {ranks.map((rank) => {
@@ -626,8 +626,8 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
                       }}
                       className={`w-full text-start p-3 rounded-xl border transition-colors flex items-center justify-between gap-3 cursor-pointer ${
                         isSelected
-                          ? 'bg-[#1A1812] border-[#D4AF37]/65 text-[#F5F0E6]'
-                          : 'bg-[#0D0D10] border-white/10 text-[#C8C2B8] hover:border-[#D4AF37]/35'
+                          ? 'bg-[#FAF6EA] dark:bg-[#1A1812] border-[#D4AF37]/65 text-[#141418] dark:text-[#F5F0E6]'
+                          : 'bg-[#EFECE4] dark:bg-[#0D0D10] border-black/10 dark:border-white/10 text-[#3F3D38] dark:text-[#C8C2B8] hover:border-[#D4AF37]/35'
                       }`}
                     >
                       <div className="flex items-center gap-3 min-w-0">
@@ -646,12 +646,12 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
                           <div className="flex flex-wrap items-center gap-1.5">
                             <span className="text-sm font-bold truncate">{rankName}</span>
                             {rank.isSuperAdminRank && (
-                              <span className="px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-400/45 text-[10px] font-bold text-amber-200">
+                              <span className="px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-400/45 text-[10px] font-bold text-amber-800 dark:text-amber-200">
                                 {tr('ليدر المنصة · للضرورة', 'Leader · Urgent')}
                               </span>
                             )}
                           </div>
-                          <div className="text-[11px] text-[#A8A29E] tabular-nums">
+                          <div className="text-[11px] text-[#5C5850] dark:text-[#A8A29E] tabular-nums">
                             {rank.officials.length > 0
                               ? tr(
                                   `${rank.officials.length} مسؤول متاح`,
@@ -664,7 +664,7 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
                       <ChevronLeft
                         className={`w-4 h-4 shrink-0 transition-transform ${
                           lang === 'en' ? 'rotate-180' : ''
-                        } ${isSelected ? 'text-[#D4AF37]' : 'text-[#6B665E]'}`}
+                        } ${isSelected ? 'text-[#9A7209] dark:text-[#D4AF37]' : 'text-[#5C5850] dark:text-[#6B665E]'}`}
                       />
                     </button>
                   );
@@ -672,10 +672,10 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
               </div>
 
               {/* Officials in Selected Rank */}
-              <div className="lg:col-span-7 rounded-2xl bg-[#0D0D10] border border-white/10 p-4 sm:p-5 space-y-4">
+              <div className="lg:col-span-7 rounded-2xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 p-4 sm:p-5 space-y-4">
                 {activeRank && (
                   <>
-                    <div className="flex items-start gap-3 pb-3 border-b border-white/10">
+                    <div className="flex items-start gap-3 pb-3 border-b border-black/10 dark:border-white/10">
                       <div
                         className={`w-11 h-11 rounded-xl border flex items-center justify-center shrink-0 ${getRankIconBoxClass(
                           activeRank.badgeColor
@@ -689,16 +689,16 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
                       </div>
                       <div className="space-y-0.5">
                         <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="text-base font-bold text-[#F5F0E6]">
+                          <h3 className="text-base font-bold text-[#141418] dark:text-[#F5F0E6]">
                             {lang === 'ar' ? activeRank.nameAr : activeRank.nameEn}
                           </h3>
                           {activeRank.isSuperAdminRank && (
-                            <span className="px-2 py-0.5 rounded-md bg-amber-500/20 border border-amber-400/50 text-[11px] font-bold text-amber-200">
+                            <span className="px-2 py-0.5 rounded-md bg-amber-500/20 border border-amber-400/50 text-[11px] font-bold text-amber-800 dark:text-amber-200">
                               {tr('ليدر المنصة · للضرورة', 'Platform Leader · Urgent Only')}
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-[#A8A29E] leading-relaxed">
+                        <p className="text-xs text-[#5C5850] dark:text-[#A8A29E] leading-relaxed">
                           {activeRank.description}
                         </p>
                       </div>
@@ -706,16 +706,16 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
 
                     {activeRank.officials.length === 0 ? (
                       <div className="py-10 text-center space-y-2.5">
-                        <div className="mx-auto w-11 h-11 rounded-xl bg-[#18181D] border border-white/10 flex items-center justify-center text-[#A8A29E]">
+                        <div className="mx-auto w-11 h-11 rounded-xl bg-[#ECE8DE] dark:bg-[#18181D] border border-black/10 dark:border-white/10 flex items-center justify-center text-[#5C5850] dark:text-[#A8A29E]">
                           <UserCheck className="w-5 h-5" />
                         </div>
-                        <p className="text-sm font-semibold text-[#F5F0E6]">
+                        <p className="text-sm font-semibold text-[#141418] dark:text-[#F5F0E6]">
                           {tr(
                             'لا يوجد مسؤول متاح حالياً في هذا القسم',
                             'No official is currently available in this department'
                           )}
                         </p>
-                        <p className="text-xs text-[#A8A29E] max-w-md mx-auto leading-relaxed">
+                        <p className="text-xs text-[#5C5850] dark:text-[#A8A29E] max-w-md mx-auto leading-relaxed">
                           {tr(
                             'يمكنك التواصل مع فريق الدعم الفني المعتمد أو ليدر المنصة للضرورة أعلاه.',
                             'You can contact the Technical Support Team or Platform Leader above if urgent.'
@@ -724,7 +724,7 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
                       </div>
                     ) : (
                       <div className="space-y-3">
-                        <div className="text-xs font-semibold text-[#C8C2B8]">
+                        <div className="text-xs font-semibold text-[#3F3D38] dark:text-[#C8C2B8]">
                           {canManageNumbers
                             ? tr(
                                 'يمكنك إضافة أو تعديل رقم الواتساب بجانب كل مسؤول:',
@@ -742,10 +742,10 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
                             return (
                               <div
                                 key={official.id}
-                                className="p-3.5 rounded-xl bg-[#141418] border border-white/10 hover:border-[#D4AF37]/45 transition-colors space-y-2.5"
+                                className="p-3.5 rounded-xl bg-[#F5F2EA] dark:bg-[#141418] border border-black/10 dark:border-white/10 hover:border-[#D4AF37]/45 transition-colors space-y-2.5"
                               >
                                 <div className="flex items-center justify-between gap-2">
-                                  <span className="text-sm font-bold text-[#F5F0E6] truncate">
+                                  <span className="text-sm font-bold text-[#141418] dark:text-[#F5F0E6] truncate">
                                     {official.displayName}
                                   </span>
 
@@ -764,20 +764,20 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
                                       <span>{tr('واتس', 'WA')}</span>
                                     </a>
                                   ) : (
-                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-white/5 border border-white/10 text-[10px] text-[#A8A29E] opacity-75 shrink-0">
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-[10px] text-[#5C5850] dark:text-[#A8A29E] opacity-75 shrink-0">
                                       <WhatsAppMark className="w-3.5 h-3.5 grayscale" />
                                     </span>
                                   )}
                                 </div>
 
                                 {official.titleNote && (
-                                  <p className="text-[11px] text-[#A8A29E] leading-snug">
+                                  <p className="text-[11px] text-[#5C5850] dark:text-[#A8A29E] leading-snug">
                                     {official.titleNote}
                                   </p>
                                 )}
 
                                 {canManageNumbers ? (
-                                  <div className="pt-1.5 border-t border-white/10 space-y-1.5">
+                                  <div className="pt-1.5 border-t border-black/10 dark:border-white/10 space-y-1.5">
                                     <button
                                       type="button"
                                       onClick={() =>
@@ -787,7 +787,7 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
                                           name: official.displayName,
                                         })
                                       }
-                                      className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[11px] font-bold text-[#F5D061] hover:bg-[#D4AF37] hover:text-[#09090B] transition-colors cursor-pointer"
+                                      className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[11px] font-bold text-[#735303] dark:text-[#F5D061] hover:bg-[#D4AF37] hover:text-[#09090B] transition-colors cursor-pointer"
                                     >
                                       {official.hasWhatsapp ? (
                                         <>
@@ -811,10 +811,10 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
                                           value={phoneInput}
                                           onChange={(e) => setPhoneInput(e.target.value)}
                                           placeholder="01012345678"
-                                          className="w-full px-2.5 py-1.5 rounded-lg bg-[#09090B] border border-[#D4AF37]/40 text-xs text-[#F5F0E6] font-mono"
+                                          className="w-full px-2.5 py-1.5 rounded-lg bg-[#F6F4EF] dark:bg-[#09090B] border border-[#D4AF37]/40 text-xs text-[#141418] dark:text-[#F5F0E6] font-mono"
                                         />
                                         {phoneError && (
-                                          <p className="text-[11px] text-red-300">{phoneError}</p>
+                                          <p className="text-[11px] text-red-700 dark:text-red-300">{phoneError}</p>
                                         )}
                                         <div className="flex items-center gap-1.5">
                                           <button
@@ -827,7 +827,7 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
                                           <button
                                             type="button"
                                             onClick={() => setEditingTarget(null)}
-                                            className="px-2.5 py-1.5 rounded-lg bg-[#18181D] border border-white/15 text-[11px] text-[#C8C2B8] cursor-pointer"
+                                            className="px-2.5 py-1.5 rounded-lg bg-[#ECE8DE] dark:bg-[#18181D] border border-black/15 dark:border-white/15 text-[11px] text-[#3F3D38] dark:text-[#C8C2B8] cursor-pointer"
                                           >
                                             {tr('إلغاء', 'Cancel')}
                                           </button>
@@ -840,13 +840,13 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
                                     href={official.whatsappUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex items-center justify-center gap-1.5 w-full px-3 py-1.5 rounded-lg bg-emerald-600/20 border border-emerald-500/45 text-emerald-200 hover:bg-emerald-600 hover:text-white text-[11px] font-bold transition-colors"
+                                    className="inline-flex items-center justify-center gap-1.5 w-full px-3 py-1.5 rounded-lg bg-emerald-600/20 border border-emerald-500/45 text-emerald-800 dark:text-emerald-200 hover:bg-emerald-600 hover:text-white text-[11px] font-bold transition-colors"
                                   >
                                     <WhatsAppMark className="w-3.5 h-3.5 shrink-0" />
                                     <span>{tr('تواصل عبر واتساب', 'Open WhatsApp')}</span>
                                   </a>
                                 ) : (
-                                  <div className="text-[11px] text-[#A8A29E]">
+                                  <div className="text-[11px] text-[#5C5850] dark:text-[#A8A29E]">
                                     {tr('لم يتم إضافة رقم بعد', 'No number added yet')}
                                   </div>
                                 )}
@@ -863,8 +863,8 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
           )}
 
           {/* Policy reminder */}
-          <div className="flex items-center gap-2 p-3 rounded-xl bg-amber-950/20 border border-amber-500/25 text-[11px] text-amber-200/90">
-            <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />
+          <div className="flex items-center gap-2 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-500/25 text-[11px] text-amber-200/90">
+            <ShieldCheck className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
             <span>
               {tr(
                 'تنبيه: التواصل مع ليدر المنصة للضرورة القصوى فقط، ويُرجى الالتزام بالتواصل مع القسم المختص عند الحاجة الفعلية.',

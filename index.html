@@ -1,8 +1,20 @@
 <!doctype html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem('mvia_theme');
+          var isLight = saved === 'light';
+          var root = document.documentElement;
+          root.classList.toggle('dark', !isLight);
+          root.dataset.theme = isLight ? 'light' : 'dark';
+          root.style.colorScheme = isLight ? 'light' : 'dark';
+        } catch (e) {}
+      })();
+    </script>
     <title>منصة MAVIA | بوابة الدفعات التعليمية</title>
     <meta name="description" content="منصة MAVIA التعليمية لجميع الدفعات من الفرقة الأولى للرابعة — مواد دراسية، ملخصات PDF، اختبارات شاملة، مسارات GIS والبرمجة، حاسبة GPA، ومجتمع تفاعلي." />
     <meta property="og:title" content="منصة MAVIA | بوابة الدفعات التعليمية" />
@@ -13,7 +25,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Changa:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   </head>
-  <body class="bg-[#09090B] text-[#F7F3EB] font-medium antialiased selection:bg-[#D4AF37]/30 selection:text-[#F5D061]">
+  <body class="bg-[#F6F4EF] dark:bg-[#09090B] text-[#141418] dark:text-[#F7F3EB] font-medium antialiased selection:bg-[#D4AF37]/30 selection:text-[#735303] dark:selection:text-[#F5D061] transition-colors duration-200">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

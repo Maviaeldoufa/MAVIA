@@ -27,8 +27,8 @@ export function HomeSection({ onNavigate, onOpenCourse }: HomeSectionProps) {
   return (
     <div className="space-y-8">
       {/* Editorial Hero Introduction */}
-      <section className="relative overflow-hidden rounded-2xl border border-[#D4AF37]/25 bg-[#121216]">
-        <div className="relative overflow-hidden p-7 sm:p-10 lg:p-12 min-h-[300px] sm:min-h-[340px] flex flex-col justify-between space-y-6">
+      <section className="relative overflow-hidden rounded-2xl border border-[#D4AF37]/30 dark:border-[#D4AF37]/25 bg-white dark:bg-[#121216] shadow-sm dark:shadow-none">
+        <div className="relative overflow-hidden p-7 sm:p-10 lg:p-12 min-h-[300px] sm:min-h-[340px] flex flex-col justify-between space-y-6 bg-[#121216]">
           <HeroGeoCodingBackdrop />
 
           <div className="relative z-10 space-y-4 max-w-4xl">
@@ -76,28 +76,28 @@ export function HomeSection({ onNavigate, onOpenCourse }: HomeSectionProps) {
         </div>
 
         {/* 4-column summary strip */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 border-t border-white/10 divide-y lg:divide-y-0 divide-x divide-x-reverse divide-white/10 bg-[#0D0D10]">
+        <div className="grid grid-cols-2 lg:grid-cols-4 border-t border-black/10 dark:border-white/10 divide-y lg:divide-y-0 divide-x divide-x-reverse divide-black/10 dark:divide-white/10 bg-[#EFECE4] dark:bg-[#0D0D10]">
           <div className="p-4 sm:p-5">
-            <div className="text-xs text-[#A8A29E]">{tr('نقاطك الحالية', 'Current Points')}</div>
-            <div className="font-mono text-2xl font-bold text-[#E5C158] tabular-nums mt-1">
+            <div className="text-xs text-[#5C5850] dark:text-[#A8A29E]">{tr('نقاطك الحالية', 'Current Points')}</div>
+            <div className="font-mono text-2xl font-bold text-[#856104] dark:text-[#E5C158] tabular-nums mt-1">
               {user?.points ?? 0}
             </div>
           </div>
           <div className="p-4 sm:p-5">
-            <div className="text-xs text-[#A8A29E]">{tr('الاختبارات المنجزة', 'Quizzes Completed')}</div>
-            <div className="font-mono text-2xl font-bold text-[#F5F0E6] tabular-nums mt-1">
+            <div className="text-xs text-[#5C5850] dark:text-[#A8A29E]">{tr('الاختبارات المنجزة', 'Quizzes Completed')}</div>
+            <div className="font-mono text-2xl font-bold text-[#141418] dark:text-[#F5F0E6] tabular-nums mt-1">
               {user?.quizzesCompleted ?? 0}
             </div>
           </div>
           <div className="p-4 sm:p-5">
-            <div className="text-xs text-[#A8A29E]">{tr('الفرقة الدراسية', 'Academic Year')}</div>
-            <div className="text-lg font-bold text-[#F5F0E6] mt-1">
+            <div className="text-xs text-[#5C5850] dark:text-[#A8A29E]">{tr('الفرقة الدراسية', 'Academic Year')}</div>
+            <div className="text-lg font-bold text-[#141418] dark:text-[#F5F0E6] mt-1">
               {user ? formatYear(user.year) : '-'}
             </div>
           </div>
           <div className="p-4 sm:p-5">
-            <div className="text-xs text-[#A8A29E]">{tr('التخصصات المغطاة', 'Tracks Covered')}</div>
-            <div className="text-lg font-bold text-[#D4AF37] mt-1">
+            <div className="text-xs text-[#5C5850] dark:text-[#A8A29E]">{tr('التخصصات المغطاة', 'Tracks Covered')}</div>
+            <div className="text-lg font-bold text-[#856104] dark:text-[#D4AF37] mt-1">
               {tr('GIS · البرمجة', 'GIS · Programming')}
             </div>
           </div>

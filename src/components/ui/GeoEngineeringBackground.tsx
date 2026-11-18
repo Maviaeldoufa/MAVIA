@@ -16,12 +16,12 @@ export function GeoEngineeringBackground({
         isHero ? 'absolute inset-0' : 'fixed inset-0 z-0'
       } ${className}`}
     >
-      {/* Subtle radial warm gold ambient glow on obsidian */}
+      {/* Subtle radial warm gold ambient glow */}
       <div
         className={`absolute inset-0 ${
           isHero
-            ? 'bg-[radial-gradient(ellipse_at_center,rgba(212,175,55,0.14)_0%,rgba(9,9,11,0.92)_72%)]'
-            : 'bg-[radial-gradient(circle_at_80%_15%,rgba(212,175,55,0.08)_0%,transparent_45%),radial-gradient(circle_at_15%_85%,rgba(212,175,55,0.06)_0%,transparent_45%)]'
+            ? 'bg-[radial-gradient(ellipse_at_center,rgba(212,175,55,0.16)_0%,rgba(246,244,239,0.75)_72%)] dark:bg-[radial-gradient(ellipse_at_center,rgba(212,175,55,0.14)_0%,rgba(9,9,11,0.92)_72%)]'
+            : 'bg-[radial-gradient(circle_at_80%_15%,rgba(212,175,55,0.12)_0%,transparent_45%),radial-gradient(circle_at_15%_85%,rgba(212,175,55,0.09)_0%,transparent_45%)] dark:bg-[radial-gradient(circle_at_80%_15%,rgba(212,175,55,0.08)_0%,transparent_45%),radial-gradient(circle_at_15%_85%,rgba(212,175,55,0.06)_0%,transparent_45%)]'
         }`}
       />
 
@@ -31,7 +31,7 @@ export function GeoEngineeringBackground({
         preserveAspectRatio="xMidYMid slice"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className={`w-full h-full ${isHero ? 'opacity-75' : 'opacity-40'}`}
+        className={`w-full h-full ${isHero ? 'opacity-65 dark:opacity-75' : 'opacity-28 dark:opacity-40'}`}
       >
         <defs>
           <linearGradient id="mvBgGold" x1="0" y1="0" x2="1440" y2="900" gradientUnits="userSpaceOnUse">

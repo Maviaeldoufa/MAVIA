@@ -414,10 +414,10 @@ export function CoursesSection({
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="font-display text-2xl sm:text-3xl font-bold text-[#F5F0E6]">
+          <h1 className="font-display text-2xl sm:text-3xl font-bold text-[#141418] dark:text-[#F5F0E6]">
             {tr('الكورسات والمجلدات الدراسية', 'Courses & Study Folders')}
           </h1>
-          <p className="text-xs sm:text-sm text-[#A8A29E]">
+          <p className="text-xs sm:text-sm text-[#5C5850] dark:text-[#A8A29E]">
             {tr(
               'مواد ومجلدات كل دفعة بصور مخصصة، كتب المادة، ملخصات PDF، تكليفات، مدرس ذكي، وامتحانات AI التفاعلية',
               'Organized course folders with device covers, textbooks, PDFs, assignments, smart tutor, and AI exams'
@@ -479,9 +479,9 @@ export function CoursesSection({
 
       {/* Course Release Countdown Timers Banner */}
       {(courseTimers.length > 0 || (isAdmin && showTimerForm)) && (
-        <section className="rounded-2xl bg-[#121216] border border-[#D4AF37]/30 p-5 space-y-4">
-          <div className="flex items-center gap-2 text-sm font-bold text-[#E5C158]">
-            <Clock className="w-4 h-4 text-[#D4AF37]" />
+        <section className="rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/30 p-5 space-y-4">
+          <div className="flex items-center gap-2 text-sm font-bold text-[#856104] dark:text-[#E5C158]">
+            <Clock className="w-4 h-4 text-[#9A7209] dark:text-[#D4AF37]" />
             <span>
               {tr(
                 'مؤقتات التنزيلات القادمة في قسم الكورسات',
@@ -493,7 +493,7 @@ export function CoursesSection({
           {isAdmin && showTimerForm && (
             <form
               onSubmit={handleCreateTimer}
-              className="p-4 rounded-xl bg-[#09090B] border border-[#D4AF37]/30 space-y-3"
+              className="p-4 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-[#D4AF37]/30 space-y-3"
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <input
@@ -505,14 +505,14 @@ export function CoursesSection({
                     'عنوان المحتوى القادم (مثال: تنزيل ملخص المحاضرة الرابعة)',
                     'Scheduled release title...'
                   )}
-                  className="px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+                  className="px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
                 />
                 <input
                   type="datetime-local"
                   required
                   value={timerTargetAt}
                   onChange={(e) => setTimerTargetAt(e.target.value)}
-                  className="px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-sm text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
+                  className="px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
                 />
               </div>
               <input
@@ -520,7 +520,7 @@ export function CoursesSection({
                 value={timerDesc}
                 onChange={(e) => setTimerDesc(e.target.value)}
                 placeholder={tr('وصف مختصر لما سيتم تنزيله (اختياري)', 'Short description (optional)')}
-                className="w-full px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+                className="w-full px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
               />
               <div className="flex justify-end">
                 <GoldChip type="submit" active={true} disabled={savingTimer}>
@@ -537,15 +537,15 @@ export function CoursesSection({
               {courseTimers.map((t) => (
                 <div
                   key={t.id}
-                  className="p-4 rounded-xl bg-[#0D0D10] border border-white/10 flex flex-col justify-between gap-3"
+                  className="p-4 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 flex flex-col justify-between gap-3"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <h3 className="font-semibold text-sm text-[#F5F0E6]">
+                      <h3 className="font-semibold text-sm text-[#141418] dark:text-[#F5F0E6]">
                         {t.title}
                       </h3>
                       {t.description && (
-                        <p className="text-xs text-[#A8A29E] mt-0.5">
+                        <p className="text-xs text-[#5C5850] dark:text-[#A8A29E] mt-0.5">
                           {t.description}
                         </p>
                       )}
@@ -555,7 +555,7 @@ export function CoursesSection({
                         type="button"
                         onClick={() => handleDeleteTimer(t.id)}
                         aria-label={tr('حذف المؤقت', 'Delete timer')}
-                        className="p-1 text-red-400 hover:text-red-300 cursor-pointer shrink-0"
+                        className="p-1 text-red-600 dark:text-red-400 hover:text-red-300 cursor-pointer shrink-0"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -570,7 +570,7 @@ export function CoursesSection({
       )}
 
       {/* Filters */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 p-4 rounded-2xl bg-[#121216] border border-white/10">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 p-4 rounded-2xl bg-white dark:bg-[#121216] border border-black/10 dark:border-white/10">
         <div className="flex items-center gap-2 overflow-x-auto pb-1 lg:pb-0">
           {yearFilters.map((f) => (
             <GoldChip
@@ -605,26 +605,26 @@ export function CoursesSection({
         <form
           ref={folderFormRef}
           onSubmit={handleAddStandaloneFolder}
-          className="p-5 rounded-2xl bg-[#121216] border border-[#D4AF37]/40 space-y-4 shadow-[0_0_24px_rgba(212,175,55,0.12)]"
+          className="p-5 rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/40 space-y-4 shadow-[0_0_24px_rgba(212,175,55,0.12)]"
         >
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <FolderPlus className="w-5 h-5 text-[#F5D061]" />
-              <h3 className="font-display text-lg font-bold text-[#E5C158]">
+              <FolderPlus className="w-5 h-5 text-[#735303] dark:text-[#F5D061]" />
+              <h3 className="font-display text-lg font-bold text-[#856104] dark:text-[#E5C158]">
                 {tr('إضافة مجلد جديد مع رفع صورة من الجهاز', 'Add New Folder with Device Image')}
               </h3>
             </div>
             <button
               type="button"
               onClick={() => setShowFolderAddForm(false)}
-              className="text-xs text-[#A8A29E] hover:text-white cursor-pointer"
+              className="text-xs text-[#5C5850] dark:text-[#A8A29E] hover:text-white cursor-pointer"
             >
               {tr('إغلاق', 'Close')}
             </button>
           </div>
 
           {folderError && (
-            <div className="p-3 rounded-lg bg-red-950/50 border border-red-500/40 text-red-200 text-xs">
+            <div className="p-3 rounded-lg bg-red-50 dark:bg-red-950/50 border border-red-500/40 text-red-700 dark:text-red-200 text-xs">
               {folderError}
             </div>
           )}
@@ -633,7 +633,7 @@ export function CoursesSection({
             <select
               value={folderCourseId || courses[0]?.id || ''}
               onChange={(e) => setFolderCourseId(e.target.value)}
-              className="px-3.5 py-2.5 rounded-xl bg-[#09090B] border border-white/10 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+              className="px-3.5 py-2.5 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
             >
               {courses.map((c) => (
                 <option key={c.id} value={c.id}>
@@ -647,14 +647,14 @@ export function CoursesSection({
               value={folderName}
               onChange={(e) => setFolderName(e.target.value)}
               placeholder={tr('اسم المجلد (مثال: مراجعات العملي)', 'Folder name...')}
-              className="px-3.5 py-2.5 rounded-xl bg-[#09090B] border border-white/10 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+              className="px-3.5 py-2.5 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
             />
             <input
               type="datetime-local"
               value={folderReleaseAt}
               onChange={(e) => setFolderReleaseAt(e.target.value)}
               title={tr('مؤقت تنزيل اختياري', 'Optional release countdown')}
-              className="px-3.5 py-2.5 rounded-xl bg-[#09090B] border border-white/10 text-sm text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
+              className="px-3.5 py-2.5 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
             />
           </div>
 
@@ -663,12 +663,12 @@ export function CoursesSection({
             value={folderDesc}
             onChange={(e) => setFolderDesc(e.target.value)}
             placeholder={tr('وصف مختصر لمحتوى المجلد (اختياري)', 'Folder description (optional)')}
-            className="w-full px-3.5 py-2.5 rounded-xl bg-[#09090B] border border-white/10 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+            className="w-full px-3.5 py-2.5 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
           />
 
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3 flex-wrap">
-              <label className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-[#151519] border border-dashed border-[#D4AF37]/60 text-xs font-semibold text-[#F5D061] cursor-pointer hover:bg-[#1C1C22] transition-colors">
+              <label className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-dashed border-[#D4AF37]/60 text-xs font-semibold text-[#735303] dark:text-[#F5D061] cursor-pointer hover:bg-[#1C1C22] transition-colors">
                 <ImagePlus className="w-4 h-4 shrink-0" />
                 <span className="truncate max-w-[260px]">
                   {folderCoverFile
@@ -684,7 +684,7 @@ export function CoursesSection({
               </label>
 
               {folderCoverPreview && (
-                <div className="relative h-12 w-20 rounded-lg overflow-hidden border border-[#D4AF37]/50 bg-[#09090B]">
+                <div className="relative h-12 w-20 rounded-lg overflow-hidden border border-[#D4AF37]/50 bg-[#F6F4EF] dark:bg-[#09090B]">
                   <img
                     src={folderCoverPreview}
                     alt="Preview"
@@ -705,13 +705,13 @@ export function CoursesSection({
       {isAdmin && showAddForm && (
         <form
           onSubmit={handleAddCourse}
-          className="p-5 rounded-2xl bg-[#121216] border border-[#D4AF37]/30 space-y-4"
+          className="p-5 rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/30 space-y-4"
         >
-          <h3 className="font-display text-lg font-bold text-[#E5C158]">
+          <h3 className="font-display text-lg font-bold text-[#856104] dark:text-[#E5C158]">
             {tr('إضافة مادة دراسية جديدة', 'Create New Course')}
           </h3>
           {courseError && (
-            <div className="p-3 rounded-lg bg-red-950/50 border border-red-500/40 text-red-200 text-xs">
+            <div className="p-3 rounded-lg bg-red-50 dark:bg-red-950/50 border border-red-500/40 text-red-700 dark:text-red-200 text-xs">
               {courseError}
             </div>
           )}
@@ -722,21 +722,21 @@ export function CoursesSection({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder={tr('اسم المادة', 'Course Name')}
-              className="sm:col-span-2 px-3.5 py-2.5 rounded-xl bg-[#09090B] border border-white/10 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+              className="sm:col-span-2 px-3.5 py-2.5 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
             />
             <input
               type="text"
               value={code}
               onChange={(e) => setCode(e.target.value)}
               placeholder={tr('كود المادة (مثال: GIS-204)', 'Code (e.g. GIS-204)')}
-              className="px-3.5 py-2.5 rounded-xl bg-[#09090B] border border-white/10 text-sm text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
+              className="px-3.5 py-2.5 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
             />
             <input
               type="text"
               value={instructor}
               onChange={(e) => setInstructor(e.target.value)}
               placeholder={tr('اسم المحاضر', 'Instructor')}
-              className="px-3.5 py-2.5 rounded-xl bg-[#09090B] border border-white/10 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+              className="px-3.5 py-2.5 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
             />
           </div>
 
@@ -744,7 +744,7 @@ export function CoursesSection({
             <select
               value={year}
               onChange={(e) => setYear(Number(e.target.value) as AcademicYear)}
-              className="px-3.5 py-2.5 rounded-xl bg-[#09090B] border border-white/10 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+              className="px-3.5 py-2.5 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
             >
               <option value={1}>{formatYear(1)}</option>
               <option value={2}>{formatYear(2)}</option>
@@ -756,7 +756,7 @@ export function CoursesSection({
               onChange={(e) =>
                 setTrack(e.target.value as 'GIS' | 'Programming' | 'General')
               }
-              className="px-3.5 py-2.5 rounded-xl bg-[#09090B] border border-white/10 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+              className="px-3.5 py-2.5 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
             >
               <option value="GIS">{tr('نظم المعلومات الجغرافية (GIS)', 'GIS')}</option>
               <option value="Programming">{tr('البرمجة وهندسة البرمجيات', 'Programming')}</option>
@@ -767,7 +767,7 @@ export function CoursesSection({
               value={courseReleaseAt}
               onChange={(e) => setCourseReleaseAt(e.target.value)}
               title={tr('مؤقت تنزيل اختياري', 'Optional release countdown')}
-              className="px-3.5 py-2.5 rounded-xl bg-[#09090B] border border-white/10 text-sm text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
+              className="px-3.5 py-2.5 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
             />
           </div>
 
@@ -776,11 +776,11 @@ export function CoursesSection({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder={tr('وصف مختصر للمادة ومحتوياتها...', 'Short course description...')}
-            className="w-full px-3.5 py-2.5 rounded-xl bg-[#09090B] border border-white/10 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+            className="w-full px-3.5 py-2.5 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
           />
 
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <label className="flex items-center gap-2.5 px-3.5 py-2 rounded-lg bg-[#151519] border border-dashed border-[#D4AF37]/50 text-xs text-[#E5C158] cursor-pointer hover:bg-[#1C1C22] transition-colors">
+            <label className="flex items-center gap-2.5 px-3.5 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-dashed border-[#D4AF37]/50 text-xs text-[#856104] dark:text-[#E5C158] cursor-pointer hover:bg-[#1C1C22] transition-colors">
               <ImagePlus className="w-4 h-4 shrink-0" />
               <span className="truncate max-w-[260px]">
                 {coverFile
@@ -808,12 +808,12 @@ export function CoursesSection({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="space-y-0.5">
               <div className="flex items-center gap-2">
-                <FolderOpen className="w-5 h-5 text-[#D4AF37]" />
-                <h2 className="font-display text-lg sm:text-xl font-bold text-[#E5C158]">
+                <FolderOpen className="w-5 h-5 text-[#9A7209] dark:text-[#D4AF37]" />
+                <h2 className="font-display text-lg sm:text-xl font-bold text-[#856104] dark:text-[#E5C158]">
                   {tr('المجلدات الدراسية', 'Study Folders')} ({filteredFolders.length})
                 </h2>
               </div>
-              <p className="text-xs sm:text-sm text-[#A8A29E]">
+              <p className="text-xs sm:text-sm text-[#5C5850] dark:text-[#A8A29E]">
                 {tr(
                   'اضغط على أي مجلد لفتح الكتاب والملخصات والتكليفات والمدرس الذكي والامتحان الذكي',
                   'Click any folder to open books, summaries, assignments, smart tutor & AI quizzes'
@@ -834,16 +834,16 @@ export function CoursesSection({
           </div>
 
           {filteredFolders.length === 0 ? (
-            <div className="p-6 rounded-2xl bg-[#121216] border border-dashed border-[#D4AF37]/35 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="p-6 rounded-2xl bg-white dark:bg-[#121216] border border-dashed border-[#D4AF37]/35 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-3 text-center sm:text-start">
-                <div className="w-11 h-11 rounded-xl bg-[#D4AF37]/12 border border-[#D4AF37]/30 flex items-center justify-center text-[#F5D061] shrink-0">
+                <div className="w-11 h-11 rounded-xl bg-[#D4AF37]/12 border border-[#D4AF37]/30 flex items-center justify-center text-[#735303] dark:text-[#F5D061] shrink-0">
                   <FolderPlus className="w-5 h-5" />
                 </div>
                 <div className="space-y-0.5">
-                  <h3 className="font-display text-base font-bold text-[#F5F0E6]">
+                  <h3 className="font-display text-base font-bold text-[#141418] dark:text-[#F5F0E6]">
                     {tr('لا توجد مجلدات دراسية بعد', 'No study folders yet')}
                   </h3>
-                  <p className="text-xs sm:text-sm text-[#A8A29E]">
+                  <p className="text-xs sm:text-sm text-[#5C5850] dark:text-[#A8A29E]">
                     {tr(
                       'أنشئ أول مجلد بصورة من جهازك واربطه بأي مادة لإضافة الكتب والملخصات والتكليفات وامتحانات AI.',
                       'Create your first folder with a device image and link it to any course.'
@@ -871,21 +871,21 @@ export function CoursesSection({
                 <div
                   key={folder.id}
                   onClick={() => handleOpenCourseCard(folder.courseId, folder.id)}
-                  className="group relative rounded-2xl bg-[#121216] border border-white/10 hover:border-[#F5D061] overflow-hidden flex flex-col justify-between cursor-pointer transition-all duration-200 hover:shadow-[0_0_26px_rgba(212,175,55,0.3)]"
+                  className="group relative rounded-2xl bg-white dark:bg-[#121216] border border-black/10 dark:border-white/10 hover:border-[#F5D061] overflow-hidden flex flex-col justify-between cursor-pointer transition-all duration-200 hover:shadow-[0_0_26px_rgba(212,175,55,0.3)]"
                 >
                   {folder.coverUrl && (
-                    <div className="relative h-32 w-full bg-[#09090B] border-b border-white/10">
+                    <div className="relative h-32 w-full bg-[#F6F4EF] dark:bg-[#09090B] border-b border-black/10 dark:border-white/10">
                       <img
                         src={resolveApiUrl(folder.coverUrl)}
                         alt={folder.name}
                         loading="lazy"
                         className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#121216]/80 via-transparent to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-white/80 dark:from-[#121216]/80 via-transparent to-transparent" />
                       {isAdmin && (
                         <label
                           onClick={(e) => e.stopPropagation()}
-                          className="absolute top-2.5 end-2.5 px-2 py-1 rounded-md bg-[#09090B]/85 border border-[#D4AF37]/40 text-[11px] text-[#E5C158] hover:bg-[#D4AF37] hover:text-[#09090B] cursor-pointer inline-flex items-center gap-1"
+                          className="absolute top-2.5 end-2.5 px-2 py-1 rounded-md bg-white/90 dark:bg-[#09090B]/85 border border-[#D4AF37]/40 text-[11px] text-[#856104] dark:text-[#E5C158] hover:bg-[#D4AF37] hover:text-[#09090B] cursor-pointer inline-flex items-center gap-1"
                         >
                           <ImagePlus className="w-3 h-3" />
                           <span>{tr('تغيير الصورة', 'Change')}</span>
@@ -908,19 +908,19 @@ export function CoursesSection({
                   <div className="p-4 space-y-2.5 flex-1 flex flex-col justify-between">
                     <div className="space-y-1.5">
                       <div className="flex flex-wrap items-center justify-between gap-1.5">
-                        <span className="text-xs font-mono text-[#D4AF37]">
+                        <span className="text-xs font-mono text-[#9A7209] dark:text-[#D4AF37]">
                           {folder.courseCode || ''} {folder.courseTitle ? `· ${folder.courseTitle}` : ''}
                         </span>
                         <div className="flex items-center gap-1.5">
                           <span
-                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#09090B] border border-white/10 text-xs font-mono text-[#E5C158] tabular-nums"
+                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 text-xs font-mono text-[#856104] dark:text-[#E5C158] tabular-nums"
                             title={tr('عدد الأشخاص الذين دخلوا المجلد', 'Users who entered this folder')}
                           >
                             <Eye className="w-3.5 h-3.5" />
                             <span>{viewsCount}</span>
                           </span>
                           {isTrending && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/20 border border-amber-400/50 text-xs font-bold text-amber-300">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/20 border border-amber-400/50 text-xs font-bold text-amber-800 dark:text-amber-300">
                               <Flame className="w-3.5 h-3.5" />
                               <span>{tr('رائج · أكثر إقبالاً', 'Trending')}</span>
                             </span>
@@ -929,20 +929,20 @@ export function CoursesSection({
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <FolderOpen className="w-4 h-4 text-[#F5D061] shrink-0" />
-                        <h3 className="font-display text-base font-bold text-[#F5F0E6] group-hover:text-[#F5D061] truncate">
+                        <FolderOpen className="w-4 h-4 text-[#735303] dark:text-[#F5D061] shrink-0" />
+                        <h3 className="font-display text-base font-bold text-[#141418] dark:text-[#F5F0E6] group-hover:text-[#F5D061] truncate">
                           {folder.name}
                         </h3>
                       </div>
 
                       {folder.description && (
-                        <p className="text-xs sm:text-sm text-[#C8C2B8] line-clamp-2">
+                        <p className="text-xs sm:text-sm text-[#3F3D38] dark:text-[#C8C2B8] line-clamp-2">
                           {folder.description}
                         </p>
                       )}
                     </div>
 
-                    <div className="flex items-center justify-between gap-2 pt-2 border-t border-white/10 text-xs text-[#A8A29E] tabular-nums">
+                    <div className="flex items-center justify-between gap-2 pt-2 border-t border-black/10 dark:border-white/10 text-xs text-[#5C5850] dark:text-[#A8A29E] tabular-nums">
                       <span>
                         {folder.booksCount ?? 0} {tr('كتب', 'Books')} ·{' '}
                         {folder.summariesCount ?? 0} {tr('ملخصات', 'Summaries')} ·{' '}
@@ -951,7 +951,7 @@ export function CoursesSection({
                       {isAdmin && !folder.coverUrl && (
                         <label
                           onClick={(e) => e.stopPropagation()}
-                          className="inline-flex items-center gap-1 text-[#E5C158] hover:underline cursor-pointer"
+                          className="inline-flex items-center gap-1 text-[#856104] dark:text-[#E5C158] hover:underline cursor-pointer"
                         >
                           <ImagePlus className="w-3.5 h-3.5" />
                           <span>{tr('رفع صورة', 'Add Image')}</span>
@@ -984,12 +984,12 @@ export function CoursesSection({
           {[1, 2, 3, 4].map((n) => (
             <div
               key={n}
-              className="h-52 rounded-2xl bg-white/5 animate-pulse"
+              className="h-52 rounded-2xl bg-black/5 dark:bg-white/5 animate-pulse"
             />
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="py-14 text-center rounded-2xl bg-[#121216] border border-white/10 text-sm text-[#A8A29E]">
+        <div className="py-14 text-center rounded-2xl bg-white dark:bg-[#121216] border border-black/10 dark:border-white/10 text-sm text-[#5C5850] dark:text-[#A8A29E]">
           {tr('لا توجد مواد مطابقة للتصفية الحالية.', 'No courses match the current filter.')}
         </div>
       ) : (
@@ -1009,10 +1009,10 @@ export function CoursesSection({
               }}
               whileHover={{ scale: 1.015 }}
               whileTap={{ scale: 0.99 }}
-              className={`group relative rounded-2xl bg-[#121216] border overflow-hidden flex flex-col justify-between transition-all duration-200 cursor-pointer hover:border-[#F5D061] hover:shadow-[0_0_32px_rgba(212,175,55,0.42),inset_0_0_24px_rgba(212,175,55,0.08)] focus-within:border-[#F5D061] ${
+              className={`group relative rounded-2xl bg-white dark:bg-[#121216] border overflow-hidden flex flex-col justify-between transition-all duration-200 cursor-pointer hover:border-[#F5D061] hover:shadow-[0_0_32px_rgba(212,175,55,0.42),inset_0_0_24px_rgba(212,175,55,0.08)] focus-within:border-[#F5D061] ${
                 isLit
                   ? 'border-[#FFF1B8] brightness-110 shadow-[0_0_40px_rgba(255,241,184,0.6),0_0_72px_rgba(212,175,55,0.45)]'
-                  : 'border-white/10'
+                  : 'border-black/10 dark:border-white/10'
               }`}
             >
               {/* Soft radial illumination sheen on hover/click */}
@@ -1024,20 +1024,20 @@ export function CoursesSection({
               />
               {/* Cover Image Header if uploaded */}
               {course.coverUrl && (
-                <div className="relative h-44 w-full bg-[#09090B] overflow-hidden border-b border-white/10">
+                <div className="relative h-44 w-full bg-[#F6F4EF] dark:bg-[#09090B] overflow-hidden border-b border-black/10 dark:border-white/10">
                   <img
                     src={resolveApiUrl(course.coverUrl)}
                     alt={course.title}
                     loading="lazy"
                     className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#121216]/85 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-white/85 dark:from-[#121216]/85 via-transparent to-transparent" />
                   {isAdmin && (
                     <div
                       onClick={(e) => e.stopPropagation()}
                       className="absolute top-3 end-3 flex items-center gap-1.5"
                     >
-                      <label className="px-2.5 py-1 rounded-lg bg-[#09090B]/85 border border-[#D4AF37]/40 text-[11px] text-[#E5C158] hover:bg-[#D4AF37] hover:text-[#09090B] cursor-pointer transition-colors inline-flex items-center gap-1">
+                      <label className="px-2.5 py-1 rounded-lg bg-white/90 dark:bg-[#09090B]/85 border border-[#D4AF37]/40 text-[11px] text-[#856104] dark:text-[#E5C158] hover:bg-[#D4AF37] hover:text-[#09090B] cursor-pointer transition-colors inline-flex items-center gap-1">
                         <ImagePlus className="w-3 h-3" />
                         <span>{tr('تغيير الغلاف', 'Change Cover')}</span>
                         <input
@@ -1055,7 +1055,7 @@ export function CoursesSection({
                       <button
                         type="button"
                         onClick={(e) => handleDeleteCourseCover(course.id, e)}
-                        className="px-2.5 py-1 rounded-lg bg-red-950/90 border border-red-500/40 text-[11px] text-red-200 hover:bg-red-600 hover:text-white cursor-pointer transition-colors inline-flex items-center gap-1"
+                        className="px-2.5 py-1 rounded-lg bg-red-50 dark:bg-red-950/90 border border-red-500/40 text-[11px] text-red-700 dark:text-red-200 hover:bg-red-600 hover:text-white cursor-pointer transition-colors inline-flex items-center gap-1"
                       >
                         <ImageOff className="w-3 h-3" />
                         <span>{tr('حذف الغلاف', 'Delete Cover')}</span>
@@ -1067,7 +1067,7 @@ export function CoursesSection({
 
               <div className="p-6 flex-1 flex flex-col justify-between gap-5">
                 <div className="space-y-2.5">
-                  <div className="flex items-center justify-between gap-2 text-xs text-[#D4AF37]">
+                  <div className="flex items-center justify-between gap-2 text-xs text-[#9A7209] dark:text-[#D4AF37]">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-mono">{course.code}</span>
                       <span aria-hidden="true">·</span>
@@ -1087,7 +1087,7 @@ export function CoursesSection({
                         {!course.coverUrl && (
                           <label
                             title={tr('إضافة غلاف صورة', 'Upload cover image')}
-                            className="p-1.5 rounded-lg text-[#D4AF37] hover:bg-[#D4AF37]/15 transition-colors cursor-pointer"
+                            className="p-1.5 rounded-lg text-[#9A7209] dark:text-[#D4AF37] hover:bg-[#D4AF37]/15 transition-colors cursor-pointer"
                           >
                             <ImagePlus className="w-4 h-4" />
                             <input
@@ -1106,7 +1106,7 @@ export function CoursesSection({
                         <button
                           type="button"
                           onClick={(e) => handleDeleteCourse(course.id, e)}
-                          className="p-1.5 rounded-lg text-red-400 hover:bg-red-950/60 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-950/60 transition-colors cursor-pointer"
                           aria-label={tr('حذف المادة', 'Delete course')}
                         >
                           <Trash2 className="w-4 h-4" />
@@ -1115,11 +1115,11 @@ export function CoursesSection({
                     )}
                   </div>
 
-                  <h3 className="font-display text-lg font-bold text-[#F5F0E6] group-hover:text-[#E5C158] transition-colors">
+                  <h3 className="font-display text-lg font-bold text-[#141418] dark:text-[#F5F0E6] group-hover:text-[#E5C158] transition-colors">
                     {course.title}
                   </h3>
 
-                  <p className="text-xs sm:text-sm text-[#C8C2B8] leading-relaxed line-clamp-2">
+                  <p className="text-xs sm:text-sm text-[#3F3D38] dark:text-[#C8C2B8] leading-relaxed line-clamp-2">
                     {course.description}
                   </p>
 
@@ -1134,8 +1134,8 @@ export function CoursesSection({
                   )}
                 </div>
 
-                <div className="flex flex-wrap items-center justify-between gap-2.5 pt-4 border-t border-white/10">
-                  <div className="flex flex-wrap items-center gap-2 text-xs text-[#A8A29E] tabular-nums">
+                <div className="flex flex-wrap items-center justify-between gap-2.5 pt-4 border-t border-black/10 dark:border-white/10">
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-[#5C5850] dark:text-[#A8A29E] tabular-nums">
                     {(course.foldersCount ?? 0) > 0 && (
                       <>
                         <span>

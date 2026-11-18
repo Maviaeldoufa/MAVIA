@@ -180,17 +180,17 @@ export function AccountModal({ open, onClose }: AccountModalProps) {
       aria-label={tr('حسابي وإدارة البيانات الشخصية', 'My Account & Personal Data Management')}
       className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4"
     >
-      <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-[#121216] border border-[#D4AF37]/40 p-5 sm:p-6 space-y-6 shadow-[0_24px_80px_rgba(0,0,0,0.85)]">
-        <div className="flex items-start justify-between gap-3 border-b border-white/10 pb-4">
+      <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/40 p-5 sm:p-6 space-y-6 shadow-[0_24px_80px_rgba(0,0,0,0.85)]">
+        <div className="flex items-start justify-between gap-3 border-b border-black/10 dark:border-white/10 pb-4">
           <div className="flex items-center gap-2.5">
-            <div className="p-2.5 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[#E5C158]">
+            <div className="p-2.5 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[#856104] dark:text-[#E5C158]">
               <UserCog className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="font-display text-lg font-bold text-[#E5C158]">
+              <h2 className="font-display text-lg font-bold text-[#856104] dark:text-[#E5C158]">
                 {tr('حسابي وإدارة البيانات الشخصية', 'Account & Personal Data')}
               </h2>
-              <p className="text-xs text-[#A8A29E] truncate max-w-[320px]">
+              <p className="text-xs text-[#5C5850] dark:text-[#A8A29E] truncate max-w-[320px]">
                 {user.email || user.phone} · {formatYear(user.year)}
               </p>
             </div>
@@ -200,7 +200,7 @@ export function AccountModal({ open, onClose }: AccountModalProps) {
             type="button"
             onClick={onClose}
             aria-label={tr('إغلاق', 'Close')}
-            className="p-2 rounded-lg bg-[#18181D] border border-white/10 text-[#C8C2B8] hover:text-[#F5D061] cursor-pointer"
+            className="p-2 rounded-lg bg-[#ECE8DE] dark:bg-[#18181D] border border-black/10 dark:border-white/10 text-[#3F3D38] dark:text-[#C8C2B8] hover:text-[#F5D061] cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -208,25 +208,25 @@ export function AccountModal({ open, onClose }: AccountModalProps) {
 
         {/* 1. Profile Form (Name & Year only; Email & Password Locked after Registration) */}
         <form onSubmit={handleSaveProfile} className="space-y-4">
-          <h3 className="font-display text-sm font-bold text-[#F5F0E6] flex items-center gap-2">
-            <UserCog className="w-4 h-4 text-[#D4AF37]" />
+          <h3 className="font-display text-sm font-bold text-[#141418] dark:text-[#F5F0E6] flex items-center gap-2">
+            <UserCog className="w-4 h-4 text-[#9A7209] dark:text-[#D4AF37]" />
             <span>{tr('تعديل البيانات الشخصية', 'Edit Personal Details')}</span>
           </h3>
 
           {profileErr && (
-            <div className="p-3 rounded-xl bg-red-950/40 border border-red-500/40 text-xs text-red-200">
+            <div className="p-3 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-500/40 text-xs text-red-700 dark:text-red-200">
               {profileErr}
             </div>
           )}
           {profileMsg && (
-            <div className="p-3 rounded-xl bg-emerald-950/35 border border-emerald-500/40 text-xs text-emerald-200">
+            <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/35 border border-emerald-500/40 text-xs text-emerald-800 dark:text-emerald-200">
               {profileMsg}
             </div>
           )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className="block text-xs text-[#C8C2B8]">
+              <label className="block text-xs text-[#3F3D38] dark:text-[#C8C2B8]">
                 {tr('الاسم بالكامل', 'Full Name')}
               </label>
               <input
@@ -234,18 +234,18 @@ export function AccountModal({ open, onClose }: AccountModalProps) {
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-[#09090B] border border-white/10 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="block text-xs text-[#C8C2B8]">
+              <label className="block text-xs text-[#3F3D38] dark:text-[#C8C2B8]">
                 {tr('الفرقة الدراسية', 'Academic Year')}
               </label>
               <select
                 value={year}
                 onChange={(e) => setYear(Number(e.target.value) as AcademicYear)}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-[#09090B] border border-white/10 text-sm text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
               >
                 <option value={1}>{formatYear(1)}</option>
                 <option value={2}>{formatYear(2)}</option>
@@ -255,17 +255,17 @@ export function AccountModal({ open, onClose }: AccountModalProps) {
             </div>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-[#0D0D10] border border-white/10 space-y-2">
+          <div className="p-3.5 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 space-y-2">
             <div className="flex items-center justify-between gap-2 text-xs">
-              <span className="inline-flex items-center gap-1.5 font-semibold text-[#C8C2B8]">
-                <Lock className="w-3.5 h-3.5 text-[#D4AF37]" />
+              <span className="inline-flex items-center gap-1.5 font-semibold text-[#3F3D38] dark:text-[#C8C2B8]">
+                <Lock className="w-3.5 h-3.5 text-[#9A7209] dark:text-[#D4AF37]" />
                 <span>{tr('البريد الإلكتروني وكلمة المرور', 'Email & Password')}</span>
               </span>
-              <span className="font-mono text-[11px] text-[#E5C158] truncate max-w-[230px]">
+              <span className="font-mono text-[11px] text-[#856104] dark:text-[#E5C158] truncate max-w-[230px]">
                 {user.email || '—'}
               </span>
             </div>
-            <p className="text-[11px] text-[#A8A29E] leading-relaxed">
+            <p className="text-[11px] text-[#5C5850] dark:text-[#A8A29E] leading-relaxed">
               {user.isSuperAdmin
                 ? tr(
                     'بصفتك المدير العام للمنصة، يمكنك تعديل البريد الإلكتروني وكلمة المرور لأي حساب من خلال ملف المستخدم في لوحة إدارة المستخدمين.',
@@ -289,34 +289,34 @@ export function AccountModal({ open, onClose }: AccountModalProps) {
         {!user.isSuperAdmin && (
           <form
             onSubmit={handleActivateAdmin}
-            className="p-4 rounded-xl bg-[#0D0D10] border border-[#D4AF37]/30 space-y-3"
+            className="p-4 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-[#D4AF37]/30 space-y-3"
           >
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-[#D4AF37]" />
-                <span className="font-display text-sm font-bold text-[#E5C158]">
+                <ShieldCheck className="w-4 h-4 text-[#9A7209] dark:text-[#D4AF37]" />
+                <span className="font-display text-sm font-bold text-[#856104] dark:text-[#E5C158]">
                   {tr('تفعيل صلاحية الأدمن بكلمة السر', 'Activate Admin Privilege')}
                 </span>
               </div>
               {user.role === 'admin' && (
-                <span className="text-[11px] font-semibold text-emerald-300">
+                <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-300">
                   {tr('حسابك يملك صلاحية أدمن حالياً', 'Admin Role Active')}
                 </span>
               )}
             </div>
-            <p className="text-xs text-[#A8A29E]">
+            <p className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
               {tr(
                 'إذا حصلت على كلمة سر تفعيل الأدمن من مدير المنصة العام، اكتبها هنا لتفعيل صلاحية الأدمن على حسابك.',
                 'If the Super Admin provided you with the admin activation password, enter it here to unlock admin access.'
               )}
             </p>
             {activationErr && (
-              <div className="p-2.5 rounded-lg bg-red-950/40 border border-red-500/40 text-xs text-red-200">
+              <div className="p-2.5 rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-500/40 text-xs text-red-700 dark:text-red-200">
                 {activationErr}
               </div>
             )}
             {activationMsg && (
-              <div className="p-2.5 rounded-lg bg-emerald-950/40 border border-emerald-500/40 text-xs text-emerald-200">
+              <div className="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/40 text-xs text-emerald-800 dark:text-emerald-200">
                 {activationMsg}
               </div>
             )}
@@ -325,9 +325,9 @@ export function AccountModal({ open, onClose }: AccountModalProps) {
                 value={activationPassword}
                 onChange={(e) => setActivationPassword(e.target.value)}
                 placeholder={tr('أدخل كلمة سر تفعيل الأدمن', 'Enter admin activation password')}
-                startIcon={<KeyRound className="w-4 h-4 text-[#D4AF37]" />}
+                startIcon={<KeyRound className="w-4 h-4 text-[#9A7209] dark:text-[#D4AF37]" />}
                 wrapperClassName="flex-1 min-w-[210px]"
-                className="w-full py-2 rounded-lg bg-[#09090B] border border-[#D4AF37]/35 text-xs text-[#F5F0E6] font-mono focus:outline-none focus:border-[#E5C158]"
+                className="w-full py-2 rounded-lg bg-[#F6F4EF] dark:bg-[#09090B] border border-[#D4AF37]/35 text-xs text-[#141418] dark:text-[#F5F0E6] font-mono focus:outline-none focus:border-[#E5C158]"
               />
               <GoldChip
                 type="submit"
@@ -347,13 +347,13 @@ export function AccountModal({ open, onClose }: AccountModalProps) {
         <UserAdminNotesCard />
 
         {/* 3. Personal Data Export & Account Deletion */}
-        <div className="p-4 rounded-xl bg-[#0D0D10] border border-white/10 space-y-4">
+        <div className="p-4 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h3 className="font-display text-sm font-bold text-[#F5F0E6]">
+              <h3 className="font-display text-sm font-bold text-[#141418] dark:text-[#F5F0E6]">
                 {tr('تصدير نسختك من البيانات الشخصية', 'Export Personal Data')}
               </h3>
-              <p className="text-xs text-[#A8A29E]">
+              <p className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
                 {tr(
                   'تحميل ملف JSON يحتوي على ملفك الشخصي ونتائج اختباراتك وحاسبة الـ GPA وتقدمك.',
                   'Download a JSON file containing your profile, quiz history, GPA table, and progress.'
@@ -366,10 +366,10 @@ export function AccountModal({ open, onClose }: AccountModalProps) {
             </GoldChip>
           </div>
 
-          <div className="border-t border-white/10 pt-4 space-y-3">
+          <div className="border-t border-black/10 dark:border-white/10 pt-4 space-y-3">
             {user.role === 'admin' || user.isProtected ? (
-              <div className="flex items-center gap-2 text-xs text-[#A8A29E]">
-                <ShieldAlert className="w-4 h-4 text-[#D4AF37] shrink-0" />
+              <div className="flex items-center gap-2 text-xs text-[#5C5850] dark:text-[#A8A29E]">
+                <ShieldAlert className="w-4 h-4 text-[#9A7209] dark:text-[#D4AF37] shrink-0" />
                 <span>
                   {tr(
                     'حساب الأدمن المحمي لا يمكن حذفه ذاتياً لضمان استمرار إدارة المنصة.',
@@ -388,22 +388,22 @@ export function AccountModal({ open, onClose }: AccountModalProps) {
                 <button
                   type="button"
                   onClick={() => setConfirmDeleteOpen(true)}
-                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-red-950/50 border border-red-500/40 text-red-200 hover:bg-red-600 hover:text-white cursor-pointer shrink-0"
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-red-50 dark:bg-red-950/50 border border-red-500/40 text-red-700 dark:text-red-200 hover:bg-red-600 hover:text-white cursor-pointer shrink-0"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   <span>{tr('حذف حسابي نهائياً', 'Delete My Account')}</span>
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleDeleteAccount} className="p-3 rounded-xl bg-red-950/25 border border-red-500/40 space-y-3">
-                <p className="text-xs font-semibold text-red-200">
+              <form onSubmit={handleDeleteAccount} className="p-3 rounded-xl bg-red-50 dark:bg-red-950/25 border border-red-500/40 space-y-3">
+                <p className="text-xs font-semibold text-red-700 dark:text-red-200">
                   {tr(
                     'أدخل كلمة المرور لتأكيد حذف الحساب وبياناتك الشخصية نهائياً:',
                     'Enter your password to permanently delete your account:'
                   )}
                 </p>
                 {deleteErr && (
-                  <p className="text-xs text-red-300">{deleteErr}</p>
+                  <p className="text-xs text-red-700 dark:text-red-300">{deleteErr}</p>
                 )}
                 <div className="flex flex-wrap items-center gap-2">
                   <PasswordInput
@@ -412,7 +412,7 @@ export function AccountModal({ open, onClose }: AccountModalProps) {
                     onChange={(e) => setDeletePassword(e.target.value)}
                     placeholder={tr('كلمة المرور', 'Password')}
                     wrapperClassName="flex-1 min-w-[180px]"
-                    className="w-full px-3 py-2 rounded-lg bg-[#09090B] border border-red-500/40 text-xs text-[#F5F0E6] focus:outline-none focus:border-red-400"
+                    className="w-full px-3 py-2 rounded-lg bg-[#F6F4EF] dark:bg-[#09090B] border border-red-500/40 text-xs text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-red-400"
                   />
                   <button
                     type="submit"
@@ -424,7 +424,7 @@ export function AccountModal({ open, onClose }: AccountModalProps) {
                   <button
                     type="button"
                     onClick={() => setConfirmDeleteOpen(false)}
-                    className="px-3 py-2 rounded-lg text-xs text-[#C8C2B8] hover:text-white cursor-pointer"
+                    className="px-3 py-2 rounded-lg text-xs text-[#3F3D38] dark:text-[#C8C2B8] hover:text-white cursor-pointer"
                   >
                     {tr('إلغاء', 'Cancel')}
                   </button>

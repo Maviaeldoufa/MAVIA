@@ -155,7 +155,7 @@ export function NotificationsBell({ onNavigate }: NotificationsBellProps) {
         className={`relative p-2 rounded-lg border transition-colors cursor-pointer ${
           open
             ? 'bg-[#D4AF37] border-[#E5C158] text-[#09090B]'
-            : 'bg-[#151519] border-white/10 text-[#F5F0E6] hover:border-[#D4AF37]/60 hover:text-[#F5D061]'
+            : 'bg-[#F5F2EA] dark:bg-[#151519] border-black/10 dark:border-white/10 text-[#141418] dark:text-[#F5F0E6] hover:border-[#D4AF37]/60 hover:text-[#F5D061]'
         }`}
       >
         <Bell className="w-4 h-4" />
@@ -175,17 +175,17 @@ export function NotificationsBell({ onNavigate }: NotificationsBellProps) {
             transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
             className={`fixed sm:absolute top-16 sm:top-full sm:mt-2 ${
               isEn ? 'end-4 sm:end-0' : 'end-4 sm:end-0'
-            } w-[calc(100vw-2rem)] sm:w-96 max-h-[75vh] flex flex-col rounded-2xl bg-[#121216] border border-[#D4AF37]/40 shadow-[0_24px_60px_rgba(0,0,0,0.85)] z-50 overflow-hidden`}
+            } w-[calc(100vw-2rem)] sm:w-96 max-h-[75vh] flex flex-col rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/40 shadow-[0_24px_60px_rgba(0,0,0,0.85)] z-50 overflow-hidden`}
           >
             {/* Header */}
-            <div className="px-4 py-3 border-b border-white/10 bg-[#0D0D10] flex items-center justify-between gap-2">
+            <div className="px-4 py-3 border-b border-black/10 dark:border-white/10 bg-[#EFECE4] dark:bg-[#0D0D10] flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <Bell className="w-4 h-4 text-[#D4AF37]" />
-                <span className="font-display text-sm font-bold text-[#F5F0E6]">
+                <Bell className="w-4 h-4 text-[#9A7209] dark:text-[#D4AF37]" />
+                <span className="font-display text-sm font-bold text-[#141418] dark:text-[#F5F0E6]">
                   {tr('الإشعارات', 'Notifications')}
                 </span>
                 {unreadCount > 0 && (
-                  <span className="text-[11px] font-mono tabular-nums text-[#E5C158]">
+                  <span className="text-[11px] font-mono tabular-nums text-[#856104] dark:text-[#E5C158]">
                     ({unreadCount})
                   </span>
                 )}
@@ -196,7 +196,7 @@ export function NotificationsBell({ onNavigate }: NotificationsBellProps) {
                   <button
                     type="button"
                     onClick={() => setShowCompose((p) => !p)}
-                    className="p-1.5 rounded-lg text-xs text-[#D4AF37] hover:bg-[#D4AF37]/15 cursor-pointer"
+                    className="p-1.5 rounded-lg text-xs text-[#9A7209] dark:text-[#D4AF37] hover:bg-[#D4AF37]/15 cursor-pointer"
                     title={tr('إرسال إشعار للطلاب', 'Broadcast notification')}
                   >
                     <Plus className="w-4 h-4" />
@@ -206,7 +206,7 @@ export function NotificationsBell({ onNavigate }: NotificationsBellProps) {
                   <button
                     type="button"
                     onClick={handleMarkAllRead}
-                    className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] text-[#C8C2B8] hover:text-[#E5C158] hover:bg-white/5 cursor-pointer"
+                    className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] text-[#3F3D38] dark:text-[#C8C2B8] hover:text-[#856104] dark:hover:text-[#E5C158] hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer"
                   >
                     <CheckCheck className="w-3.5 h-3.5" />
                     <span>{tr('قرأت الكل', 'Mark all')}</span>
@@ -215,7 +215,7 @@ export function NotificationsBell({ onNavigate }: NotificationsBellProps) {
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="p-1 rounded-lg text-[#A8A29E] hover:text-white cursor-pointer"
+                  className="p-1 rounded-lg text-[#5C5850] dark:text-[#A8A29E] hover:text-[#141418] dark:hover:text-white cursor-pointer"
                   aria-label={tr('إغلاق', 'Close')}
                 >
                   <X className="w-4 h-4" />
@@ -227,9 +227,9 @@ export function NotificationsBell({ onNavigate }: NotificationsBellProps) {
             {isAdmin && showCompose && (
               <form
                 onSubmit={handleSendBroadcast}
-                className="p-3.5 border-b border-white/10 bg-[#09090B] space-y-2.5"
+                className="p-3.5 border-b border-black/10 dark:border-white/10 bg-[#F6F4EF] dark:bg-[#09090B] space-y-2.5"
               >
-                <div className="text-xs font-semibold text-[#E5C158]">
+                <div className="text-xs font-semibold text-[#856104] dark:text-[#E5C158]">
                   {tr('إرسال إشعار فوري للطلاب', 'Send Instant Notification')}
                 </div>
                 <input
@@ -238,7 +238,7 @@ export function NotificationsBell({ onNavigate }: NotificationsBellProps) {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder={tr('عنوان الإشعار', 'Notification title')}
-                  className="w-full px-3 py-1.5 rounded-lg bg-[#151519] border border-white/10 text-xs text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+                  className="w-full px-3 py-1.5 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-xs text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
                 />
                 <textarea
                   rows={2}
@@ -246,13 +246,13 @@ export function NotificationsBell({ onNavigate }: NotificationsBellProps) {
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder={tr('تفاصيل التنبيه...', 'Message details...')}
-                  className="w-full px-3 py-1.5 rounded-lg bg-[#151519] border border-white/10 text-xs text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+                  className="w-full px-3 py-1.5 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-xs text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
                 />
                 <div className="grid grid-cols-2 gap-2">
                   <select
                     value={targetSection}
                     onChange={(e) => setTargetSection(e.target.value as NavSection)}
-                    className="px-2 py-1.5 rounded-lg bg-[#151519] border border-white/10 text-xs text-[#F5F0E6]"
+                    className="px-2 py-1.5 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-xs text-[#141418] dark:text-[#F5F0E6]"
                   >
                     <option value="home">{tr('الرئيسية', 'Home')}</option>
                     <option value="courses">{tr('الكورسات', 'Courses')}</option>
@@ -263,7 +263,7 @@ export function NotificationsBell({ onNavigate }: NotificationsBellProps) {
                   <select
                     value={year}
                     onChange={(e) => setYear(Number(e.target.value))}
-                    className="px-2 py-1.5 rounded-lg bg-[#151519] border border-white/10 text-xs text-[#F5F0E6]"
+                    className="px-2 py-1.5 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-xs text-[#141418] dark:text-[#F5F0E6]"
                   >
                     <option value={0}>{tr('جميع الدفعات', 'All Years')}</option>
                     <option value={1}>{formatYear(1)}</option>
@@ -286,9 +286,9 @@ export function NotificationsBell({ onNavigate }: NotificationsBellProps) {
             )}
 
             {/* Notifications List */}
-            <div className="flex-1 overflow-y-auto divide-y divide-white/5">
+            <div className="flex-1 overflow-y-auto divide-y divide-black/5 dark:divide-white/5">
               {notifications.length === 0 ? (
-                <div className="py-10 px-4 text-center text-xs text-[#A8A29E]">
+                <div className="py-10 px-4 text-center text-xs text-[#5C5850] dark:text-[#A8A29E]">
                   {tr('لا توجد إشعارات جديدة حالياً.', 'No notifications right now.')}
                 </div>
               ) : (
@@ -296,7 +296,7 @@ export function NotificationsBell({ onNavigate }: NotificationsBellProps) {
                   <div
                     key={item.id}
                     onClick={() => handleNotificationClick(item)}
-                    className={`p-3.5 hover:bg-white/[0.03] transition-colors cursor-pointer flex items-start justify-between gap-2.5 ${
+                    className={`p-3.5 hover:bg-black/[0.03] dark:hover:bg-white/[0.03] transition-colors cursor-pointer flex items-start justify-between gap-2.5 ${
                       item.read ? 'opacity-75' : 'bg-[#D4AF37]/[0.06]'
                     }`}
                   >
@@ -305,14 +305,14 @@ export function NotificationsBell({ onNavigate }: NotificationsBellProps) {
                         {!item.read && (
                           <span className="w-2 h-2 rounded-full bg-[#E5C158] shrink-0" />
                         )}
-                        <h4 className="text-xs font-bold text-[#F5F0E6] truncate">
+                        <h4 className="text-xs font-bold text-[#141418] dark:text-[#F5F0E6] truncate">
                           {item.title}
                         </h4>
                       </div>
-                      <p className="text-[11px] text-[#C8C2B8] leading-relaxed line-clamp-2">
+                      <p className="text-[11px] text-[#3F3D38] dark:text-[#C8C2B8] leading-relaxed line-clamp-2">
                         {item.message}
                       </p>
-                      <div className="text-[10px] text-[#A8A29E] font-mono tabular-nums">
+                      <div className="text-[10px] text-[#5C5850] dark:text-[#A8A29E] font-mono tabular-nums">
                         {item.year === 0 ? tr('كل الدفعات', 'All Years') : formatYear(item.year)} ·{' '}
                         {new Date(item.createdAt).toLocaleString()}
                       </div>
@@ -322,7 +322,7 @@ export function NotificationsBell({ onNavigate }: NotificationsBellProps) {
                       <button
                         type="button"
                         onClick={(e) => handleDeleteNotification(item.id, e)}
-                        className="p-1 text-red-400 hover:text-red-300 shrink-0 cursor-pointer"
+                        className="p-1 text-red-600 dark:text-red-400 hover:text-red-300 shrink-0 cursor-pointer"
                         aria-label={tr('حذف الإشعار', 'Delete notification')}
                       >
                         <Trash2 className="w-3.5 h-3.5" />

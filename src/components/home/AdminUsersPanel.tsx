@@ -483,21 +483,21 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
   return (
     <section
       aria-label={tr('لوحة إدارة المستخدمين', 'Admin User Management Dashboard')}
-      className="rounded-2xl bg-[#121216] border border-[#D4AF37]/30 p-4 sm:p-6 space-y-5"
+      className="rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/30 p-4 sm:p-6 space-y-5"
     >
       {/* Header & Top Actions */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-5 h-5 text-[#D4AF37]" />
-            <h2 className="font-display text-xl font-bold text-[#E5C158]">
+            <ShieldCheck className="w-5 h-5 text-[#9A7209] dark:text-[#D4AF37]" />
+            <h2 className="font-display text-xl font-bold text-[#856104] dark:text-[#E5C158]">
               {tr(
                 'لوحة إدارة المستخدمين والصلاحيات (للأدمن فقط)',
                 'Admin User Management Dashboard'
               )}
             </h2>
           </div>
-          <p className="text-xs text-[#A8A29E]">
+          <p className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
             {tr(
               'عرض وإدارة جميع الطلاب والمعلمين والمديرين، مراجعة الملفات والإحصائيات الأكاديمية، التصدير الآمن، وسجل التدقيق الإداري.',
               'Manage registered students, teachers, and administrators, inspect academic profiles, control account access, export CSV securely, and review audit logs.'
@@ -512,8 +512,8 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
               onClick={() => setShowAuditLogs((p) => !p)}
               className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold border transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                 showAuditLogs
-                  ? 'bg-[#D4AF37]/15 border-[#D4AF37] text-[#E5C158]'
-                  : 'bg-[#151519] border-white/10 text-[#C8C2B8] hover:border-[#D4AF37]/50 hover:text-[#E5C158]'
+                  ? 'bg-[#D4AF37]/15 border-[#D4AF37] text-[#856104] dark:text-[#E5C158]'
+                  : 'bg-[#F5F2EA] dark:bg-[#151519] border-black/10 dark:border-white/10 text-[#3F3D38] dark:text-[#C8C2B8] hover:border-[#D4AF37]/50 hover:text-[#E5C158]'
               }`}
             >
               <History className="w-3.5 h-3.5" />
@@ -527,7 +527,7 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
                 type="button"
                 disabled={busyId === '__revoke_non_admins__'}
                 onClick={() => setConfirmAction({ type: 'revoke_non_admins' })}
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold border bg-amber-950/40 border-amber-500/40 text-amber-200 hover:bg-amber-600 hover:text-white transition-colors cursor-pointer whitespace-nowrap shrink-0 disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold border bg-amber-50 dark:bg-amber-950/40 border-amber-500/40 text-amber-800 dark:text-amber-200 hover:bg-amber-600 hover:text-white transition-colors cursor-pointer whitespace-nowrap shrink-0 disabled:opacity-50"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 <span>{tr('إنهاء جلسات المسجلين (عدا الأدمن)', 'End Non-Admin Sessions')}</span>
@@ -551,50 +551,50 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
       </div>
 
       {/* 4-column Summary KPI Strip (Single elevation) */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 rounded-xl bg-[#0D0D10] border border-white/10 divide-y lg:divide-y-0 divide-x divide-x-reverse divide-white/10">
+      <div className="grid grid-cols-2 lg:grid-cols-4 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 divide-y lg:divide-y-0 divide-x divide-x-reverse divide-black/10 dark:divide-white/10">
         <div className="p-4">
-          <div className="text-xs text-[#A8A29E] flex items-center gap-1.5">
-            <Users className="w-3.5 h-3.5 text-[#D4AF37]" />
+          <div className="text-xs text-[#5C5850] dark:text-[#A8A29E] flex items-center gap-1.5">
+            <Users className="w-3.5 h-3.5 text-[#9A7209] dark:text-[#D4AF37]" />
             <span>{tr('إجمالي المستخدمين المسجلين', 'Total Registered Users')}</span>
           </div>
-          <div className="font-mono text-2xl font-bold text-[#E5C158] tabular-nums mt-1">
+          <div className="font-mono text-2xl font-bold text-[#856104] dark:text-[#E5C158] tabular-nums mt-1">
             {stats.totalUsers}
           </div>
         </div>
 
         <div className="p-4">
-          <div className="text-xs text-[#A8A29E] flex items-center gap-1.5">
-            <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
+          <div className="text-xs text-[#5C5850] dark:text-[#A8A29E] flex items-center gap-1.5">
+            <UserCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
             <span>{tr('المستخدمون النشطون', 'Active Users')}</span>
           </div>
           <div className="flex items-baseline gap-2 mt-1">
-            <span className="font-mono text-2xl font-bold text-emerald-400 tabular-nums">
+            <span className="font-mono text-2xl font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
               {stats.activeUsers}
             </span>
-            <span className="text-[11px] font-mono tabular-nums text-amber-300">
+            <span className="text-[11px] font-mono tabular-nums text-amber-800 dark:text-amber-300">
               · {stats.suspendedUsers} {tr('معلق', 'suspended')}
             </span>
           </div>
         </div>
 
         <div className="p-4">
-          <div className="text-xs text-[#A8A29E] flex items-center gap-1.5">
-            <GraduationCap className="w-3.5 h-3.5 text-sky-400" />
+          <div className="text-xs text-[#5C5850] dark:text-[#A8A29E] flex items-center gap-1.5">
+            <GraduationCap className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
             <span>{tr('الطلاب / المعلمون', 'Students / Teachers')}</span>
           </div>
-          <div className="font-mono text-2xl font-bold text-[#F5F0E6] tabular-nums mt-1">
+          <div className="font-mono text-2xl font-bold text-[#141418] dark:text-[#F5F0E6] tabular-nums mt-1">
             {stats.studentsCount}{' '}
-            <span className="text-sm text-[#A8A29E] font-normal">/</span>{' '}
-            <span className="text-sky-300">{stats.teachersCount}</span>
+            <span className="text-sm text-[#5C5850] dark:text-[#A8A29E] font-normal">/</span>{' '}
+            <span className="text-sky-700 dark:text-sky-300">{stats.teachersCount}</span>
           </div>
         </div>
 
         <div className="p-4">
-          <div className="text-xs text-[#A8A29E] flex items-center gap-1.5">
-            <ShieldCheck className="w-3.5 h-3.5 text-[#D4AF37]" />
+          <div className="text-xs text-[#5C5850] dark:text-[#A8A29E] flex items-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5 text-[#9A7209] dark:text-[#D4AF37]" />
             <span>{tr('المديرون المحميون', 'Administrators')}</span>
           </div>
-          <div className="font-mono text-2xl font-bold text-[#D4AF37] tabular-nums mt-1">
+          <div className="font-mono text-2xl font-bold text-[#9A7209] dark:text-[#D4AF37] tabular-nums mt-1">
             {stats.adminsCount}
           </div>
         </div>
@@ -604,13 +604,13 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
       {statusMsg && (
         <div
           role="status"
-          className="p-3 rounded-xl bg-emerald-950/50 border border-emerald-500/40 text-emerald-200 text-xs flex items-center justify-between gap-2"
+          className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-500/40 text-emerald-800 dark:text-emerald-200 text-xs flex items-center justify-between gap-2"
         >
           <span>{statusMsg}</span>
           <button
             type="button"
             onClick={() => setStatusMsg(null)}
-            className="text-emerald-300 hover:text-white cursor-pointer"
+            className="text-emerald-700 dark:text-emerald-300 hover:text-white cursor-pointer"
             aria-label={tr('إغلاق', 'Dismiss')}
           >
             <X className="w-4 h-4" />
@@ -620,13 +620,13 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
       {errorMsg && (
         <div
           role="alert"
-          className="p-3 rounded-xl bg-red-950/50 border border-red-500/40 text-red-200 text-xs flex items-center justify-between gap-2"
+          className="p-3 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-500/40 text-red-700 dark:text-red-200 text-xs flex items-center justify-between gap-2"
         >
           <span>{errorMsg}</span>
           <button
             type="button"
             onClick={() => setErrorMsg(null)}
-            className="text-red-300 hover:text-white cursor-pointer"
+            className="text-red-700 dark:text-red-300 hover:text-white cursor-pointer"
             aria-label={tr('إغلاق', 'Dismiss')}
           >
             <X className="w-4 h-4" />
@@ -638,9 +638,9 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
       {showAddForm && (
         <form
           onSubmit={handleAddUser}
-          className="p-4 rounded-xl bg-[#09090B] border border-[#D4AF37]/30 space-y-3"
+          className="p-4 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-[#D4AF37]/30 space-y-3"
         >
-          <div className="text-xs font-semibold text-[#E5C158]">
+          <div className="text-xs font-semibold text-[#856104] dark:text-[#E5C158]">
             {tr('إنشاء حساب طالب أو معلم أو أدمن', 'Create Student, Teacher, or Admin Account')}
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2.5">
@@ -650,7 +650,7 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder={tr('الاسم الكامل', 'Full Name')}
-              className="px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-xs text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+              className="px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-xs text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
             />
             <input
               type="email"
@@ -658,7 +658,7 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder={tr('البريد الإلكتروني', 'Email Address')}
-              className="px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-xs text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
+              className="px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-xs text-[#141418] dark:text-[#F5F0E6] font-mono focus:outline-none focus:border-[#D4AF37]"
             />
             <input
               type="tel"
@@ -666,7 +666,7 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder={tr('رقم الهاتف', 'Phone Number')}
-              className="px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-xs text-[#F5F0E6] font-mono tabular-nums focus:outline-none focus:border-[#D4AF37]"
+              className="px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-xs text-[#141418] dark:text-[#F5F0E6] font-mono tabular-nums focus:outline-none focus:border-[#D4AF37]"
             />
             <PasswordInput
               required
@@ -674,13 +674,13 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder={tr('كلمة المرور (4+)', 'Password (4+ chars)')}
-              className="w-full px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-xs text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+              className="w-full px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-xs text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
             />
             <select
               value={year}
               onChange={(e) => setYear(Number(e.target.value) as AcademicYear)}
               aria-label={tr('الفرقة الدراسية', 'Academic Year')}
-              className="px-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-xs text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+              className="px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-xs text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
             >
               <option value={1}>{formatYear(1)}</option>
               <option value={2}>{formatYear(2)}</option>
@@ -692,7 +692,7 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
                 value={role}
                 onChange={(e) => setRole(e.target.value as UserRole)}
                 aria-label={tr('الصلاحية', 'Role')}
-                className="flex-1 px-2.5 py-2 rounded-lg bg-[#151519] border border-white/10 text-xs text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+                className="flex-1 px-2.5 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-xs text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
               >
                 <option value="student">{tr('طالب', 'Student')}</option>
                 <option value="teacher">{tr('معلم / مدرس', 'Teacher')}</option>
@@ -712,11 +712,11 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
       )}
 
       {/* Search, Filter, Sort & CSV Export Toolbar */}
-      <div className="p-3.5 rounded-xl bg-[#0D0D10] border border-white/10 space-y-3">
+      <div className="p-3.5 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 space-y-3">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-2.5">
           {/* Search */}
           <div className="md:col-span-4 relative">
-            <Search className="w-3.5 h-3.5 text-[#A8A29E] absolute top-1/2 -translate-y-1/2 start-3 pointer-events-none" />
+            <Search className="w-3.5 h-3.5 text-[#5C5850] dark:text-[#A8A29E] absolute top-1/2 -translate-y-1/2 start-3 pointer-events-none" />
             <input
               type="search"
               value={searchInput}
@@ -726,7 +726,7 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
                 'Search name, email, phone, or ID...'
               )}
               aria-label={tr('بحث في المستخدمين', 'Search users')}
-              className="w-full ps-8 pe-3 py-2 rounded-lg bg-[#151519] border border-white/10 text-xs text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+              className="w-full ps-8 pe-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-xs text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
             />
           </div>
 
@@ -739,7 +739,7 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
                 setPage(1);
               }}
               aria-label={tr('تصفية حسب الدور', 'Filter by role')}
-              className="w-full px-2.5 py-2 rounded-lg bg-[#151519] border border-white/10 text-xs text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+              className="w-full px-2.5 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-xs text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
             >
               <option value="all">{tr('كل الأدوار', 'All Roles')}</option>
               <option value="student">{tr('الطلاب', 'Students')}</option>
@@ -757,7 +757,7 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
                 setPage(1);
               }}
               aria-label={tr('تصفية حسب الحالة', 'Filter by status')}
-              className="w-full px-2.5 py-2 rounded-lg bg-[#151519] border border-white/10 text-xs text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+              className="w-full px-2.5 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-xs text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
             >
               <option value="all">{tr('كل الحالات', 'All Statuses')}</option>
               <option value="active">{tr('نشط فقط', 'Active Only')}</option>
@@ -774,7 +774,7 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
                 setPage(1);
               }}
               aria-label={tr('تصفية حسب الفرقة', 'Filter by year')}
-              className="w-full px-2.5 py-2 rounded-lg bg-[#151519] border border-white/10 text-xs text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+              className="w-full px-2.5 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-xs text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
             >
               <option value={0}>{tr('كل الدفعات', 'All Years')}</option>
               <option value={1}>{formatYear(1)}</option>
@@ -801,7 +801,7 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
                 setPage(1);
               }}
               aria-label={tr('ترتيب حسب', 'Sort by')}
-              className="flex-1 min-w-0 px-2.5 py-2 rounded-lg bg-[#151519] border border-white/10 text-xs text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+              className="flex-1 min-w-0 px-2.5 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-xs text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
             >
               <option value="createdAt">{tr('تاريخ التسجيل', 'Registration')}</option>
               <option value="lastLoginAt">{tr('آخر دخول', 'Last Login')}</option>
@@ -818,7 +818,7 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
                   ? tr('تنازلي (اضغط للتبديل)', 'Descending (click to toggle)')
                   : tr('تصاعدي (اضغط للتبديل)', 'Ascending (click to toggle)')
               }
-              className="px-2.5 py-2 rounded-lg bg-[#151519] border border-white/10 text-xs font-mono text-[#E5C158] hover:border-[#D4AF37]/50 cursor-pointer shrink-0"
+              className="px-2.5 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-xs font-mono text-[#856104] dark:text-[#E5C158] hover:border-[#D4AF37]/50 cursor-pointer shrink-0"
             >
               {sortDir === 'desc' ? '↓' : '↑'}
             </button>
@@ -826,13 +826,13 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
         </div>
 
         {/* CSV Export + Privacy Control + Refresh */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-white/10 text-xs">
-          <label className="inline-flex items-center gap-2 text-[#C8C2B8] cursor-pointer select-none">
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-black/10 dark:border-white/10 text-xs">
+          <label className="inline-flex items-center gap-2 text-[#3F3D38] dark:text-[#C8C2B8] cursor-pointer select-none">
             <input
               type="checkbox"
               checked={includeContactCsv}
               onChange={(e) => setIncludeContactCsv(e.target.checked)}
-              className="rounded border-white/20 bg-[#151519] text-[#D4AF37] focus:ring-[#D4AF37]"
+              className="rounded border-black/20 dark:border-white/20 bg-[#F5F2EA] dark:bg-[#151519] text-[#9A7209] dark:text-[#D4AF37] focus:ring-[#D4AF37]"
             />
             <span>
               {tr(
@@ -847,7 +847,7 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
               type="button"
               onClick={loadUsers}
               disabled={loading}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#151519] border border-white/10 text-xs text-[#C8C2B8] hover:text-[#E5C158] hover:border-[#D4AF37]/40 cursor-pointer disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-xs text-[#3F3D38] dark:text-[#C8C2B8] hover:text-[#E5C158] hover:border-[#D4AF37]/40 cursor-pointer disabled:opacity-50"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
               <span>{tr('تحديث', 'Refresh')}</span>
@@ -874,9 +874,9 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
 
       {/* Audit Log Panel (Collapsible) */}
       {showAuditLogs && (
-        <div className="p-4 rounded-xl bg-[#0D0D10] border border-[#D4AF37]/25 space-y-3">
+        <div className="p-4 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-[#D4AF37]/25 space-y-3">
           <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 text-xs font-semibold text-[#E5C158]">
+            <div className="flex items-center gap-2 text-xs font-semibold text-[#856104] dark:text-[#E5C158]">
               <History className="w-4 h-4" />
               <span>
                 {tr(
@@ -889,7 +889,7 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
               type="button"
               onClick={loadAuditLogs}
               disabled={auditLoading}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#151519] border border-white/10 text-[11px] text-[#C8C2B8] hover:text-[#E5C158] cursor-pointer"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-[11px] text-[#3F3D38] dark:text-[#C8C2B8] hover:text-[#E5C158] cursor-pointer"
             >
               <RefreshCw className={`w-3 h-3 ${auditLoading ? 'animate-spin' : ''}`} />
               <span>{tr('تحديث السجل', 'Reload')}</span>
@@ -897,18 +897,18 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
           </div>
 
           {auditLoading && auditLogs.length === 0 ? (
-            <div className="text-xs text-[#A8A29E] py-4 text-center">
+            <div className="text-xs text-[#5C5850] dark:text-[#A8A29E] py-4 text-center">
               {tr('جاري تحميل سجل التدقيق...', 'Loading audit log...')}
             </div>
           ) : auditLogs.length === 0 ? (
-            <div className="text-xs text-[#A8A29E] py-4 text-center">
+            <div className="text-xs text-[#5C5850] dark:text-[#A8A29E] py-4 text-center">
               {tr('لم تُسجل عمليات إدارية حساسة بعد.', 'No sensitive administrative actions logged yet.')}
             </div>
           ) : (
             <div className="overflow-x-auto max-h-60 overflow-y-auto">
               <table className="w-full text-start border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-white/10 text-[#A8A29E]">
+                  <tr className="border-b border-black/10 dark:border-white/10 text-[#5C5850] dark:text-[#A8A29E]">
                     <th className="py-2 px-2.5 font-semibold">{tr('الوقت', 'Timestamp')}</th>
                     <th className="py-2 px-2.5 font-semibold">{tr('المنفذ', 'Actor')}</th>
                     <th className="py-2 px-2.5 font-semibold">{tr('الإجراء', 'Action')}</th>
@@ -916,25 +916,25 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
                     <th className="py-2 px-2.5 font-semibold">{tr('التفاصيل', 'Details')}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody className="divide-y divide-black/5 dark:divide-white/5">
                   {auditLogs.map((log) => (
-                    <tr key={log.id} className="hover:bg-white/[0.02]">
-                      <td className="py-2 px-2.5 font-mono tabular-nums text-[11px] text-[#A8A29E] whitespace-nowrap">
+                    <tr key={log.id} className="hover:bg-black/[0.025] dark:hover:bg-white/[0.02]">
+                      <td className="py-2 px-2.5 font-mono tabular-nums text-[11px] text-[#5C5850] dark:text-[#A8A29E] whitespace-nowrap">
                         {formatDateTime(log.createdAt)}
                       </td>
-                      <td className="py-2 px-2.5 text-[#F5F0E6] whitespace-nowrap">
+                      <td className="py-2 px-2.5 text-[#141418] dark:text-[#F5F0E6] whitespace-nowrap">
                         {log.actorName}
                       </td>
-                      <td className="py-2 px-2.5 font-semibold text-[#E5C158] whitespace-nowrap">
+                      <td className="py-2 px-2.5 font-semibold text-[#856104] dark:text-[#E5C158] whitespace-nowrap">
                         {auditActionLabel(log.action)}
                       </td>
-                      <td className="py-2 px-2.5 text-[#C8C2B8] whitespace-nowrap">
+                      <td className="py-2 px-2.5 text-[#3F3D38] dark:text-[#C8C2B8] whitespace-nowrap">
                         {log.targetUserName || '—'}
                       </td>
-                      <td className="py-2 px-2.5 text-[#A8A29E]">
+                      <td className="py-2 px-2.5 text-[#5C5850] dark:text-[#A8A29E]">
                         {log.details || '—'}
                         {log.ip ? (
-                          <span className="font-mono text-[10px] text-[#78716C] ms-2">
+                          <span className="font-mono text-[10px] text-[#5C5850] dark:text-[#78716C] ms-2">
                             ({log.ip})
                           </span>
                         ) : null}
@@ -949,10 +949,10 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
       )}
 
       {/* Users Table */}
-      <div className="overflow-x-auto rounded-xl border border-white/10 bg-[#0D0D10]">
+      <div className="overflow-x-auto rounded-xl border border-black/10 dark:border-white/10 bg-[#EFECE4] dark:bg-[#0D0D10]">
         <table className="w-full text-start border-collapse">
           <thead>
-            <tr className="border-b border-white/10 text-xs text-[#A8A29E] bg-[#09090B]">
+            <tr className="border-b border-black/10 dark:border-white/10 text-xs text-[#5C5850] dark:text-[#A8A29E] bg-[#F6F4EF] dark:bg-[#09090B]">
               <th className="py-3 px-3 font-semibold">{tr('المستخدم والدور', 'User & Role')}</th>
               <th className="py-3 px-3 font-semibold">{tr('التواصل', 'Contact')}</th>
               <th className="py-3 px-3 font-semibold">{tr('التسجيل', 'Registered')}</th>
@@ -962,36 +962,36 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-white/5 text-sm">
+          <tbody className="divide-y divide-black/5 dark:divide-white/5 text-sm">
             {loading ? (
               Array.from({ length: 4 }).map((_, idx) => (
                 <tr key={idx} className="animate-pulse">
                   <td className="py-3.5 px-3">
-                    <div className="h-4 w-36 rounded bg-white/10" />
-                    <div className="h-3 w-24 rounded bg-white/5 mt-1.5" />
+                    <div className="h-4 w-36 rounded bg-black/10 dark:bg-white/10" />
+                    <div className="h-3 w-24 rounded bg-black/5 dark:bg-white/5 mt-1.5" />
                   </td>
                   <td className="py-3.5 px-3">
-                    <div className="h-3 w-40 rounded bg-white/10" />
-                    <div className="h-3 w-24 rounded bg-white/5 mt-1.5" />
+                    <div className="h-3 w-40 rounded bg-black/10 dark:bg-white/10" />
+                    <div className="h-3 w-24 rounded bg-black/5 dark:bg-white/5 mt-1.5" />
                   </td>
                   <td className="py-3.5 px-3">
-                    <div className="h-3 w-20 rounded bg-white/10" />
+                    <div className="h-3 w-20 rounded bg-black/10 dark:bg-white/10" />
                   </td>
                   <td className="py-3.5 px-3">
-                    <div className="h-3 w-28 rounded bg-white/10" />
+                    <div className="h-3 w-28 rounded bg-black/10 dark:bg-white/10" />
                   </td>
                   <td className="py-3.5 px-3">
-                    <div className="h-4 w-16 rounded bg-white/10" />
+                    <div className="h-4 w-16 rounded bg-black/10 dark:bg-white/10" />
                   </td>
                   <td className="py-3.5 px-3 text-end">
-                    <div className="h-7 w-32 rounded bg-white/10 inline-block" />
+                    <div className="h-7 w-32 rounded bg-black/10 dark:bg-white/10 inline-block" />
                   </td>
                 </tr>
               ))
             ) : users.length === 0 ? (
               <tr>
                 <td colSpan={6} className="py-10 px-4 text-center space-y-3">
-                  <p className="text-sm text-[#C8C2B8]">
+                  <p className="text-sm text-[#3F3D38] dark:text-[#C8C2B8]">
                     {tr(
                       'لا يوجد مستخدمون مطابقون لمعايير البحث أو التصفية الحالية.',
                       'No users match the current search or filters.'
@@ -1006,7 +1006,7 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
                       setYearFilter(0);
                       setPage(1);
                     }}
-                    className="px-3.5 py-1.5 rounded-lg bg-[#151519] border border-[#D4AF37]/40 text-xs text-[#E5C158] hover:bg-[#D4AF37] hover:text-[#09090B] transition-colors cursor-pointer"
+                    className="px-3.5 py-1.5 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-[#D4AF37]/40 text-xs text-[#856104] dark:text-[#E5C158] hover:bg-[#D4AF37] hover:text-[#09090B] transition-colors cursor-pointer"
                   >
                     {tr('إعادة ضبط الفلاتر', 'Reset Filters')}
                   </button>
@@ -1016,19 +1016,19 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
               users.map((u) => {
                 const isImmune = u.isProtected || u.role === 'admin';
                 return (
-                  <tr key={u.id} className="hover:bg-white/[0.02] transition-colors">
+                  <tr key={u.id} className="hover:bg-black/[0.025] dark:hover:bg-white/[0.02] transition-colors">
                     {/* Name + Role + Academic Year */}
                     <td className="py-3 px-3 align-top">
                       <button
                         type="button"
                         onClick={() => handleViewProfile(u)}
-                        className="font-medium text-[#F5F0E6] hover:text-[#E5C158] flex flex-wrap items-center gap-1.5 text-start cursor-pointer transition-colors"
+                        className="font-medium text-[#141418] dark:text-[#F5F0E6] hover:text-[#856104] dark:hover:text-[#E5C158] flex flex-wrap items-center gap-1.5 text-start cursor-pointer transition-colors"
                       >
                         {u.rankBadge ? (
                           <RankBadge rankBadge={u.rankBadge} size="xs" />
                         ) : u.role === 'admin' ? (
                           <ShieldCheck
-                            className="w-3.5 h-3.5 text-[#D4AF37] shrink-0"
+                            className="w-3.5 h-3.5 text-[#9A7209] dark:text-[#D4AF37] shrink-0"
                             aria-hidden="true"
                           />
                         ) : null}
@@ -1036,14 +1036,14 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
                           {u.name}
                         </span>
                       </button>
-                      <div className="text-[11px] text-[#A8A29E] mt-0.5 flex flex-wrap items-center gap-1.5">
+                      <div className="text-[11px] text-[#5C5850] dark:text-[#A8A29E] mt-0.5 flex flex-wrap items-center gap-1.5">
                         <span
                           className={`font-semibold ${
                             u.role === 'admin'
-                              ? 'text-[#E5C158]'
+                              ? 'text-[#856104] dark:text-[#E5C158]'
                               : u.role === 'teacher'
-                              ? 'text-sky-300'
-                              : 'text-[#C8C2B8]'
+                              ? 'text-sky-700 dark:text-sky-300'
+                              : 'text-[#3F3D38] dark:text-[#C8C2B8]'
                           }`}
                         >
                           {roleLabel(u.role)}
@@ -1051,7 +1051,7 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
                         <span aria-hidden="true">·</span>
                         <span>{formatYear(u.year)}</span>
                         <span aria-hidden="true">·</span>
-                        <span className="font-mono tabular-nums text-[#E5C158]">
+                        <span className="font-mono tabular-nums text-[#856104] dark:text-[#E5C158]">
                           {u.points} {tr('نقطة', 'pts')}
                         </span>
                       </div>
@@ -1059,30 +1059,30 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
 
                     {/* Contact (Email & Phone) */}
                     <td className="py-3 px-3 align-top text-xs">
-                      <div className="font-mono text-[#F5F0E6] flex items-center gap-1.5">
-                        <Mail className="w-3 h-3 text-[#A8A29E] shrink-0" />
+                      <div className="font-mono text-[#141418] dark:text-[#F5F0E6] flex items-center gap-1.5">
+                        <Mail className="w-3 h-3 text-[#5C5850] dark:text-[#A8A29E] shrink-0" />
                         <span>{u.email || '—'}</span>
                       </div>
-                      <div className="font-mono tabular-nums text-[#A8A29E] mt-0.5 flex items-center gap-1.5">
-                        <Phone className="w-3 h-3 text-[#78716C] shrink-0" />
+                      <div className="font-mono tabular-nums text-[#5C5850] dark:text-[#A8A29E] mt-0.5 flex items-center gap-1.5">
+                        <Phone className="w-3 h-3 text-[#5C5850] dark:text-[#78716C] shrink-0" />
                         <span>{u.phone || '—'}</span>
                       </div>
                     </td>
 
                     {/* Registration Date */}
-                    <td className="py-3 px-3 align-top font-mono tabular-nums text-xs text-[#C8C2B8] whitespace-nowrap">
+                    <td className="py-3 px-3 align-top font-mono tabular-nums text-xs text-[#3F3D38] dark:text-[#C8C2B8] whitespace-nowrap">
                       {formatDateOnly(u.createdAt)}
                     </td>
 
                     {/* Last Login */}
-                    <td className="py-3 px-3 align-top font-mono tabular-nums text-xs text-[#C8C2B8] whitespace-nowrap">
+                    <td className="py-3 px-3 align-top font-mono tabular-nums text-xs text-[#3F3D38] dark:text-[#C8C2B8] whitespace-nowrap">
                       {u.lastLoginAt ? (
                         <span className="inline-flex items-center gap-1">
-                          <Clock className="w-3 h-3 text-[#D4AF37] shrink-0" />
+                          <Clock className="w-3 h-3 text-[#9A7209] dark:text-[#D4AF37] shrink-0" />
                           <span>{formatDateTime(u.lastLoginAt)}</span>
                         </span>
                       ) : (
-                        <span className="text-[#78716C]">
+                        <span className="text-[#5C5850] dark:text-[#78716C]">
                           {tr('لم يسجل دخول بعد', 'Never')}
                         </span>
                       )}
@@ -1092,13 +1092,13 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
                     <td className="py-3 px-3 align-top text-xs whitespace-nowrap">
                       {u.isSuspended ? (
                         <div className="space-y-0.5">
-                          <span className="inline-flex items-center gap-1.5 font-semibold text-amber-300">
+                          <span className="inline-flex items-center gap-1.5 font-semibold text-amber-800 dark:text-amber-300">
                             <Ban className="w-3.5 h-3.5 shrink-0" />
                             <span>{tr('معلق', 'Suspended')}</span>
                           </span>
                           {u.suspendedReason && (
                             <div
-                              className="text-[11px] text-[#A8A29E] max-w-[160px] truncate"
+                              className="text-[11px] text-[#5C5850] dark:text-[#A8A29E] max-w-[160px] truncate"
                               title={u.suspendedReason}
                             >
                               {u.suspendedReason}
@@ -1106,7 +1106,7 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
                           )}
                         </div>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 font-medium text-emerald-400">
+                        <span className="inline-flex items-center gap-1.5 font-medium text-emerald-600 dark:text-emerald-400">
                           <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
                           <span>{tr('نشط', 'Active')}</span>
                         </span>
@@ -1119,14 +1119,14 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
                         <button
                           type="button"
                           onClick={() => handleViewProfile(u)}
-                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-[#151519] border border-white/15 text-[#F5F0E6] hover:border-[#D4AF37] hover:text-[#E5C158] transition-colors cursor-pointer"
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-[#141418] dark:text-[#F5F0E6] hover:border-[#D4AF37] hover:text-[#E5C158] transition-colors cursor-pointer"
                         >
                           <Eye className="w-3.5 h-3.5" />
                           <span>{tr('الملف والملاحظات', 'Profile & Notes')}</span>
                         </button>
 
                         {!canManageStudents ? null : isImmune ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-1.5 text-xs text-[#D4AF37]">
+                          <span className="inline-flex items-center gap-1 px-2 py-1.5 text-xs text-[#9A7209] dark:text-[#D4AF37]">
                             <Lock className="w-3.5 h-3.5" />
                             <span>{tr('محمي', 'Protected')}</span>
                           </span>
@@ -1149,8 +1149,8 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
                               }
                               className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-colors cursor-pointer disabled:opacity-50 ${
                                 u.isSuspended
-                                  ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-200 hover:bg-emerald-600 hover:text-white'
-                                  : 'bg-amber-950/60 border-amber-500/40 text-amber-200 hover:bg-amber-600 hover:text-white'
+                                  ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500/40 text-emerald-800 dark:text-emerald-200 hover:bg-emerald-600 hover:text-white'
+                                  : 'bg-amber-50 dark:bg-amber-950/60 border-amber-500/40 text-amber-800 dark:text-amber-200 hover:bg-amber-600 hover:text-white'
                               }`}
                             >
                               {u.isSuspended ? (
@@ -1172,7 +1172,7 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
                               onClick={() =>
                                 setConfirmAction({ type: 'delete', user: u })
                               }
-                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-red-950/60 border border-red-500/40 text-red-200 hover:bg-red-600 hover:text-white transition-colors cursor-pointer disabled:opacity-50"
+                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-red-50 dark:bg-red-950/60 border border-red-500/40 text-red-700 dark:text-red-200 hover:bg-red-600 hover:text-white transition-colors cursor-pointer disabled:opacity-50"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                               <span>{tr('حذف', 'Delete')}</span>
@@ -1190,7 +1190,7 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
       </div>
 
       {/* Pagination Footer */}
-      <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[#A8A29E]">
+      <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[#5C5850] dark:text-[#A8A29E]">
         <div className="font-mono tabular-nums">
           {tr('عرض', 'Showing')} {startIndex}–{endIndex} {tr('من', 'of')}{' '}
           {pagination.totalFiltered} {tr('نتيجة', 'matching users')}
@@ -1205,7 +1205,7 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
                 setLimit(Number(e.target.value));
                 setPage(1);
               }}
-              className="px-2 py-1 rounded-md bg-[#151519] border border-white/10 text-[#F5F0E6] font-mono text-xs focus:outline-none focus:border-[#D4AF37]"
+              className="px-2 py-1 rounded-md bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-[#141418] dark:text-[#F5F0E6] font-mono text-xs focus:outline-none focus:border-[#D4AF37]"
             >
               <option value={10}>10</option>
               <option value={20}>20</option>
@@ -1219,11 +1219,11 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
               disabled={pagination.page <= 1 || loading}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               aria-label={tr('الصفحة السابقة', 'Previous page')}
-              className="p-1.5 rounded-md bg-[#151519] border border-white/10 text-[#F5F0E6] hover:border-[#D4AF37] disabled:opacity-40 cursor-pointer"
+              className="p-1.5 rounded-md bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-[#141418] dark:text-[#F5F0E6] hover:border-[#D4AF37] disabled:opacity-40 cursor-pointer"
             >
               <ChevronRight className="w-4 h-4 rtl:rotate-0 ltr:rotate-180" />
             </button>
-            <span className="px-2.5 font-mono tabular-nums text-[#F5F0E6]">
+            <span className="px-2.5 font-mono tabular-nums text-[#141418] dark:text-[#F5F0E6]">
               {pagination.page} / {pagination.totalPages}
             </span>
             <button
@@ -1231,7 +1231,7 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
               disabled={pagination.page >= pagination.totalPages || loading}
               onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
               aria-label={tr('الصفحة التالية', 'Next page')}
-              className="p-1.5 rounded-md bg-[#151519] border border-white/10 text-[#F5F0E6] hover:border-[#D4AF37] disabled:opacity-40 cursor-pointer"
+              className="p-1.5 rounded-md bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-[#141418] dark:text-[#F5F0E6] hover:border-[#D4AF37] disabled:opacity-40 cursor-pointer"
             >
               <ChevronLeft className="w-4 h-4 rtl:rotate-0 ltr:rotate-180" />
             </button>
@@ -1247,21 +1247,21 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
           aria-labelledby="admin-confirm-title"
           className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4"
         >
-          <div className="w-full max-w-md rounded-2xl bg-[#121216] border border-[#D4AF37]/40 p-5 space-y-4">
+          <div className="w-full max-w-md rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/40 p-5 space-y-4">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-2">
                 <AlertTriangle
                   className={`w-5 h-5 shrink-0 ${
                     confirmAction.type === 'delete'
-                      ? 'text-red-400'
+                      ? 'text-red-600 dark:text-red-400'
                       : confirmAction.type === 'suspend' || confirmAction.type === 'revoke_non_admins'
-                      ? 'text-amber-400'
-                      : 'text-emerald-400'
+                      ? 'text-amber-600 dark:text-amber-400'
+                      : 'text-emerald-600 dark:text-emerald-400'
                   }`}
                 />
                 <h3
                   id="admin-confirm-title"
-                  className="font-display text-base font-bold text-[#F5F0E6]"
+                  className="font-display text-base font-bold text-[#141418] dark:text-[#F5F0E6]"
                 >
                   {confirmAction.type === 'revoke_non_admins'
                     ? tr('تأكيد إنهاء جلسات جميع المسجلين', 'Confirm Revoking All Non-Admin Sessions')
@@ -1276,18 +1276,18 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
                 type="button"
                 onClick={() => setConfirmAction(null)}
                 aria-label={tr('إغلاق', 'Close')}
-                className="text-[#A8A29E] hover:text-white cursor-pointer"
+                className="text-[#5C5850] dark:text-[#A8A29E] hover:text-white cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {confirmAction.type === 'revoke_non_admins' ? (
-              <div className="p-3 rounded-xl bg-amber-950/30 border border-amber-500/30 text-xs text-amber-100 space-y-1">
+              <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-500/30 text-xs text-amber-900 dark:text-amber-100 space-y-1">
                 <div className="font-semibold">
                   {tr('نطاق التنفيذ: الطلاب والمعلمون فقط', 'Scope: Students & Teachers Only')}
                 </div>
-                <div className="text-[#C8C2B8]">
+                <div className="text-[#3F3D38] dark:text-[#C8C2B8]">
                   {tr(
                     'ستظل جلسة الأدمن الحالية وجميع جلسات المديرين الآخرين نشطة دون أي تسجيل خروج.',
                     'Your current admin session and all other administrator sessions will stay active.'
@@ -1295,20 +1295,20 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
                 </div>
               </div>
             ) : (
-              <div className="p-3 rounded-xl bg-[#09090B] border border-white/10 text-xs space-y-1">
-                <div className="font-semibold text-[#F5F0E6]">
+              <div className="p-3 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-black/10 dark:border-white/10 text-xs space-y-1">
+                <div className="font-semibold text-[#141418] dark:text-[#F5F0E6]">
                   {confirmAction.user.name} ·{' '}
-                  <span className="text-[#E5C158]">
+                  <span className="text-[#856104] dark:text-[#E5C158]">
                     {roleLabel(confirmAction.user.role)}
                   </span>
                 </div>
-                <div className="font-mono text-[#A8A29E]">
+                <div className="font-mono text-[#5C5850] dark:text-[#A8A29E]">
                   {confirmAction.user.email || confirmAction.user.phone}
                 </div>
               </div>
             )}
 
-            <p className="text-xs text-[#C8C2B8] leading-relaxed">
+            <p className="text-xs text-[#3F3D38] dark:text-[#C8C2B8] leading-relaxed">
               {confirmAction.type === 'revoke_non_admins'
                 ? tr(
                     'سيتم تسجيل خروج كل الطلاب والمعلمين المسجلين في المنصة فوراً وإلزامهم بتسجيل الدخول مرة أخرى من جديد، ولن يتم إنهاء جلسات الأدمن.',
@@ -1332,7 +1332,7 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
 
             {confirmAction.type === 'suspend' && (
               <div className="space-y-1">
-                <label className="block text-xs text-[#C8C2B8]">
+                <label className="block text-xs text-[#3F3D38] dark:text-[#C8C2B8]">
                   {tr('سبب التعليق (اختياري)', 'Suspension Reason (Optional)')}
                 </label>
                 <input
@@ -1344,7 +1344,7 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
                       reason: e.target.value,
                     })
                   }
-                  className="w-full px-3 py-2 rounded-lg bg-[#09090B] border border-white/15 text-xs text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+                  className="w-full px-3 py-2 rounded-lg bg-[#F6F4EF] dark:bg-[#09090B] border border-black/15 dark:border-white/15 text-xs text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
                 />
               </div>
             )}
@@ -1353,7 +1353,7 @@ export function AdminUsersPanel({ onUsersChanged }: AdminUsersPanelProps) {
               <button
                 type="button"
                 onClick={() => setConfirmAction(null)}
-                className="px-3.5 py-2 rounded-lg bg-[#151519] border border-white/10 text-xs text-[#C8C2B8] hover:text-white cursor-pointer"
+                className="px-3.5 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-xs text-[#3F3D38] dark:text-[#C8C2B8] hover:text-white cursor-pointer"
               >
                 {tr('إلغاء', 'Cancel')}
               </button>

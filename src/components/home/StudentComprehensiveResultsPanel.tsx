@@ -34,15 +34,15 @@ export function StudentComprehensiveResultsPanel() {
   if (!user || submissions.length === 0) return null;
 
   return (
-    <section className="rounded-2xl border border-[#D4AF37]/30 bg-[#121216] p-5 sm:p-6 space-y-4">
+    <section className="rounded-2xl border border-[#D4AF37]/30 bg-white dark:bg-[#121216] p-5 sm:p-6 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
-          <ClipboardCheck className="w-5 h-5 text-[#D4AF37]" />
+          <ClipboardCheck className="w-5 h-5 text-[#9A7209] dark:text-[#D4AF37]" />
           <div>
-            <h2 className="font-display text-lg font-bold text-[#F5F0E6]">
+            <h2 className="font-display text-lg font-bold text-[#141418] dark:text-[#F5F0E6]">
               {tr('نتائج الامتحانات الشاملة', 'Comprehensive Exam Results')}
             </h2>
-            <p className="text-xs text-[#A8A29E]">
+            <p className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
               {tr(
                 'تابع حالة تصحيح امتحاناتك الشاملة، وعند إرسال الدرجة يمكنك عرض التفاصيل ومراجعة ما غلطت فيه.',
                 'Track grading status and review detailed feedback and mistakes once graded.'
@@ -66,25 +66,25 @@ export function StudentComprehensiveResultsPanel() {
           return (
             <div
               key={sub.id}
-              className="p-4 rounded-xl bg-[#0D0D10] border border-white/10 flex flex-col justify-between gap-3"
+              className="p-4 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 flex flex-col justify-between gap-3"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="space-y-1 min-w-0">
-                  <h3 className="text-sm font-bold text-[#F5F0E6] truncate">
+                  <h3 className="text-sm font-bold text-[#141418] dark:text-[#F5F0E6] truncate">
                     {sub.subjectName}
                   </h3>
-                  <div className="text-xs text-[#A8A29E] font-mono tabular-nums">
+                  <div className="text-xs text-[#5C5850] dark:text-[#A8A29E] font-mono tabular-nums">
                     {new Date(sub.submittedAt).toLocaleString()}
                   </div>
                 </div>
 
                 {isGraded ? (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-950/70 border border-emerald-500/40 text-emerald-300 text-xs font-semibold shrink-0">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-500/40 text-emerald-700 dark:text-emerald-300 text-xs font-semibold shrink-0">
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     <span>{tr('تم التصحيح', 'Graded')}</span>
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-950/70 border border-amber-500/40 text-amber-200 text-xs font-semibold shrink-0">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/70 border border-amber-500/40 text-amber-800 dark:text-amber-200 text-xs font-semibold shrink-0">
                     <Hourglass className="w-3.5 h-3.5" />
                     <span>{tr('في انتظار التصحيح', 'Pending Grading')}</span>
                   </span>
@@ -92,13 +92,13 @@ export function StudentComprehensiveResultsPanel() {
               </div>
 
               {isGraded ? (
-                <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-white/10">
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-black/10 dark:border-white/10">
                   <div className="flex items-center gap-3 text-xs font-mono tabular-nums">
-                    <span className="text-base font-bold text-[#F5D061]">
+                    <span className="text-base font-bold text-[#735303] dark:text-[#F5D061]">
                       {sub.totalScore} / {sub.maxScore}
                     </span>
-                    <span className="text-emerald-300 font-bold">({pct}%)</span>
-                    <span className="text-red-300">
+                    <span className="text-emerald-700 dark:text-emerald-300 font-bold">({pct}%)</span>
+                    <span className="text-red-700 dark:text-red-300">
                       {tr(`أخطاء: ${wrongCount}`, `Mistakes: ${wrongCount}`)}
                     </span>
                   </div>
@@ -119,7 +119,7 @@ export function StudentComprehensiveResultsPanel() {
                   </GoldChip>
                 </div>
               ) : (
-                <div className="flex items-center justify-between gap-2 pt-2 border-t border-white/10 text-xs text-[#C8C2B8]">
+                <div className="flex items-center justify-between gap-2 pt-2 border-t border-black/10 dark:border-white/10 text-xs text-[#3F3D38] dark:text-[#C8C2B8]">
                   <span>
                     {tr(
                       'بانتظار مراجعة الأدمن وإرسال الدرجة...',

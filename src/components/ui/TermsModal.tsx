@@ -55,10 +55,10 @@ export function TermsModal({
       }
       className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4"
     >
-      <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-[#121216] border border-[#D4AF37]/40 p-5 sm:p-6 space-y-5 shadow-[0_24px_80px_rgba(0,0,0,0.85)]">
-        <div className="flex items-start justify-between gap-3 border-b border-white/10 pb-4">
+      <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/40 p-5 sm:p-6 space-y-5 shadow-[0_24px_80px_rgba(0,0,0,0.85)]">
+        <div className="flex items-start justify-between gap-3 border-b border-black/10 dark:border-white/10 pb-4">
           <div className="flex items-center gap-2.5">
-            <div className="p-2.5 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[#E5C158]">
+            <div className="p-2.5 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[#856104] dark:text-[#E5C158]">
               {tab === 'privacy' ? (
                 <Lock className="w-5 h-5" />
               ) : (
@@ -66,12 +66,12 @@ export function TermsModal({
               )}
             </div>
             <div>
-              <h2 className="font-display text-lg sm:text-xl font-bold text-[#E5C158]">
+              <h2 className="font-display text-lg sm:text-xl font-bold text-[#856104] dark:text-[#E5C158]">
                 {tab === 'privacy'
                   ? tr('سياسة الخصوصية وحماية البيانات — MAVIA', 'Privacy Policy — MAVIA Platform')
                   : tr('الشروط والأحكام — منصة MAVIA', 'Terms & Conditions — MAVIA Platform')}
               </h2>
-              <p className="text-xs text-[#A8A29E]">
+              <p className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
                 {tab === 'privacy'
                   ? tr(
                       'كيفية جمع وحماية بيانات الطلاب وحقوقك في التصدير والحذف',
@@ -89,7 +89,7 @@ export function TermsModal({
             type="button"
             onClick={onClose}
             aria-label={tr('إغلاق', 'Close')}
-            className="p-2 rounded-lg bg-[#18181D] border border-white/10 text-[#C8C2B8] hover:text-[#F5D061] hover:border-[#D4AF37]/50 cursor-pointer shrink-0"
+            className="p-2 rounded-lg bg-[#ECE8DE] dark:bg-[#18181D] border border-black/10 dark:border-white/10 text-[#3F3D38] dark:text-[#C8C2B8] hover:text-[#F5D061] hover:border-[#D4AF37]/50 cursor-pointer shrink-0"
           >
             <X className="w-4 h-4" />
           </button>
@@ -117,9 +117,9 @@ export function TermsModal({
 
         {tab === 'terms' ? (
           <div className="space-y-3.5 text-xs sm:text-sm leading-relaxed">
-            <div className="p-4 rounded-xl bg-red-950/25 border border-red-500/35 space-y-2">
-              <div className="flex items-center gap-2 font-display font-bold text-red-200">
-                <Ban className="w-4 h-4 text-red-400 shrink-0" />
+            <div className="p-4 rounded-xl bg-red-50 dark:bg-red-950/25 border border-red-500/35 space-y-2">
+              <div className="flex items-center gap-2 font-display font-bold text-red-700 dark:text-red-200">
+                <Ban className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0" />
                 <span>
                   {tr(
                     '1. الانضباط في الشات والمنصة والحظر المؤقت',
@@ -127,7 +127,7 @@ export function TermsModal({
                   )}
                 </span>
               </div>
-              <p className="text-[#E5E0D8]">
+              <p className="text-[#2A2823] dark:text-[#E5E0D8]">
                 {tr(
                   'يلتزم كل طالب بالاحترام المتبادل والأدب العام في شات الدفعة، والتعليقات، وكافة أقسام المنصة. أي طالب يتجاوز حدوده أو يصدر منه إساءة أو مخالفة يتم حظره مؤقتاً وإلغاء جلسته فوراً، ولن يتمكن من الدخول إلى المنصة مرة أخرى إلا بإذن وموافقة مباشرة من أدمن المنصة.',
                   'All students must maintain respectful conduct in batch chat and across all sections. Any student who crosses boundaries or violates platform rules will be temporarily suspended immediately and will NOT be allowed to re-enter without explicit permission from the Platform Admin.'
@@ -135,9 +135,9 @@ export function TermsModal({
               </p>
             </div>
 
-            <div className="p-4 rounded-xl bg-amber-950/25 border border-amber-500/35 space-y-2">
-              <div className="flex items-center gap-2 font-display font-bold text-amber-200">
-                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+            <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/25 border border-amber-500/35 space-y-2">
+              <div className="flex items-center gap-2 font-display font-bold text-amber-800 dark:text-amber-200">
+                <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
                 <span>
                   {tr(
                     '2. قواعد التواصل مع الدعم الفني (تنبيه هام جداً)',
@@ -145,7 +145,7 @@ export function TermsModal({
                   )}
                 </span>
               </div>
-              <p className="text-[#E5E0D8]">
+              <p className="text-[#2A2823] dark:text-[#E5E0D8]">
                 {tr(
                   'يُمنع منعاً باتاً التواصل مع الدعم الفني عبر واتساب أو تليجرام إلا إذا احتاج الأمر لذلك بالفعل وفي حالات الضرورة القصوى فقط (مثل الأعطال التقنية الحقيقية أو طلب إذن فك الحظر). أي إزعاج أو تواصل غير مبرر يعرض الحساب للحظر الفوري.',
                   'Contacting Technical Support via WhatsApp or Telegram is STRICTLY PROHIBITED unless genuinely necessary (such as critical technical issues or requesting re-entry approval). Unnecessary or spam contact results in immediate suspension.'
@@ -153,9 +153,9 @@ export function TermsModal({
               </p>
             </div>
 
-            <div className="p-4 rounded-xl bg-[#0D0D10] border border-[#D4AF37]/25 space-y-2">
-              <div className="flex items-center gap-2 font-display font-bold text-[#E5C158]">
-                <ShieldCheck className="w-4 h-4 text-[#D4AF37] shrink-0" />
+            <div className="p-4 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-[#D4AF37]/25 space-y-2">
+              <div className="flex items-center gap-2 font-display font-bold text-[#856104] dark:text-[#E5C158]">
+                <ShieldCheck className="w-4 h-4 text-[#9A7209] dark:text-[#D4AF37] shrink-0" />
                 <span>
                   {tr(
                     '3. الحفاظ على حسابك ومحتوى المنصة',
@@ -163,7 +163,7 @@ export function TermsModal({
                   )}
                 </span>
               </div>
-              <p className="text-[#C8C2B8]">
+              <p className="text-[#3F3D38] dark:text-[#C8C2B8]">
                 {tr(
                   'حسابك شخصي ولا يجوز مشاركته مع الغير. جميع الملخصات والمحاضرات والاختبارات مخصصة لطلاب الدفعات على منصة MAVIA، وتخضع إدارة الأعضاء لصلاحيات الأدمن الكاملة.',
                   'Your account is personal and may not be shared. All summaries, lectures, and exams belong exclusively to MAVIA students and are governed by Admin moderation.'
@@ -173,14 +173,14 @@ export function TermsModal({
           </div>
         ) : (
           <div className="space-y-3.5 text-xs sm:text-sm leading-relaxed">
-            <div className="p-4 rounded-xl bg-[#0D0D10] border border-[#D4AF37]/25 space-y-2">
-              <div className="flex items-center gap-2 font-display font-bold text-[#E5C158]">
-                <Database className="w-4 h-4 text-[#D4AF37] shrink-0" />
+            <div className="p-4 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-[#D4AF37]/25 space-y-2">
+              <div className="flex items-center gap-2 font-display font-bold text-[#856104] dark:text-[#E5C158]">
+                <Database className="w-4 h-4 text-[#9A7209] dark:text-[#D4AF37] shrink-0" />
                 <span>
                   {tr('1. البيانات التي نجمعها وهدفها', '1. Data We Collect & Purpose')}
                 </span>
               </div>
-              <p className="text-[#C8C2B8]">
+              <p className="text-[#3F3D38] dark:text-[#C8C2B8]">
                 {tr(
                   'تجمع منصة MAVIA فقط البيانات الأساسية اللازمة لتشغيل حسابك الأكاديمي: الاسم، البريد الإلكتروني، رقم الهاتف، الفرقة الدراسية، درجات الاختبارات، التقدم في الدروس، وملاحظات المحاضرات. لا يتم بيع أو مشاركة بيانات الطلاب مع أي أطراف خارجية.',
                   'MAVIA collects only essential data required to run your academic account: name, email, phone number, academic year, quiz scores, lesson progress, and lecture notes. Student data is never sold or shared with third-party advertisers.'
@@ -188,14 +188,14 @@ export function TermsModal({
               </p>
             </div>
 
-            <div className="p-4 rounded-xl bg-[#0D0D10] border border-white/10 space-y-2">
-              <div className="flex items-center gap-2 font-display font-bold text-[#F5F0E6]">
-                <Lock className="w-4 h-4 text-emerald-400 shrink-0" />
+            <div className="p-4 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 space-y-2">
+              <div className="flex items-center gap-2 font-display font-bold text-[#141418] dark:text-[#F5F0E6]">
+                <Lock className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span>
                   {tr('2. خصوصية الطلاب والحماية التقنية', '2. Student Privacy & Technical Protection')}
                 </span>
               </div>
-              <p className="text-[#C8C2B8]">
+              <p className="text-[#3F3D38] dark:text-[#C8C2B8]">
                 {tr(
                   'يتم تشفير كلمات المرور باستخدام خوارزمية scrypt مع Salt عشوائي فريد لكل مستخدم، ولا تظهر بيانات الاتصال الشخصية (البريد أو الهاتف) في لوحة التصدر للطلاب الآخرين. الجلسات محمية برموز توثيق عشوائية ومحددة الصلاحيات.',
                   'Passwords are hashed with scrypt and unique per-user salts. Personal contact details (email and phone) are hidden on public leaderboards. All routes enforce server-side authentication and role-based access control.'
@@ -203,9 +203,9 @@ export function TermsModal({
               </p>
             </div>
 
-            <div className="p-4 rounded-xl bg-[#0D0D10] border border-white/10 space-y-2">
-              <div className="flex items-center gap-2 font-display font-bold text-[#F5F0E6]">
-                <UserCheck className="w-4 h-4 text-[#D4AF37] shrink-0" />
+            <div className="p-4 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 space-y-2">
+              <div className="flex items-center gap-2 font-display font-bold text-[#141418] dark:text-[#F5F0E6]">
+                <UserCheck className="w-4 h-4 text-[#9A7209] dark:text-[#D4AF37] shrink-0" />
                 <span>
                   {tr(
                     '3. حقوقك: تعديل البيانات، التصدير، وحذف الحساب',
@@ -213,7 +213,7 @@ export function TermsModal({
                   )}
                 </span>
               </div>
-              <p className="text-[#C8C2B8]">
+              <p className="text-[#3F3D38] dark:text-[#C8C2B8]">
                 {tr(
                   'يمكنك في أي وقت من خلال نافذة "حسابي وبياناتي" في الشريط العلوي تعديل اسمك أو فرقتك، تغيير كلمة المرور، تحميل نسخة JSON كاملة من بياناتك الأكاديمية، أو حذف حسابك وجميع بياناتك الشخصية نهائياً من المنصة.',
                   'At any time from the "My Account & Data" dialog in the top bar, you can update your name/year, change your password, export your complete academic records as JSON, or permanently delete your student account and personal data.'
@@ -223,9 +223,9 @@ export function TermsModal({
           </div>
         )}
 
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-white/10">
-          <div className="flex items-center gap-1.5 text-[11px] text-[#A8A29E]">
-            <ShieldAlert className="w-3.5 h-3.5 text-[#D4AF37]" />
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-black/10 dark:border-white/10">
+          <div className="flex items-center gap-1.5 text-[11px] text-[#5C5850] dark:text-[#A8A29E]">
+            <ShieldAlert className="w-3.5 h-3.5 text-[#9A7209] dark:text-[#D4AF37]" />
             <span>
               {tr(
                 'الالتزام بهذه السياسات يضمن بيئة تعليمية آمنة ومحترمة للجميع.',
