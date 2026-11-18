@@ -6,8 +6,8 @@ import {
   requireAuth,
   requirePermission,
   requireSuperAdmin,
-} from '../auth.ts';
-import type { AuthenticatedRequest } from '../auth.ts';
+} from '../auth.js';
+import type { AuthenticatedRequest } from '../auth.js';
 import {
   createBackupSnapshot,
   db,
@@ -17,14 +17,14 @@ import {
   recordAppError,
   restoreBackupSnapshot,
   validateBackupSchema,
-} from '../db.ts';
-import { IS_VERCEL, isSupabaseStorageEnabled } from '../storage.ts';
+} from '../db.js';
+import { IS_VERCEL, isSupabaseStorageEnabled } from '../storage.js';
 import {
   getLastSupabaseSyncError,
   getSupabaseStatusDetails,
   isSupabaseConfigured,
-} from '../supabase.ts';
-import type { DatabaseSchema } from '../types.ts';
+} from '../supabase.js';
+import type { DatabaseSchema } from '../types.js';
 
 const router = Router();
 
