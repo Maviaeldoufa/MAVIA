@@ -417,36 +417,3 @@ router.post(
     }
 
     const targetRank = (store.adminRanks || []).find((r) => r.id === rankId.trim());
-    if (!targetRank) {
-      res.status(404).json({ error: 'الرتبة الإدارية غير موجودة.' });
-      return;
-    }
-
-    if (targetUser.id === req.currentUser!.id && !callerIsSuperAdmin) {
-      res.status(403).json({
-        error: 'لا يمكنك تعديل رتبتك أو ترقية نفسك.',
-      });
-      return;
-    }
-
-    if (!callerIsSuperAdmin) {
-      if (
-        targetRank.isSuperAdminRank ||
-        targetRank.id === 'rank-super-admin' ||
-        targetRank.id === 'rank-deputy-director'
-      ) {
-        res.status(403).json({
-          error: 'تعيين أو تعديل منصب المدير العام أو نائبه محصور بالمدير العام فقط.',
-        });
-        return;
-      }
-      if (targetUser.isProtected || targetUser.adminRankId === 'rank-super-admin') {
-        res.status(403).json({
-          error: 'لا تملك صلاحية تعديل منصب المدير العام.',
-        });
-        return;
-      }
-    }
-
-    if (
-      (targetRank.isSuper
