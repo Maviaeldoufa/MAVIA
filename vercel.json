@@ -3,14 +3,14 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "functions": {
-    "api/index.ts": {
+    "server.ts": {
       "includeFiles": "data/mafia-db.json"
     }
   },
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/api?__mvia_path=$1"
+      "destination": "/server.ts"
     },
     {
       "source": "/((?!api/|assets/|src/assets/|uploads/|favicon\\.ico).*)",
