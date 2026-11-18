@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { requireAuth } from '../auth.ts';
-import type { AuthenticatedRequest } from '../auth.ts';
+import { requireAuth } from '../auth.js';
+import type { AuthenticatedRequest } from '../auth.js';
 import {
   db,
   hashPassword,
@@ -8,9 +8,9 @@ import {
   recordAdminAudit,
   toSafeUser,
   verifyPassword,
-} from '../db.ts';
-import { checkLoginLockout, clearLoginFailures, recordFailedLogin } from '../rateLimit.ts';
-import type { AcademicYear, NoteReactionEmoji } from '../types.ts';
+} from '../db.js';
+import { checkLoginLockout, clearLoginFailures, recordFailedLogin } from '../rateLimit.js';
+import type { AcademicYear, NoteReactionEmoji } from '../types.js';
 
 const router = Router();
 const ALLOWED_NOTE_REACTIONS = new Set<NoteReactionEmoji>([
@@ -234,7 +234,6 @@ router.post('/account/notes/:noteId/react', requireAuth, (req: AuthenticatedRequ
     (r) => r.userId === req.currentUser!.id
   );
   if (existingIdx >= 0 && note.reactions[existingIdx].emoji === emoji) {
-    // Toggle off the same reaction
     note.reactions = note.reactions.filter((r) => r.userId !== req.currentUser!.id);
   } else {
     note.reactions = [
@@ -248,7 +247,7 @@ router.post('/account/notes/:noteId/react', requireAuth, (req: AuthenticatedRequ
     ];
   }
 
-  note.updatedAt = new Date().toISOString();
+    note.updatedAt = new Date().toISOString();
   db.save();
   res.json({ note });
 });
