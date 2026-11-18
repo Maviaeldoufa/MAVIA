@@ -4,18 +4,33 @@
   --font-display: "Changa", "Cairo", sans-serif;
   --font-sans: "Cairo", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", monospace;
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.5;
+  --text-sm: 0.9125rem;
+  --text-sm--line-height: 1.58;
 }
 
 @layer base {
   html {
     font-family: "Cairo", system-ui, sans-serif;
-    font-size: clamp(15.75px, 0.12vw + 15.5px, 16.5px);
-    line-height: 1.62;
+    font-size: clamp(16.75px, 0.16vw + 16.4px, 17.75px);
+    line-height: 1.66;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: #09090B;
-    color: #F5F0E6;
+    color: #F7F3EB;
+  }
+
+  body {
+    font-weight: 500;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font-weight: 500;
   }
 
   /* Custom subtle obsidian scrollbar */
