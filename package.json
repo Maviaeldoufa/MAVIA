@@ -4,9 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "fix-imports": "node -e \"const fs=require('fs');const path=require('path');function walk(dir){fs.readdirSync(dir).forEach(f=>{const p=path.join(dir,f);if(fs.statSync(p).isDirectory())walk(p);else if(p.endsWith('.ts')||p.endsWith('.js')){let c=fs.readFileSync(p,'utf8');c=c.replace(/from '(\.[^']+)(?<!\.js)'/g,\"from '$1.js'\").replace(/from \"(\.[^\"]+)(?<!\.js)\"/g,'from \"$1.js\"');fs.writeFileSync(p,c,'utf8');}});}walk('./server');console.log('Imports fixed successfully!');\"",
+    "build": "npm run fix-imports && tsc && vite build",
     "dev": "tsx server.ts",
     "start": "tsx server.ts",
-    "build": "vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
