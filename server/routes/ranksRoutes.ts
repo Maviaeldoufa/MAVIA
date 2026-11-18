@@ -417,3 +417,133 @@ router.post(
     }
 
     const targetRank = (store.adminRanks || []).find((r) => r.id === rankId.trim());
+    if (!targetRank) {
+      res.status(404).json({ error: 'الرتبة الإدارية غير موجودة.' });
+      return;
+    }
+
+    if (targetUser.id === req.currentUser!.id && !callerIsSuperAdmin) {
+      res.status(403).json({
+        error: 'لا يمكنك تعديل رتبتك أو ترقية نفسك.',
+      });
+      return;
+    }
+
+    if (!callerIsSuperAdmin) {
+      if (
+        targetRank.isSuperAdminRank ||
+        targetRank.id === 'rank-super-admin' ||
+        targetRank.id === 'rank-deputy-director'
+      ) {
+        res.status(403).json({
+          error: 'تعيين أو تعديل منصب المدير العام أو نائبه محصور بالمدير العام فقط.',
+        });
+        return;
+      }
+      if (targetUser.isProtected || targetUser.adminRankId === 'rank-super-admin') {
+        res.status(403).json({
+          error: 'لا تملك صلاحية تعديل منصب المدير العام.',
+        });
+        return;
+      }
+    }
+
+    if (
+      (targetRank.isSuperAdminRank || targetRank.id === 'rank-super-admin') &&
+      !callerIsSuperAdmin
+    ) {
+      res.status(403).json({
+        error: 'لا يمكن لغير المدير العام تعيين منصب المدير العام.',
+      });
+      return;
+    }
+
+    if (!Array.isArray(store.adminOfficials)) {
+      store.adminOfficials = [];
+    }
+
+    const now = new Date().toISOString();
+    const cleanDisplayName = (displayName?.trim() || targetUser.name).slice(0, 80);
+    const cleanWhatsapp = hasRawWhatsapp ? normalizeWhatsappNumber(whatsappNumber!) : '';
+
+    targetUser.role = 'admin';
+    targetUser.adminRankId = targetRank.id;
+
+    const existingOfficial = store.adminOfficials.find(
+      (o) => o.userId === targetUser.id
+    );
+
+    let savedOfficial: AdminOfficial;
+    if (existingOfficial) {
+      existingOfficial.rankId = targetRank.id;
+      existingOfficial.displayName = cleanDisplayName;
+      existingOfficial.whatsappNumber = cleanWhatsapp;
+      existingOfficial.titleNote = titleNote?.trim().slice(0, 120) || undefined;
+      existingOfficial.showInSupport =
+        typeof showInSupport === 'boolean' ? showInSupport : true;
+      existingOfficial.isActive = typeof isActive === 'boolean' ? isActive : true;
+      existingOfficial.updatedAt = now;
+      savedOfficial = existingOfficial;
+    } else {
+      savedOfficial = {
+        id: `official-${crypto.randomUUID()}`,
+        userId: targetUser.id,
+        rankId: targetRank.id,
+        displayName: cleanDisplayName,
+        whatsappNumber: cleanWhatsapp,
+        titleNote: titleNote?.trim().slice(0, 120) || undefined,
+        showInSupport: typeof showInSupport === 'boolean' ? showInSupport : true,
+        isActive: typeof isActive === 'boolean' ? isActive : true,
+        assignedBy: req.currentUser!.id,
+        createdAt: now,
+        updatedAt: now,
+      };
+      store.adminOfficials.unshift(savedOfficial);
+    }
+
+    db.save();
+
+    recordAdminAudit({
+      actorId: req.currentUser!.id,
+      actorName: req.currentUser!.name,
+      action: 'official.assign',
+      targetUserId: targetUser.id,
+      targetUserName: targetUser.name,
+      details: `Assigned to rank ${targetRank.nameAr} (${targetRank.id})`,
+      ip: getClientIp(req),
+    });
+
+    res.status(201).json({ official: savedOfficial });
+  }
+);
+
+router.patch(
+  '/admin/officials/:id',
+  requireAuth,
+  requirePermission('manage_officials'),
+  (req: AuthenticatedRequest, res) => {
+    const { id } = req.params;
+    const {
+      rankId,
+      displayName,
+      whatsappNumber,
+      titleNote,
+      showInSupport,
+      isActive,
+    } = req.body as {
+      rankId?: string;
+      displayName?: string;
+      whatsappNumber?: string;
+      titleNote?: string;
+      showInSupport?: boolean;
+      isActive?: boolean;
+    };
+
+    const store = db.get();
+    const official = (store.adminOfficials || []).find((o) => o.id === id);
+    if (!official) {
+      res.status(404).json({ error: 'بيانات المسؤول غير موجودة.' });
+      return;
+    }
+
+    const callerIsSuperAdmin =
