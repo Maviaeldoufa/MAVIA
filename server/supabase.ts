@@ -1,5 +1,5 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import type { DatabaseSchema } from './types.ts';
+import type { DatabaseSchema } from './types.js';
 
 let cachedClient: SupabaseClient | null = null;
 let cachedKeySignature = '';
