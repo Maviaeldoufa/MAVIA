@@ -340,6 +340,8 @@ export interface NotificationItem {
   type: 'course' | 'exam' | 'lecture' | 'announcement' | 'general';
   targetSection: NavSection;
   year: AcademicYear | 0;
+  userId?: string;
+  comprehensiveExamId?: string;
   read: boolean;
   createdBy: string;
   createdAt: string;
@@ -729,3 +731,87 @@ export interface StudentDashboardData {
     quizzesCompleted: number;
   };
 }
+
+export type ComprehensiveQuestionType = 'mcq' | 'true_false' | 'essay';
+
+export interface ComprehensiveQuestion {
+  id: string;
+  type: ComprehensiveQuestionType;
+  question: string;
+  points: number;
+  options?: string[];
+  correctIndex?: number;
+  modelAnswer?: string;
+}
+
+export interface ComprehensiveExamPublic {
+  id: string;
+  subjectName: string;
+  durationMinutes: number;
+  targetYear: AcademicYear | 0;
+  isActive: boolean;
+  questionsCount: number;
+  totalPoints: number;
+  createdBy: string;
+  createdAt: string;
+  closedAt?: string;
+  mySubmissionStatus: 'pending_grading' | 'graded' | null;
+  mySubmissionId: string | null;
+  questions: Array<{
+    id: string;
+    type: ComprehensiveQuestionType;
+    question: string;
+    points: number;
+    options?: string[];
+  }>;
+}
+
+export interface ComprehensiveAnswerItem {
+  questionId: string;
+  questionType: ComprehensiveQuestionType;
+  questionText: string;
+  maxPoints: number;
+  options?: string[];
+  selectedIndex?: number;
+  essayAnswer?: string;
+  awardedPoints?: number;
+  isCorrect?: boolean;
+  correctAnswerText?: string;
+  adminFeedback?: string;
+}
+
+export interface ComprehensiveSubmission {
+  id: string;
+  examId: string;
+  subjectName: string;
+  userId: string;
+  studentName: string;
+  studentYear: AcademicYear;
+  answers: ComprehensiveAnswerItem[];
+  status: 'pending_grading' | 'graded';
+  totalScore: number;
+  maxScore: number;
+  timeSpentSeconds: number;
+  adminNote?: string;
+  submittedAt: string;
+  gradedAt?: string;
+  gradedBy?: string;
+}
+
+export interface ComprehensiveExamAdmin {
+  id: string;
+  subjectName: string;
+  durationMinutes: number;
+  targetYear: AcademicYear | 0;
+  isActive: boolean;
+  questions: ComprehensiveQuestion[];
+  createdBy: string;
+  createdById: string;
+  createdAt: string;
+  closedAt?: string;
+  submissionsCount: number;
+  pendingCount: number;
+  gradedCount: number;
+  submissions: ComprehensiveSubmission[];
+}
+

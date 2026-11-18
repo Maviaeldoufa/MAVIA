@@ -1,6 +1,6 @@
 import express from 'express';
 import fs from 'fs';
-import { extractAuthToken, getUserByToken } from './auth.js';
+import { extractAuthToken, resolveUserByToken } from './auth.js';
 import { db, recordAppError, UPLOADS_DIR } from './db.js';
 import { globalApiRateLimiter } from './rateLimit.js';
 import { IS_VERCEL } from './storage.js';
@@ -135,6 +135,11 @@ export function createApp(): express.Express {
 
   app.use('/api', globalApiRateLimiter);
 
+  app.use('/api/auth', (_req, res, next) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    next();
+  });
+
   app.use('/api', (req, res, next) => {
     const store = db.get();
     if (!store.maintenance?.enabled) {
@@ -148,18 +153,20 @@ export function createApp(): express.Express {
     }
 
     const token = extractAuthToken(req);
-    const user = getUserByToken(token);
-    if (user?.role === 'admin') {
-      next();
-      return;
-    }
-
-    res.status(503).json({
-      maintenance: true,
-      error:
-        store.maintenance.message ||
-        'المنصة في وضع الصيانة حالياً لإجراء تحديثات. سنعود قريباً.',
-    });
+    resolveUserByToken(token)
+      .then((user) => {
+        if (user?.role === 'admin') {
+          next();
+          return;
+        }
+        res.status(503).json({
+          maintenance: true,
+          error:
+            store.maintenance?.message ||
+            'المنصة في وضع الصيانة حالياً لإجراء تحديثات. سنعود قريباً.',
+        });
+      })
+      .catch(next);
   });
 
   app.use('/api', authRoutes);

@@ -4,6 +4,7 @@ import { Suspense, lazy, useEffect, useState } from 'react';
 import { AuthScreen } from './components/auth/AuthScreen';
 import { WelcomeCelebrationScreen } from './components/auth/WelcomeCelebrationScreen';
 import { ComprehensiveExamBannerAndModal } from './components/exams/ComprehensiveExamBannerAndModal';
+import { AntiScreenshotGuard } from './components/ui/AntiScreenshotGuard';
 import { FloatingChatbotWidget } from './components/ui/FloatingChatbotWidget';
 import { FloatingLogo } from './components/ui/FloatingLogo';
 import { Footer } from './components/ui/Footer';
@@ -246,7 +247,8 @@ function MviaWorkspace() {
   }
 
   return (
-    <div className="min-h-screen bg-[#09090B] text-[#F5F0E6] flex flex-col relative overflow-x-hidden">
+    <div className="min-h-screen bg-[#09090B] text-[#F5F0E6] flex flex-col relative overflow-x-hidden mvia-protected">
+      <AntiScreenshotGuard />
       <a href="#main-content" className="skip-to-content">
         {tr('تخطي إلى المحتوى الرئيسي', 'Skip to main content')}
       </a>

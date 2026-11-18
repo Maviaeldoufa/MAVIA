@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { requireAuth } from '../auth.js';
+import { requireAuth, revokeUserSessions } from '../auth.js';
 import type { AuthenticatedRequest } from '../auth.js';
 import {
   db,
@@ -278,7 +278,7 @@ router.get('/account/export', requireAuth, (req: AuthenticatedRequest, res) => {
 });
 
 // Self-service account deletion (blocked for protected/admin accounts)
-router.delete('/account', requireAuth, (req: AuthenticatedRequest, res) => {
+router.delete('/account', requireAuth, async (req: AuthenticatedRequest, res) => {
   const { password } = req.body as { password?: string };
   const user = req.currentUser!;
 
@@ -303,7 +303,7 @@ router.delete('/account', requireAuth, (req: AuthenticatedRequest, res) => {
   const userId = user.id;
 
   store.users = store.users.filter((u) => u.id !== userId);
-  store.sessions = store.sessions.filter((s) => s.userId !== userId);
+  await revokeUserSessions(userId);
   store.quizSubmissions = store.quizSubmissions.filter((s) => s.userId !== userId);
   store.chatMessages = store.chatMessages.filter((m) => m.userId !== userId);
   if (store.supportTickets) {

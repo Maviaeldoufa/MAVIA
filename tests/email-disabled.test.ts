@@ -68,4 +68,14 @@ describe('MVIA Email Feature Flag (EMAIL_ENABLED)', () => {
     const cfg = getEmailDeliveryConfig();
     assert.equal(cfg.enabled, false);
   });
+
+  test('5. Email delivery remains disabled when RESEND_API_KEY is "disabled"', () => {
+    process.env.EMAIL_ENABLED = 'true';
+    process.env.RESEND_API_KEY = 'disabled';
+    process.env.EMAIL_FROM = 'MVIA <noreply@mvia.edu>';
+
+    const cfg = getEmailDeliveryConfig();
+    assert.equal(cfg.enabled, false);
+    assert.equal(cfg.apiKey, '');
+  });
 });

@@ -1,469 +1,519 @@
 import crypto from 'crypto';
-import { Router } from 'express';
+import type { NextFunction, Request, Response } from 'express';
+import { db, hasUserPermission, isUserSuperAdmin } from './db.js';
 import {
-  clearSessionCookie,
-  createSessionToken,
-  getAdminSecretCode,
-  requireAnyPermission,
-  requireAuth,
-  requirePermission,
-  requireSuperAdmin,
-  setSessionCookie,
-} from '../auth.js';
-import type { AuthenticatedRequest } from '../auth.js';
-import {
-  db,
-  getEmailDeliveryConfig,
-  hashPassword,
-  hasUserPermission,
-  isUserSuperAdmin,
-  recordAdminAudit,
-  recordAppError,
-  toLeaderboardUser,
-  toSafeUser,
-  verifyPassword,
-} from '../db.js';
-import {
-  checkLoginLockout,
-  clearLoginFailures,
-  loginRateLimiter,
-  recordFailedLogin,
-  registerRateLimiter,
-} from '../rateLimit.js';
-import type { AcademicYear, User, UserProfileNote, UserRole } from '../types.js';
+  deleteNonAdminSessionsFromSupabase,
+  deleteSessionFromSupabase,
+  deleteUserSessionsFromSupabase,
+  findSessionInSupabase,
+  findUserInSupabase,
+  isSupabaseDbEnabled,
+  persistSessionToSupabase,
+  upsertUserToSupabase,
+} from './supabase.js';
+import type { AdminPermissionKey, User } from './types.js';
 
-const router = Router();
+const SESSION_COOKIE_NAME = 'mvia_session';
+const ONE_YEAR_SECONDS = 365 * 24 * 60 * 60;
+const ONE_YEAR_MS = ONE_YEAR_SECONDS * 1000;
 
-const SUPER_ADMIN_EMAIL = 'MAVIAMahmou1@1';
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const VERIFICATION_TTL_MS = 15 * 60 * 1000;
-
-function hashOtpCode(code: string): string {
-  return crypto.createHash('sha256').update(code.trim()).digest('hex');
+export interface AuthenticatedRequest extends Request {
+  currentUser?: User;
+  authToken?: string;
 }
 
-function getClientIp(req: AuthenticatedRequest): string {
-  const fwd = req.headers['x-forwarded-for'];
-  if (typeof fwd === 'string' && fwd.trim()) {
-    return fwd.split(',')[0].trim();
-  }
-  return req.ip || 'unknown';
+export function getAdminSecretCode(): string {
+  return (process.env.ADMIN_SECRET_CODE || '').trim();
 }
 
-function csvEscapeCell(raw: string | number | boolean | undefined | null): string {
-  const str = String(raw ?? '');
-  const safe = /^[=+\-@\t\r]/.test(str) ? `'${str}` : str;
-  return `"${safe.replace(/"/g, '""')}"`;
-}
-
-function maskEmail(email: string): string {
-  const clean = (email || '').trim();
-  if (!clean || !clean.includes('@')) return clean ? '***' : '';
-  const [local, domain] = clean.split('@');
-  if (!local) return `***@${domain}`;
-  const visible = local.slice(0, Math.min(2, local.length));
-  return `${visible}***@${domain}`;
-}
-
-function maskPhone(phone: string): string {
-  const clean = (phone || '').trim();
-  if (!clean) return '';
-  if (clean.length <= 4) return '****';
-  return `${clean.slice(0, 3)}${'*'.repeat(Math.max(2, clean.length - 5))}${clean.slice(-2)}`;
-}
-
-function filterAndSortAdminUsers(
-  allUsers: User[],
-  query: Record<string, unknown>
-): User[] {
-  const search = typeof query.search === 'string' ? query.search.trim().toLowerCase() : '';
-  const roleFilter = typeof query.role === 'string' ? query.role.trim() : 'all';
-  const statusFilter = typeof query.status === 'string' ? query.status.trim() : 'all';
-  const yearFilter = Number(query.year || 0);
-  const sortBy = typeof query.sortBy === 'string' ? query.sortBy : 'createdAt';
-  const sortDir = query.sortDir === 'asc' ? 1 : -1;
-
-  const filtered = allUsers.filter((u) => {
-    if (roleFilter === 'student' || roleFilter === 'teacher' || roleFilter === 'admin') {
-      if (u.role !== roleFilter) return false;
-    }
-    if (statusFilter === 'active' && u.isSuspended) return false;
-    if (statusFilter === 'suspended' && !u.isSuspended) return false;
-    if (yearFilter >= 1 && yearFilter <= 4 && u.year !== yearFilter) return false;
-    if (search) {
-      const hay = `${u.name} ${u.email || ''} ${u.phone || ''} ${u.id}`.toLowerCase();
-      if (!hay.includes(search)) return false;
-    }
-    return true;
-  });
-
-  filtered.sort((a, b) => {
-    if (sortBy === 'name') {
-      return a.name.localeCompare(b.name, 'ar') * sortDir;
-    }
-    if (sortBy === 'points') {
-      return (a.points - b.points) * sortDir;
-    }
-    if (sortBy === 'role') {
-      return a.role.localeCompare(b.role) * sortDir;
-    }
-    if (sortBy === 'status') {
-      const av = a.isSuspended ? 1 : 0;
-      const bv = b.isSuspended ? 1 : 0;
-      return (av - bv) * sortDir;
-    }
-    if (sortBy === 'lastLoginAt') {
-      const at = a.lastLoginAt ? new Date(a.lastLoginAt).getTime() : 0;
-      const bt = b.lastLoginAt ? new Date(b.lastLoginAt).getTime() : 0;
-      return (at - bt) * sortDir;
-    }
-    const at = new Date(a.createdAt).getTime() || 0;
-    const bt = new Date(b.createdAt).getTime() || 0;
-    return (at - bt) * sortDir;
-  });
-
-  return filtered;
-}
-
-router.post('/auth/register', registerRateLimiter, (req, res) => {
-  const { name, email, phone, password, year, adminCode, acceptedTerms } = req.body as {
-    name?: string;
-    email?: string;
-    phone?: string;
-    password?: string;
-    year?: number;
-    adminCode?: string;
-    acceptedTerms?: boolean;
-  };
-
-  if (acceptedTerms !== true) {
-    res.status(400).json({
-      error: 'يجب الموافقة على الشروط والأحكام أولاً قبل إنشاء الحساب.',
-    });
-    return;
-  }
-
-  if (!name?.trim() || !email?.trim() || !phone?.trim() || !password || !year) {
-    res.status(400).json({
-      error: 'يرجى استكمال الاسم والبريد الإلكتروني ورقم التليفون وكلمة المرور والسنة الدراسية.',
-    });
-    return;
-  }
-
-  const cleanEmail = email.trim().toLowerCase();
-  if (!EMAIL_REGEX.test(cleanEmail)) {
-    res.status(400).json({ error: 'صيغة البريد الإلكتروني غير صحيحة.' });
-    return;
-  }
-
-  const parsedYear = Number(year) as AcademicYear;
-  if (![1, 2, 3, 4].includes(parsedYear)) {
-    res.status(400).json({ error: 'السنة الدراسية يجب أن تكون من الفرقة الأولى إلى الرابعة.' });
-    return;
-  }
-
-  if (password.length < 4) {
-    res.status(400).json({ error: 'كلمة المرور يجب أن تكون 4 أحرف على الأقل.' });
-    return;
+function getSessionSigningSecret(): string {
+  const envSecret = (
+    process.env.SESSION_SECRET ||
+    process.env.JWT_SECRET ||
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.SUPABASE_SECRET_KEY ||
+    process.env.ADMIN_SECRET_CODE ||
+    ''
+  ).trim();
+  if (envSecret) {
+    return crypto.createHash('sha256').update(`mvia-jwt:${envSecret}`).digest('hex');
   }
 
   const store = db.get();
-  const cleanPhone = phone.trim();
-  const cleanName = name.trim();
+  if (!store.platformConfig) {
+    store.platformConfig = { whatsappNumber: '01159637247', telegramUrl: '' };
+  }
+  if (!store.platformConfig.sessionSigningSecret) {
+    store.platformConfig.sessionSigningSecret = crypto.randomBytes(32).toString('hex');
+    db.save();
+  }
+  return store.platformConfig.sessionSigningSecret;
+}
 
-  if (store.users.some((u) => u.phone === cleanPhone)) {
-    res.status(409).json({ error: 'رقم التليفون مسجل بالفعل في المنصة.' });
-    return;
+function toBase64Url(input: Buffer | string): string {
+  const buf = typeof input === 'string' ? Buffer.from(input, 'utf-8') : input;
+  return buf.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+}
+
+function fromBase64Url(input: string): string {
+  const padded = input.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((input.length + 3) % 4);
+  return Buffer.from(padded, 'base64').toString('utf-8');
+}
+
+interface SessionJwtPayload {
+  sid: string;
+  sub: string;
+  iat: number;
+  iatMs?: number;
+  exp: number;
+}
+
+function signSessionJwt(userId: string, sid: string): string {
+  const nowMs = Date.now();
+  const nowSec = Math.floor(nowMs / 1000);
+  const header = toBase64Url(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+  const payload: SessionJwtPayload = {
+    sid,
+    sub: userId,
+    iat: nowSec,
+    iatMs: nowMs,
+    exp: nowSec + ONE_YEAR_SECONDS,
+  };
+  const encodedPayload = toBase64Url(JSON.stringify(payload));
+  const data = `${header}.${encodedPayload}`;
+  const sig = toBase64Url(
+    crypto.createHmac('sha256', getSessionSigningSecret()).update(data).digest()
+  );
+  return `${data}.${sig}`;
+}
+
+export function verifySessionJwt(token: string): SessionJwtPayload | null {
+  const parts = token.split('.');
+  if (parts.length !== 3) return null;
+  const [header, encodedPayload, sig] = parts;
+  if (!header || !encodedPayload || !sig) return null;
+
+  const data = `${header}.${encodedPayload}`;
+  const expectedSig = toBase64Url(
+    crypto.createHmac('sha256', getSessionSigningSecret()).update(data).digest()
+  );
+  const sigBuf = Buffer.from(sig);
+  const expectedBuf = Buffer.from(expectedSig);
+  if (sigBuf.length !== expectedBuf.length || !crypto.timingSafeEqual(sigBuf, expectedBuf)) {
+    return null;
   }
 
-  if (store.users.some((u) => (u.email || '').toLowerCase() === cleanEmail)) {
-    res.status(409).json({ error: 'البريد الإلكتروني مسجل بالفعل في المنصة.' });
-    return;
+  try {
+    const parsed = JSON.parse(fromBase64Url(encodedPayload)) as Partial<SessionJwtPayload>;
+    if (!parsed.sub || !parsed.sid || !parsed.exp || !parsed.iat) return null;
+    if (Date.now() >= parsed.exp * 1000) return null;
+    return parsed as SessionJwtPayload;
+  } catch {
+    return null;
+  }
+}
+
+function getTokenSessionId(token: string): string {
+  const jwt = verifySessionJwt(token);
+  if (jwt?.sid) return jwt.sid;
+  return crypto.createHash('sha256').update(token).digest('hex').slice(0, 24);
+}
+
+function recordRevokedSessionId(token: string): void {
+  const store = db.get();
+  if (!Array.isArray(store.revokedSessionIds)) {
+    store.revokedSessionIds = [];
+  }
+  const sid = getTokenSessionId(token);
+  if (!store.revokedSessionIds.includes(sid)) {
+    store.revokedSessionIds.push(sid);
+    if (store.revokedSessionIds.length > 500) {
+      store.revokedSessionIds = store.revokedSessionIds.slice(-500);
+    }
+  }
+}
+
+function parseCookies(cookieHeader?: string): Record<string, string> {
+  const result: Record<string, string> = {};
+  if (!cookieHeader) return result;
+  for (const part of cookieHeader.split(';')) {
+    const eqIdx = part.indexOf('=');
+    if (eqIdx === -1) continue;
+    const key = part.slice(0, eqIdx).trim();
+    const val = part.slice(eqIdx + 1).trim();
+    if (key) {
+      try {
+        result[key] = decodeURIComponent(val);
+      } catch {
+        result[key] = val;
+      }
+    }
+  }
+  return result;
+}
+
+export function extractAuthToken(req: Request): string | undefined {
+  const authHeader = req.headers.authorization;
+  if (typeof authHeader === 'string' && authHeader.toLowerCase().startsWith('bearer ')) {
+    const bearer = authHeader.slice(7).trim();
+    if (bearer) return bearer;
   }
 
-  const isOwnerEmail = cleanEmail === SUPER_ADMIN_EMAIL.toLowerCase();
-  const isFirstAccount = store.users.length === 0 || isOwnerEmail;
+  const cookies = parseCookies(req.headers.cookie);
+  const cookieToken = cookies[SESSION_COOKIE_NAME];
+  if (cookieToken && cookieToken.trim()) {
+    return cookieToken.trim();
+  }
 
-  let role: UserRole = 'student';
-  let isProtected = false;
-  let adminRankId: string | undefined;
+  return undefined;
+}
 
-  if (isFirstAccount) {
-    role = 'admin';
-    isProtected = true;
-    adminRankId = 'rank-super-admin';
-  } else if (adminCode && adminCode.trim().length > 0) {
-    const cleanCode = adminCode.trim();
-    const configuredSecret = getAdminSecretCode();
-    const customHash = store.platformConfig?.adminActivationPasswordHash;
+export function getUserByToken(token?: string): User | undefined {
+  if (!token) return undefined;
+  const store = db.get();
+  const session = store.sessions.find((s) => s.token === token);
+  if (session) {
+    return store.users.find((u) => u.id === session.userId);
+  }
 
-    if (configuredSecret && cleanCode === configuredSecret) {
-      role = 'admin';
-      isProtected = true;
-      adminRankId = 'rank-super-admin';
-    } else if (customHash && verifyPassword(cleanCode, customHash)) {
-      const configuredRankId =
-        store.platformConfig?.adminActivationDefaultRankId || 'rank-deputy-director';
-      const validRank = (store.adminRanks || []).find(
-        (r) => r.id === configuredRankId && !r.isSuperAdminRank && r.id !== 'rank-super-admin'
-      );
-      role = 'admin';
-      isProtected = false;
-      adminRankId = validRank ? validRank.id : 'rank-deputy-director';
-    } else if (!configuredSecret && !customHash) {
-      res.status(403).json({ error: 'تسجيل الأدمن بالكود غير مفعّل حالياً على الخادم.' });
-      return;
-    } else {
-      res.status(403).json({ error: 'كود أو كلمة سر تفعيل الأدمن غير صحيحة.' });
-      return;
+  // Fallback to stateless JWT signature check when DB snapshot lagged
+  const jwt = verifySessionJwt(token);
+  if (jwt) {
+    if (store.revokedSessionIds?.includes(jwt.sid)) return undefined;
+    const user = store.users.find((u) => u.id === jwt.sub);
+    if (!user) return undefined;
+    const issuedAtMs = jwt.iatMs ?? jwt.iat * 1000;
+    if (user.sessionsRevokedBefore && issuedAtMs < user.sessionsRevokedBefore) {
+      return undefined;
+    }
+    return user;
+  }
+
+  return undefined;
+}
+
+export async function resolveUserByToken(token?: string): Promise<User | undefined> {
+  if (!token) return undefined;
+  const store = db.get();
+
+  const localSession = store.sessions.find((s) => s.token === token);
+  if (localSession) {
+    if (localSession.expiresAt) {
+      const expMs = new Date(localSession.expiresAt).getTime();
+      if (Number.isFinite(expMs) && expMs <= Date.now()) {
+        await revokeSessionToken(token);
+        return undefined;
+      }
+    }
+    let user = store.users.find((u) => u.id === localSession.userId);
+    if (!user && isSupabaseDbEnabled()) {
+      const remoteUser = await findUserInSupabase(localSession.userId);
+      if (remoteUser) {
+        store.users.push(remoteUser);
+        user = remoteUser;
+      }
+    }
+    if (user) return user;
+  }
+
+  // Check persistent Supabase public.sessions table directly (immune to snapshot races/cold starts)
+  if (isSupabaseDbEnabled()) {
+    const remoteSession = await findSessionInSupabase(token);
+    if (remoteSession) {
+      let user = store.users.find((u) => u.id === remoteSession.userId);
+      if (!user) {
+        const remoteUser = await findUserInSupabase(remoteSession.userId);
+        if (remoteUser) {
+          store.users.push(remoteUser);
+          user = remoteUser;
+        }
+      }
+      if (user) {
+        if (!store.sessions.some((s) => s.token === token)) {
+          store.sessions.push({
+            token: remoteSession.token,
+            userId: remoteSession.userId,
+            createdAt: remoteSession.createdAt,
+            expiresAt: remoteSession.expiresAt,
+          });
+        }
+        return user;
+      }
     }
   }
 
-  const nowIso = new Date().toISOString();
-  const newUser: User = {
-    id: `user-${crypto.randomUUID()}`,
-    name: cleanName,
-    email: cleanEmail,
-    phone: cleanPhone,
-    passwordHash: hashPassword(password),
-    year: parsedYear,
-    role,
-    adminRankId,
-    isProtected,
-    points: 0,
-    quizzesCompleted: 0,
-    emailVerified: false,
-    lastLoginAt: nowIso,
-    createdAt: nowIso,
-  };
+  // Stateless signed JWT fallback (if session row wasn't flushed before deploy/cold start)
+  const jwt = verifySessionJwt(token);
+  if (jwt) {
+    if (store.revokedSessionIds?.includes(jwt.sid)) {
+      return undefined;
+    }
+    let user = store.users.find((u) => u.id === jwt.sub);
+    if (!user && isSupabaseDbEnabled()) {
+      const remoteUser = await findUserInSupabase(jwt.sub);
+      if (remoteUser) {
+        store.users.push(remoteUser);
+        user = remoteUser;
+      }
+    }
+    if (!user) return undefined;
+    const issuedAtMs = jwt.iatMs ?? jwt.iat * 1000;
+    if (user.sessionsRevokedBefore && issuedAtMs < user.sessionsRevokedBefore) {
+      return undefined;
+    }
+    if (!store.sessions.some((s) => s.token === token)) {
+      store.sessions.push({
+        token,
+        userId: user.id,
+        createdAt: new Date(issuedAtMs).toISOString(),
+        expiresAt: new Date(jwt.exp * 1000).toISOString(),
+      });
+    }
+    return user;
+  }
 
-  store.users.push(newUser);
+  return undefined;
+}
+
+export function createSessionToken(userId: string): string {
+  const sid = crypto.randomBytes(16).toString('hex');
+  const token = signSessionJwt(userId, sid);
+  const now = Date.now();
+  const createdAt = new Date(now).toISOString();
+  const expiresAt = new Date(now + ONE_YEAR_MS).toISOString();
+  const store = db.get();
+  store.sessions.push({
+    token,
+    userId,
+    createdAt,
+    expiresAt,
+  });
   db.save();
 
-  const token = createSessionToken(newUser.id);
-  setSessionCookie(req, res, token);
-  res.status(201).json({
-    token,
-    user: toSafeUser(newUser),
-  });
-});
-
-router.post('/auth/login', loginRateLimiter, (req, res) => {
-  const { identifier, password } = req.body as {
-    identifier?: string;
-    password?: string;
-  };
-
-  if (!identifier?.trim() || !password) {
-    res.status(400).json({ error: 'يرجى إدخال البريد الإلكتروني أو رقم التليفون وكلمة المرور.' });
-    return;
+  if (isSupabaseDbEnabled()) {
+    const user = store.users.find((u) => u.id === userId);
+    void (async () => {
+      if (user) await upsertUserToSupabase(user);
+      await persistSessionToSupabase({ token, userId, createdAt, expiresAt });
+    })();
   }
 
-  const clean = identifier.trim().toLowerCase();
-  const lockout = checkLoginLockout(clean);
-  if (lockout.locked) {
-    const minutes = Math.max(1, Math.ceil(lockout.retryAfterSeconds / 60));
-    res.setHeader('Retry-After', String(lockout.retryAfterSeconds));
-    res.status(429).json({
-      error: `تم قفل المحاولة مؤقتاً بسبب تكرار كلمات مرور خاطئة. حاول بعد ${minutes} دقيقة.`,
-      retryAfterSeconds: lockout.retryAfterSeconds,
-    });
-    return;
-  }
+  return token;
+}
 
+export async function createPersistentSession(userId: string): Promise<string> {
+  const sid = crypto.randomBytes(16).toString('hex');
+  const token = signSessionJwt(userId, sid);
+  const now = Date.now();
+  const createdAt = new Date(now).toISOString();
+  const expiresAt = new Date(now + ONE_YEAR_MS).toISOString();
   const store = db.get();
-  const user = store.users.find(
-    (u) =>
-      u.phone === identifier.trim() ||
-      (u.email || '').toLowerCase() === clean ||
-      u.name.toLowerCase() === clean
-  );
+  store.sessions.push({
+    token,
+    userId,
+    createdAt,
+    expiresAt,
+  });
+  db.save();
 
-  if (!user || !verifyPassword(password, user.passwordHash)) {
-    const failState = recordFailedLogin(clean);
-    if (failState.locked) {
-      res.setHeader('Retry-After', String(failState.retryAfterSeconds));
-      res.status(429).json({
-        error: 'تم قفل تسجيل الدخول لهذا الحساب لمدة 15 دقيقة بعد 5 محاولات خاطئة متتالية.',
-        retryAfterSeconds: failState.retryAfterSeconds,
+  if (isSupabaseDbEnabled()) {
+    const user = store.users.find((u) => u.id === userId);
+    if (user) {
+      await upsertUserToSupabase(user);
+    }
+    await persistSessionToSupabase({ token, userId, createdAt, expiresAt });
+    await db.flushRemoteIfDirty();
+  }
+
+  return token;
+}
+
+export async function revokeSessionToken(token?: string): Promise<void> {
+  if (!token) return;
+  const store = db.get();
+  store.sessions = store.sessions.filter((s) => s.token !== token);
+  recordRevokedSessionId(token);
+  db.save();
+
+  if (isSupabaseDbEnabled()) {
+    await deleteSessionFromSupabase(token);
+    await db.flushRemoteIfDirty();
+  }
+}
+
+export async function revokeUserSessions(
+  userId: string,
+  exceptToken?: string
+): Promise<void> {
+  const store = db.get();
+  store.sessions = store.sessions.filter(
+    (s) => s.userId !== userId || (exceptToken ? s.token === exceptToken : false)
+  );
+  if (!exceptToken) {
+    const user = store.users.find((u) => u.id === userId);
+    if (user) {
+      user.sessionsRevokedBefore = Date.now();
+    }
+  }
+  db.save();
+
+  if (isSupabaseDbEnabled()) {
+    await deleteUserSessionsFromSupabase(userId, exceptToken);
+    await db.flushRemoteIfDirty();
+  }
+}
+
+export async function revokeNonAdminSessions(
+  adminUserIds: Set<string>
+): Promise<{ revokedSessionsCount: number; affectedUsersCount: number; keptAdminSessionsCount: number }> {
+  const store = db.get();
+  const nowMs = Date.now();
+
+  const beforeCount = store.sessions.length;
+  const affectedUsers = new Set<string>();
+  const keptSessions = store.sessions.filter((s) => {
+    if (adminUserIds.has(s.userId)) return true;
+    affectedUsers.add(s.userId);
+    return false;
+  });
+
+  for (const user of store.users) {
+    if (!adminUserIds.has(user.id)) {
+      user.sessionsRevokedBefore = nowMs;
+    }
+  }
+
+  const revokedSessionsCount = beforeCount - keptSessions.length;
+  store.sessions = keptSessions;
+  db.save();
+
+  if (isSupabaseDbEnabled()) {
+    await deleteNonAdminSessionsFromSupabase(Array.from(adminUserIds));
+    await db.flushRemoteIfDirty();
+  }
+
+  return {
+    revokedSessionsCount,
+    affectedUsersCount: affectedUsers.size,
+    keptAdminSessionsCount: keptSessions.length,
+  };
+}
+
+function isSecureRequest(req: Request): boolean {
+  if (req.secure) return true;
+  const proto = req.headers['x-forwarded-proto'];
+  if (typeof proto === 'string') {
+    return proto.split(',')[0].trim().toLowerCase() === 'https';
+  }
+  return false;
+}
+
+export function setSessionCookie(req: Request, res: Response, token: string): void {
+  const parts = [
+    `${SESSION_COOKIE_NAME}=${encodeURIComponent(token)}`,
+    'Path=/',
+    'HttpOnly',
+    'SameSite=Lax',
+    `Max-Age=${ONE_YEAR_SECONDS}`,
+  ];
+  if (isSecureRequest(req)) {
+    parts.push('Secure');
+  }
+  res.setHeader('Set-Cookie', parts.join('; '));
+  res.setHeader('Cache-Control', 'no-store, private');
+}
+
+export function clearSessionCookie(req: Request, res: Response): void {
+  const parts = [
+    `${SESSION_COOKIE_NAME}=`,
+    'Path=/',
+    'HttpOnly',
+    'SameSite=Lax',
+    'Max-Age=0',
+  ];
+  if (isSecureRequest(req)) {
+    parts.push('Secure');
+  }
+  res.setHeader('Set-Cookie', parts.join('; '));
+  res.setHeader('Cache-Control', 'no-store, private');
+}
+
+export async function requireAuth(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const token = extractAuthToken(req);
+    if (!token) {
+      res.status(401).json({ error: 'يرجى تسجيل الدخول أولاً.' });
+      return;
+    }
+
+    const user = await resolveUserByToken(token);
+    if (!user) {
+      res.status(401).json({ error: 'انتهت صلاحية الجلسة، يرجى تسجيل الدخول مجدداً.' });
+      return;
+    }
+
+    if (user.isSuspended && !user.isProtected && user.role !== 'admin') {
+      res.status(403).json({
+        suspended: true,
+        error:
+          'تم حظر حسابك مؤقتاً لمخالفة الشروط والأحكام، ولا يمكن الدخول إلا بإذن وموافقة من الأدمن.',
       });
       return;
     }
-    res.status(401).json({
-      error: `بيانات الدخول غير صحيحة. المحاولات المتبقية: ${failState.remainingAttempts}.`,
-    });
+
+    req.currentUser = user;
+    req.authToken = token;
+    next();
+  } catch (err) {
+    next(err);
+  }
+}
+
+export function requireAdmin(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): void {
+  if (!req.currentUser || req.currentUser.role !== 'admin') {
+    res.status(403).json({ error: 'هذه الصلاحية مخصصة للإدارة (Admin) فقط.' });
     return;
   }
+  next();
+}
 
-  if (user.isSuspended && !user.isProtected && user.role !== 'admin') {
-    res.status(403).json({
-      suspended: true,
-      error:
-        'تم حظر حسابك مؤقتاً لمخالفة الشروط والأحكام، ولا يمكنك الدخول مجدداً إلا بإذن وموافقة من الأدمن.',
-    });
+export function requireSuperAdmin(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): void {
+  if (!isUserSuperAdmin(req.currentUser)) {
+    res.status(403).json({ error: 'هذه الصلاحية حصرية للمدير العام (Super Admin) فقط.' });
     return;
   }
+  next();
+}
 
-  if ((user.email || '').toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) {
-    user.role = 'admin';
-    user.isProtected = true;
-    user.adminRankId = 'rank-super-admin';
-  }
-
-  clearLoginFailures(clean);
-  user.lastLoginAt = new Date().toISOString();
-  db.save();
-  const token = createSessionToken(user.id);
-  setSessionCookie(req, res, token);
-  res.json({
-    token,
-    user: toSafeUser(user),
-  });
-});
-
-router.post('/auth/logout', requireAuth, (req: AuthenticatedRequest, res) => {
-  const store = db.get();
-  store.sessions = store.sessions.filter((s) => s.token !== req.authToken);
-  db.save();
-  clearSessionCookie(req, res);
-  res.json({ ok: true });
-});
-
-router.get('/auth/me', requireAuth, (req: AuthenticatedRequest, res) => {
-  if (req.authToken) {
-    setSessionCookie(req, res, req.authToken);
-  }
-  res.json({
-    token: req.authToken,
-    user: toSafeUser(req.currentUser!),
-  });
-});
-
-router.get('/users', requireAuth, (req: AuthenticatedRequest, res) => {
-  const yearParam = req.query.year ? Number(req.query.year) : 0;
-  const store = db.get();
-  const canViewSensitive = hasUserPermission(req.currentUser, 'view_sensitive_data');
-  let users = store.users.map((u) =>
-    canViewSensitive ? toSafeUser(u) : toLeaderboardUser(u)
-  );
-  if (yearParam >= 1 && yearParam <= 4) {
-    users = users.filter((u) => u.year === yearParam);
-  }
-  users.sort((a, b) => b.points - a.points);
-  res.json({ users });
-});
-
-router.get('/admin/users', requireAuth, requireAnyPermission('manage_students', 'manage_user_notes'), (req: AuthenticatedRequest, res) => {
-  const store = db.get();
-  const allUsers = store.users;
-  const canViewSensitive = hasUserPermission(req.currentUser, 'view_sensitive_data');
-
-  const stats = {
-    totalUsers: allUsers.length,
-    activeUsers: allUsers.filter((u) => !u.isSuspended).length,
-    suspendedUsers: allUsers.filter((u) => Boolean(u.isSuspended)).length,
-    studentsCount: allUsers.filter((u) => u.role === 'student').length,
-    teachersCount: allUsers.filter((u) => u.role === 'teacher').length,
-    adminsCount: allUsers.filter((u) => u.role === 'admin').length,
-  };
-
-  const filtered = filterAndSortAdminUsers(
-    allUsers,
-    req.query as Record<string, unknown>
-  );
-
-  const page = Math.max(1, Number(req.query.page) || 1);
-  const limit = Math.max(1, Math.min(100, Number(req.query.limit) || 10));
-  const totalFiltered = filtered.length;
-  const totalPages = Math.max(1, Math.ceil(totalFiltered / limit));
-  const safePage = Math.min(page, totalPages);
-  const offset = (safePage - 1) * limit;
-  const paginated = filtered.slice(offset, offset + limit).map((u) => {
-    const safe = toSafeUser(u);
-    if (!canViewSensitive) {
-      return {
-        ...safe,
-        email: maskEmail(safe.email),
-        phone: maskPhone(safe.phone),
-      };
+export function requirePermission(permission: AdminPermissionKey) {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+    if (!hasUserPermission(req.currentUser, permission)) {
+      res.status(403).json({ error: 'ليس لديك الصلاحية المطلوبة لتنفيذ هذا الإجراء.' });
+      return;
     }
-    return safe;
-  });
+    next();
+  };
+}
 
-  res.json({
-    users: paginated,
-    pagination: {
-      page: safePage,
-      limit,
-      totalFiltered,
-      totalPages,
-    },
-    stats,
-  });
-});
+export function requireAnyPermission(...permissions: AdminPermissionKey[]) {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+    if (!permissions.some((p) => hasUserPermission(req.currentUser, p))) {
+      res.status(403).json({ error: 'ليس لديك أي من الصلاحيات المطلوبة للوصول إلى هذا القسم.' });
+      return;
+    }
+    next();
+  };
+}
 
-router.post('/admin/users/:id/suspend', requireAuth, requirePermission('manage_students'), (req: AuthenticatedRequest, res) => {
-  const targetId = req.params.id;
-  const { reason } = req.body as { reason?: string };
-  const store = db.get();
-  const target = store.users.find((u) => u.id === targetId);
-
-  if (!target) {
-    res.status(404).json({ error: 'المستخدم غير موجود.' });
-    return;
-  }
-
-  if (target.isProtected || target.role === 'admin' || target.id === req.currentUser!.id) {
-    res.status(403).json({ error: 'حساب الأدمن محمي ولا يمكن تعليقه.' });
-    return;
-  }
-
-  const finalReason = reason?.trim() || 'تجاوز الحدود ومخالفة الشروط والأحكام';
-  target.isSuspended = true;
-  target.suspendedReason = finalReason;
-  target.suspendedAt = new Date().toISOString();
-  store.sessions = store.sessions.filter((s) => s.userId !== targetId);
-  db.save();
-
-  recordAdminAudit({
-    actorId: req.currentUser!.id,
-    actorName: req.currentUser!.name,
-    action: 'user.suspend',
-    targetUserId: targetId,
-    targetUserName: target.name,
-    details: `Suspended user: ${finalReason}`,
-    ip: getClientIp(req),
-  });
-
-  res.json({ ok: true, user: toSafeUser(target) });
-});
-
-router.post('/admin/users/:id/unsuspend', requireAuth, requirePermission('manage_students'), (req: AuthenticatedRequest, res) => {
-  const targetId = req.params.id;
-  const store = db.get();
-  const target = store.users.find((u) => u.id === targetId);
-
-  if (!target) {
-    res.status(404).json({ error: 'المستخدم غير موجود.' });
-    return;
-  }
-
-  target.isSuspended = false;
-  target.suspendedReason = undefined;
-  target.suspendedAt = undefined;
-  db.save();
-
-  recordAdminAudit({
-    actorId: req.currentUser!.id,
-    actorName: req.currentUser!.name,
-    action: 'user.unsuspend',
-    targetUserId: targetId,
-    targetUserName: target.name,
-    details: 'Lifted suspension and restored user access',
-    ip: getClientIp(req),
-  });
-
-  res.json({ ok: true, user: toSafeUser(target) });
-});
-
-export default router;

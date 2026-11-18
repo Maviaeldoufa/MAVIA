@@ -68,3 +68,39 @@
     scroll-behavior: auto !important;
   }
 }
+
+.mvia-protected {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.mvia-protected input,
+.mvia-protected textarea,
+.mvia-protected select,
+.mvia-protected [contenteditable="true"] {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+@media print {
+  body * {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  body::before {
+    content: "ممنوع طباعة أو التقاط شاشة محتوى منصة MAVIA";
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ef4444;
+    background: #09090b;
+    text-align: center;
+    padding: 2rem;
+  }
+}
+

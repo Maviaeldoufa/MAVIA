@@ -121,6 +121,7 @@ export interface User {
   emailVerified?: boolean;
   emailVerificationTokenHash?: string;
   emailVerificationExpiresAt?: string;
+  sessionsRevokedBefore?: number;
   lastLoginAt?: string;
   createdAt: string;
 }
@@ -392,6 +393,7 @@ export interface PlatformConfig {
   adminActivationPasswordHash?: string;
   adminActivationPasswordUpdatedAt?: string;
   adminActivationDefaultRankId?: string;
+  sessionSigningSecret?: string;
 }
 
 export interface LearningLink {
@@ -472,6 +474,7 @@ export interface SessionRecord {
   token: string;
   userId: string;
   createdAt: string;
+  expiresAt?: string;
 }
 
 export interface SupportTicket {
@@ -499,6 +502,8 @@ export interface AppErrorLog {
   path?: string;
   userId?: string;
   stack?: string;
+  notifyAdmin?: boolean;
+  resolved?: boolean;
   createdAt: string;
 }
 
@@ -545,6 +550,7 @@ export interface AdminAuditLog {
 export interface DatabaseSchema {
   users: User[];
   sessions: SessionRecord[];
+  revokedSessionIds?: string[];
   courses: Course[];
   folders?: CourseFolder[];
   summaries: SummaryItem[];

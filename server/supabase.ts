@@ -1,5 +1,5 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import type { DatabaseSchema } from './types.js';
+import type { AcademicYear, DatabaseSchema, User, UserRole } from './types.js';
 
 let cachedClient: SupabaseClient | null = null;
 let cachedKeySignature = '';
@@ -146,3 +146,188 @@ export async function saveStateToSupabase(
     return false;
   }
 }
+
+export async function upsertUserToSupabase(user: User): Promise<void> {
+  if (!isSupabaseDbEnabled()) return;
+  const supabase = getSupabaseAdminClient();
+  if (!supabase) return;
+
+  try {
+    await supabase.from('users').upsert(
+      {
+        id: user.id,
+        name: user.name,
+        email: user.email || null,
+        phone: user.phone || null,
+        password_hash: user.passwordHash,
+        year: user.year,
+        role: user.role,
+        admin_rank_id: user.adminRankId || null,
+        is_protected: Boolean(user.isProtected),
+        is_suspended: Boolean(user.isSuspended),
+        suspended_reason: user.suspendedReason || null,
+        suspended_at: user.suspendedAt || null,
+        points: user.points || 0,
+        quizzes_completed: user.quizzesCompleted || 0,
+        email_verified: Boolean(user.emailVerified),
+        last_login_at: user.lastLoginAt || null,
+        created_at: user.createdAt,
+      },
+      { onConflict: 'id' }
+    );
+  } catch {
+    // Non-fatal fallback: app_state_snapshot remains active
+  }
+}
+
+export async function persistSessionToSupabase(session: {
+  token: string;
+  userId: string;
+  createdAt: string;
+  expiresAt?: string;
+}): Promise<void> {
+  if (!isSupabaseDbEnabled()) return;
+  const supabase = getSupabaseAdminClient();
+  if (!supabase) return;
+
+  try {
+    await supabase.from('sessions').upsert(
+      {
+        token: session.token,
+        user_id: session.userId,
+        created_at: session.createdAt,
+        expires_at: session.expiresAt || null,
+      },
+      { onConflict: 'token' }
+    );
+  } catch {
+    // Non-fatal fallback: app_state_snapshot & signed JWT remain active
+  }
+}
+
+export async function deleteSessionFromSupabase(token: string): Promise<void> {
+  if (!isSupabaseDbEnabled() || !token) return;
+  const supabase = getSupabaseAdminClient();
+  if (!supabase) return;
+
+  try {
+    await supabase.from('sessions').delete().eq('token', token);
+  } catch {
+    // Non-fatal
+  }
+}
+
+export async function deleteUserSessionsFromSupabase(
+  userId: string,
+  exceptToken?: string
+): Promise<void> {
+  if (!isSupabaseDbEnabled() || !userId) return;
+  const supabase = getSupabaseAdminClient();
+  if (!supabase) return;
+
+  try {
+    let query = supabase.from('sessions').delete().eq('user_id', userId);
+    if (exceptToken) {
+      query = query.neq('token', exceptToken);
+    }
+    await query;
+  } catch {
+    // Non-fatal
+  }
+}
+
+export async function deleteNonAdminSessionsFromSupabase(
+  adminUserIds: string[]
+): Promise<void> {
+  if (!isSupabaseDbEnabled()) return;
+  const supabase = getSupabaseAdminClient();
+  if (!supabase) return;
+
+  try {
+    if (adminUserIds.length === 0) {
+      await supabase.from('sessions').delete().neq('token', '');
+      return;
+    }
+    const quotedList = `(${adminUserIds.map((id) => `"${id.replace(/"/g, '')}"`).join(',')})`;
+    await supabase.from('sessions').delete().not('user_id', 'in', quotedList);
+  } catch {
+    // Non-fatal
+  }
+}
+
+export async function findSessionInSupabase(token: string): Promise<{
+  token: string;
+  userId: string;
+  createdAt: string;
+  expiresAt?: string;
+} | null> {
+  if (!isSupabaseDbEnabled() || !token) return null;
+  const supabase = getSupabaseAdminClient();
+  if (!supabase) return null;
+
+  try {
+    const { data, error } = await supabase
+      .from('sessions')
+      .select('token, user_id, created_at, expires_at')
+      .eq('token', token)
+      .maybeSingle();
+
+    if (error || !data) return null;
+
+    if (data.expires_at) {
+      const expMs = new Date(data.expires_at as string).getTime();
+      if (Number.isFinite(expMs) && expMs <= Date.now()) {
+        void deleteSessionFromSupabase(token);
+        return null;
+      }
+    }
+
+    return {
+      token: String(data.token),
+      userId: String(data.user_id),
+      createdAt: String(data.created_at || new Date().toISOString()),
+      expiresAt: data.expires_at ? String(data.expires_at) : undefined,
+    };
+  } catch {
+    return null;
+  }
+}
+
+export async function findUserInSupabase(userId: string): Promise<User | null> {
+  if (!isSupabaseDbEnabled() || !userId) return null;
+  const supabase = getSupabaseAdminClient();
+  if (!supabase) return null;
+
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (error || !data) return null;
+
+    return {
+      id: String(data.id),
+      name: String(data.name || ''),
+      email: String(data.email || ''),
+      phone: String(data.phone || ''),
+      passwordHash: String(data.password_hash || ''),
+      year: (Number(data.year) || 1) as AcademicYear,
+      role: (data.role as UserRole) || 'student',
+      adminRankId: data.admin_rank_id ? String(data.admin_rank_id) : undefined,
+      isProtected: Boolean(data.is_protected),
+      isSuspended: Boolean(data.is_suspended),
+      suspendedReason: data.suspended_reason ? String(data.suspended_reason) : undefined,
+      suspendedAt: data.suspended_at ? String(data.suspended_at) : undefined,
+      points: Number(data.points || 0),
+      quizzesCompleted: Number(data.quizzes_completed || 0),
+      emailVerified: Boolean(data.email_verified),
+      lastLoginAt: data.last_login_at ? String(data.last_login_at) : undefined,
+      createdAt: String(data.created_at || new Date().toISOString()),
+    };
+  } catch {
+    return null;
+  }
+}
+
