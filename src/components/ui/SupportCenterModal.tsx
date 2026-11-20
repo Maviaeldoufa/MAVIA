@@ -178,9 +178,9 @@ export function SupportCenterModal({ open, onClose }: SupportCenterModalProps) {
       role="dialog"
       aria-modal="true"
       aria-labelledby="support-center-title"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-3 sm:p-5"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-2.5 sm:p-5"
     >
-      <div className="w-full max-w-4xl max-h-[90vh] flex flex-col rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/35 shadow-[0_24px_80px_rgba(0,0,0,0.85)] overflow-hidden">
+      <div className="w-full max-w-4xl max-h-[92dvh] flex flex-col rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/35 shadow-[0_24px_80px_rgba(0,0,0,0.85)] overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-4 border-b border-black/10 dark:border-white/10 bg-[#EFECE4] dark:bg-[#0D0D10]">
           <div className="flex items-center gap-3">

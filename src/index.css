@@ -14,8 +14,9 @@
 @layer base {
   html {
     font-family: "Cairo", system-ui, sans-serif;
-    font-size: clamp(16.75px, 0.16vw + 16.4px, 17.75px);
+    font-size: clamp(15px, 0.2vw + 14.6px, 17.5px);
     line-height: 1.66;
+    overflow-x: clip;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -30,6 +31,7 @@
 
   body {
     font-weight: 500;
+    overflow-x: clip;
   }
 
   button,
@@ -111,6 +113,15 @@ html.dark .text-\[\#71717A\] {
 
 .tabular-nums {
   font-variant-numeric: tabular-nums;
+}
+
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }
 
 .skip-to-content {

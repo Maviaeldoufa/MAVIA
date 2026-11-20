@@ -692,6 +692,7 @@ export function pushNotification(params: {
   year: AcademicYear | 0;
   userId?: string;
   comprehensiveExamId?: string;
+  expiresAt?: string;
   createdBy: string;
 }): NotificationItem {
   const store = db.get();
@@ -707,6 +708,7 @@ export function pushNotification(params: {
     year: params.year,
     userId: params.userId,
     comprehensiveExamId: params.comprehensiveExamId,
+    expiresAt: params.expiresAt,
     readBy: [],
     createdBy: params.createdBy,
     createdAt: new Date().toISOString(),

@@ -29,11 +29,12 @@ export function CommunitySection() {
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 p-2 rounded-2xl bg-white dark:bg-[#121216] border border-black/10 dark:border-white/10 w-fit">
+      <div className="flex items-center gap-2 p-1.5 sm:p-2 rounded-2xl bg-white dark:bg-[#121216] border border-black/10 dark:border-white/10 w-full sm:w-fit overflow-x-auto scrollbar-none flex-nowrap sm:flex-wrap">
         <GoldChip
           active={activeTab === 'chat'}
           layoutId="community-subtab"
           onClick={() => setActiveTab('chat')}
+          className="shrink-0 whitespace-nowrap"
         >
           <MessageSquare className="w-4 h-4" />
           <span>{tr('شات الدفعة المباشر', 'Live Batch Chat')}</span>
@@ -43,6 +44,7 @@ export function CommunitySection() {
           active={activeTab === 'groups'}
           layoutId="community-subtab"
           onClick={() => setActiveTab('groups')}
+          className="shrink-0 whitespace-nowrap"
         >
           <Users className="w-4 h-4" />
           <span>{tr('روابط الجروبات', 'Group Links')}</span>
@@ -52,6 +54,7 @@ export function CommunitySection() {
           active={activeTab === 'support'}
           layoutId="community-subtab"
           onClick={() => setActiveTab('support')}
+          className="shrink-0 whitespace-nowrap"
         >
           <LifeBuoy className="w-4 h-4" />
           <span>{tr('تذاكر الدعم والبلاغات', 'Support Tickets')}</span>
@@ -61,13 +64,14 @@ export function CommunitySection() {
           active={activeTab === 'ai'}
           layoutId="community-subtab"
           onClick={() => setActiveTab('ai')}
+          className="shrink-0 whitespace-nowrap"
         >
           <Bot className="w-4 h-4" />
           <span>{tr('شات بوت الذكاء الاصطناعي', 'AI Platform Guide')}</span>
         </GoldChip>
       </div>
 
-      <section className="rounded-2xl bg-white dark:bg-[#121216] border border-black/10 dark:border-white/10 p-5 sm:p-6">
+      <section className="rounded-2xl bg-white dark:bg-[#121216] border border-black/10 dark:border-white/10 p-3.5 sm:p-6">
         {activeTab === 'chat' && <BatchChatTab />}
         {activeTab === 'groups' && <GroupLinksTab />}
         {activeTab === 'support' && <SupportTicketsTab />}

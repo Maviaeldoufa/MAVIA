@@ -282,7 +282,7 @@ function MviaWorkspace() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F6F4EF] dark:bg-[#09090B] text-[#141418] dark:text-[#F5F0E6] flex flex-col relative overflow-x-hidden mvia-protected transition-colors duration-200">
+    <div className="min-h-screen bg-[#F6F4EF] dark:bg-[#09090B] text-[#141418] dark:text-[#F5F0E6] flex flex-col relative overflow-x-clip mvia-protected transition-colors duration-200">
       <AntiScreenshotGuard />
       <a href="#main-content" className="skip-to-content">
         {tr('تخطي إلى المحتوى الرئيسي', 'Skip to main content')}
@@ -308,7 +308,7 @@ function MviaWorkspace() {
 
       <main
         id="main-content"
-        className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-6 sm:py-8"
+        className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8"
       >
         <Suspense
           fallback={

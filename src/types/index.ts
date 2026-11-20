@@ -214,6 +214,7 @@ export interface Course {
   summariesCount?: number;
   quizzesCount?: number;
   foldersCount?: number;
+  mindMapsCount?: number;
 }
 
 export interface CourseFolder {
@@ -233,6 +234,7 @@ export interface CourseFolder {
   summariesCount?: number;
   quizzesCount?: number;
   assignmentsCount?: number;
+  mindMapsCount?: number;
   createdAt: string;
 }
 
@@ -266,6 +268,22 @@ export interface CourseAssignment {
   fileSize?: number;
   mimeType?: string;
   roleTag?: 'assignment' | 'submission';
+  createdBy: string;
+  createdById: string;
+  createdAt: string;
+}
+
+export interface CourseMindMap {
+  id: string;
+  courseId: string;
+  folderId?: string;
+  title: string;
+  description?: string;
+  fileType: 'pdf' | 'image';
+  fileUrl: string;
+  fileName?: string;
+  fileSize?: number;
+  mimeType?: string;
   createdBy: string;
   createdById: string;
   createdAt: string;
@@ -342,6 +360,7 @@ export interface NotificationItem {
   year: AcademicYear | 0;
   userId?: string;
   comprehensiveExamId?: string;
+  expiresAt?: string;
   read: boolean;
   createdBy: string;
   createdAt: string;
@@ -750,6 +769,8 @@ export interface ComprehensiveExamPublic {
   durationMinutes: number;
   targetYear: AcademicYear | 0;
   isActive: boolean;
+  announcementDurationMinutes?: number;
+  announcementExpiresAt?: string;
   questionsCount: number;
   totalPoints: number;
   createdBy: string;
@@ -804,6 +825,8 @@ export interface ComprehensiveExamAdmin {
   durationMinutes: number;
   targetYear: AcademicYear | 0;
   isActive: boolean;
+  announcementDurationMinutes?: number;
+  announcementExpiresAt?: string;
   questions: ComprehensiveQuestion[];
   createdBy: string;
   createdById: string;

@@ -178,9 +178,9 @@ export function AccountModal({ open, onClose }: AccountModalProps) {
       role="dialog"
       aria-modal="true"
       aria-label={tr('حسابي وإدارة البيانات الشخصية', 'My Account & Personal Data Management')}
-      className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4"
+      className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-2.5 sm:p-4"
     >
-      <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/40 p-5 sm:p-6 space-y-6 shadow-[0_24px_80px_rgba(0,0,0,0.85)]">
+      <div className="w-full max-w-2xl max-h-[92dvh] overflow-y-auto rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/40 p-4 sm:p-6 space-y-5 sm:space-y-6 shadow-[0_24px_80px_rgba(0,0,0,0.85)]">
         <div className="flex items-start justify-between gap-3 border-b border-black/10 dark:border-white/10 pb-4">
           <div className="flex items-center gap-2.5">
             <div className="p-2.5 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[#856104] dark:text-[#E5C158]">

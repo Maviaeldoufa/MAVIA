@@ -14,6 +14,23 @@ import type {
 
 const router = Router();
 
+function expireElapsedExamAnnouncements(exams?: ComprehensiveExam[]): boolean {
+  if (!Array.isArray(exams)) return false;
+  const nowMs = Date.now();
+  let changed = false;
+  for (const exam of exams) {
+    if (exam.isActive && exam.announcementExpiresAt) {
+      const expMs = new Date(exam.announcementExpiresAt).getTime();
+      if (Number.isFinite(expMs) && expMs <= nowMs) {
+        exam.isActive = false;
+        exam.closedAt = exam.announcementExpiresAt;
+        changed = true;
+      }
+    }
+  }
+  return changed;
+}
+
 function sanitizeExamForStudent(exam: ComprehensiveExam) {
   return {
     id: exam.id,
@@ -21,6 +38,8 @@ function sanitizeExamForStudent(exam: ComprehensiveExam) {
     durationMinutes: exam.durationMinutes,
     targetYear: exam.targetYear,
     isActive: exam.isActive,
+    announcementDurationMinutes: exam.announcementDurationMinutes,
+    announcementExpiresAt: exam.announcementExpiresAt,
     questionsCount: exam.questions.length,
     totalPoints: exam.questions.reduce((acc, q) => acc + (Number(q.points) || 1), 0),
     createdBy: exam.createdBy,
@@ -39,12 +58,19 @@ function sanitizeExamForStudent(exam: ComprehensiveExam) {
 // Public-to-logged-in-users: get active comprehensive exams visible in top news bar
 router.get('/comprehensive-exams/active', requireAuth, (req: AuthenticatedRequest, res) => {
   const store = db.get();
+  if (expireElapsedExamAnnouncements(store.comprehensiveExams)) {
+    db.save();
+  }
   const user = req.currentUser!;
-  const exams = (store.comprehensiveExams || []).filter(
-    (e) =>
-      e.isActive &&
-      (user.role === 'admin' || e.targetYear === 0 || e.targetYear === user.year)
-  );
+  const nowMs = Date.now();
+  const exams = (store.comprehensiveExams || []).filter((e) => {
+    if (!e.isActive) return false;
+    if (e.announcementExpiresAt) {
+      const expMs = new Date(e.announcementExpiresAt).getTime();
+      if (Number.isFinite(expMs) && expMs <= nowMs) return false;
+    }
+    return user.role === 'admin' || e.targetYear === 0 || e.targetYear === user.year;
+  });
   const submissions = store.comprehensiveSubmissions || [];
 
   const result = exams.map((exam) => {
@@ -237,6 +263,9 @@ router.get(
   requirePermission('manage_quizzes'),
   (_req, res) => {
     const store = db.get();
+    if (expireElapsedExamAnnouncements(store.comprehensiveExams)) {
+      db.save();
+    }
     const exams = [...(store.comprehensiveExams || [])].sort(
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
@@ -268,9 +297,16 @@ router.post(
   requireAdmin,
   requirePermission('manage_quizzes'),
   (req: AuthenticatedRequest, res) => {
-    const { subjectName, durationMinutes, targetYear, questions } = req.body as {
+    const {
+      subjectName,
+      durationMinutes,
+      announcementDurationMinutes,
+      targetYear,
+      questions,
+    } = req.body as {
       subjectName?: string;
       durationMinutes?: number;
+      announcementDurationMinutes?: number;
       targetYear?: number;
       questions?: Array<{
         type?: ComprehensiveQuestionType;
@@ -288,6 +324,13 @@ router.post(
     }
 
     const duration = Math.max(1, Math.min(360, Number(durationMinutes) || 30));
+    const annDuration = Math.max(
+      1,
+      Math.min(43200, Math.round(Number(announcementDurationMinutes) || 1440))
+    );
+    const announcementExpiresAt = new Date(
+      Date.now() + annDuration * 60 * 1000
+    ).toISOString();
     const parsedYear = Number(targetYear || 0);
     const validYear = ([0, 1, 2, 3, 4].includes(parsedYear)
       ? parsedYear
@@ -375,6 +418,8 @@ router.post(
       durationMinutes: duration,
       targetYear: validYear,
       isActive: true,
+      announcementDurationMinutes: annDuration,
+      announcementExpiresAt,
       questions: normalizedQuestions,
       createdBy: req.currentUser!.name,
       createdById: req.currentUser!.id,
@@ -402,6 +447,7 @@ router.post(
       targetSection: 'home',
       year: validYear,
       comprehensiveExamId: exam.id,
+      expiresAt: announcementExpiresAt,
       createdBy: req.currentUser!.name,
     });
 
@@ -440,6 +486,9 @@ router.post(
   requirePermission('manage_quizzes'),
   (req, res) => {
     const { id } = req.params;
+    const { announcementDurationMinutes } = (req.body || {}) as {
+      announcementDurationMinutes?: number;
+    };
     const store = db.get();
     const exam = (store.comprehensiveExams || []).find((e) => e.id === id);
     if (!exam) {
@@ -447,8 +496,21 @@ router.post(
       return;
     }
 
+    const annDuration = Math.max(
+      1,
+      Math.min(
+        43200,
+        Math.round(
+          Number(announcementDurationMinutes) || exam.announcementDurationMinutes || 1440
+        )
+      )
+    );
     exam.isActive = true;
     exam.closedAt = undefined;
+    exam.announcementDurationMinutes = annDuration;
+    exam.announcementExpiresAt = new Date(
+      Date.now() + annDuration * 60 * 1000
+    ).toISOString();
     db.save();
 
     res.json({ exam });

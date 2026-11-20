@@ -194,6 +194,22 @@ export interface CourseAssignment {
   createdAt: string;
 }
 
+export interface CourseMindMap {
+  id: string;
+  courseId: string;
+  folderId?: string;
+  title: string;
+  description?: string;
+  fileType: 'pdf' | 'image';
+  fileUrl: string;
+  fileName?: string;
+  fileSize?: number;
+  mimeType?: string;
+  createdBy: string;
+  createdById: string;
+  createdAt: string;
+}
+
 export interface QuizQuestion {
   id: string;
   question: string;
@@ -278,6 +294,7 @@ export interface NotificationItem {
   year: AcademicYear | 0; // 0 = all years
   userId?: string; // Optional single-recipient target
   comprehensiveExamId?: string;
+  expiresAt?: string;
   readBy: string[];
   createdBy: string;
   createdAt: string;
@@ -301,6 +318,8 @@ export interface ComprehensiveExam {
   durationMinutes: number;
   targetYear: AcademicYear | 0; // 0 = all years
   isActive: boolean;
+  announcementDurationMinutes?: number;
+  announcementExpiresAt?: string;
   questions: ComprehensiveQuestion[];
   createdBy: string;
   createdById: string;
@@ -555,6 +574,7 @@ export interface DatabaseSchema {
   folders?: CourseFolder[];
   summaries: SummaryItem[];
   assignments?: CourseAssignment[];
+  mindMaps?: CourseMindMap[];
   quizzes: Quiz[];
   quizSubmissions: QuizSubmission[];
   announcements?: AnnouncementCountdown[];

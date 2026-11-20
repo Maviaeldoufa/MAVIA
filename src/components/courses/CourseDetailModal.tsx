@@ -19,6 +19,7 @@ import {
   GraduationCap,
   ImageOff,
   ImagePlus,
+  Network,
   Play,
   Plus,
   Shuffle,
@@ -35,6 +36,7 @@ import type {
   Course,
   CourseAssignment,
   CourseFolder,
+  CourseMindMap,
   Quiz,
   QuizDifficulty,
   QuizSubmission,
@@ -42,6 +44,7 @@ import type {
   SummaryItem,
 } from '../../types';
 import { apiRequest, resolveApiUrl } from '../../utils/api';
+import { hasAdminPermission } from '../../utils/permissions';
 import { CountdownTimer } from '../ui/CountdownTimer';
 import { GoldChip } from '../ui/GoldChip';
 import { buildPdfViewerHref } from '../ui/PdfViewerPage';
@@ -55,7 +58,14 @@ interface CourseDetailModalProps {
   onContentChanged: () => void;
 }
 
-type FolderSubTab = 'all' | 'books' | 'summaries' | 'quizzes' | 'tutor' | 'assignments';
+type FolderSubTab =
+  | 'all'
+  | 'books'
+  | 'summaries'
+  | 'mindmaps'
+  | 'quizzes'
+  | 'tutor'
+  | 'assignments';
 
 export function CourseDetailModal({
   courseId,
@@ -66,11 +76,13 @@ export function CourseDetailModal({
   const { user } = useAuth();
   const { tr, formatYear, isEn } = useLanguage();
   const isAdmin = user?.role === 'admin';
+  const canManageCourses = isAdmin && hasAdminPermission(user, 'manage_courses');
 
   const [course, setCourse] = useState<Course | null>(null);
   const [folders, setFolders] = useState<CourseFolder[]>([]);
   const [summaries, setSummaries] = useState<SummaryItem[]>([]);
   const [assignments, setAssignments] = useState<CourseAssignment[]>([]);
+  const [mindMaps, setMindMaps] = useState<CourseMindMap[]>([]);
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [submissions, setSubmissions] = useState<QuizSubmission[]>([]);
   const [enrolled, setEnrolled] = useState(false);
@@ -78,7 +90,7 @@ export function CourseDetailModal({
   const [loading, setLoading] = useState(true);
 
   const [activeTab, setActiveTab] = useState<
-    'folders' | 'summaries' | 'quizzes' | 'tutor'
+    'folders' | 'summaries' | 'mindmaps' | 'quizzes' | 'tutor'
   >('folders');
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(
     initialFolderId
@@ -132,6 +144,17 @@ export function CourseDetailModal({
   const [savingAssign, setSavingAssign] = useState(false);
   const [assignError, setAssignError] = useState<string | null>(null);
 
+  // Mind Maps ("خانة الخرائط الذهنية") state
+  const [showMindMapForm, setShowMindMapForm] = useState(false);
+  const [mindMapTitle, setMindMapTitle] = useState('');
+  const [mindMapDesc, setMindMapDesc] = useState('');
+  const [mindMapFolderId, setMindMapFolderId] = useState('');
+  const [mindMapFileType, setMindMapFileType] = useState<'image' | 'pdf'>('image');
+  const [mindMapFile, setMindMapFile] = useState<File | null>(null);
+  const [mindMapFilePreview, setMindMapFilePreview] = useState<string | null>(null);
+  const [savingMindMap, setSavingMindMap] = useState(false);
+  const [mindMapError, setMindMapError] = useState<string | null>(null);
+
   useEffect(() => {
     return () => {
       if (litFolderTimerRef.current !== null) {
@@ -159,6 +182,23 @@ export function CourseDetailModal({
     setAssignFilePreview(url);
     return () => URL.revokeObjectURL(url);
   }, [assignFile, assignMode]);
+
+  useEffect(() => {
+    if (!mindMapFile) {
+      setMindMapFilePreview(null);
+      return;
+    }
+    const isPdf =
+      mindMapFile.type === 'application/pdf' ||
+      mindMapFile.name.toLowerCase().endsWith('.pdf');
+    if (isPdf) {
+      setMindMapFilePreview(null);
+      return;
+    }
+    const url = URL.createObjectURL(mindMapFile);
+    setMindMapFilePreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [mindMapFile]);
 
   const recordFolderView = async (folderId: string) => {
     try {
@@ -189,6 +229,7 @@ export function CourseDetailModal({
     }, 650);
     setSelectedFolderId(folderId);
     setSumFolderId(folderId);
+    setMindMapFolderId(folderId);
     setFolderSubTab('all');
     void recordFolderView(folderId);
   };
@@ -201,6 +242,7 @@ export function CourseDetailModal({
         folders?: CourseFolder[];
         summaries: SummaryItem[];
         assignments?: CourseAssignment[];
+        mindMaps?: CourseMindMap[];
         quizzes: Quiz[];
         submissions: QuizSubmission[];
         enrolled?: boolean;
@@ -210,6 +252,7 @@ export function CourseDetailModal({
       setFolders(data.folders || []);
       setSummaries(data.summaries);
       setAssignments(data.assignments || []);
+      setMindMaps(data.mindMaps || []);
       setQuizzes(data.quizzes);
       setSubmissions(data.submissions);
       setEnrolled(Boolean(data.enrolled));
@@ -218,6 +261,7 @@ export function CourseDetailModal({
       if (initialFolderId && (data.folders || []).some((f) => f.id === initialFolderId)) {
         setSelectedFolderId(initialFolderId);
         setSumFolderId(initialFolderId);
+        setMindMapFolderId(initialFolderId);
         setActiveTab('folders');
         void recordFolderView(initialFolderId);
       }
@@ -391,6 +435,7 @@ export function CourseDetailModal({
       setFolders((prev) => prev.filter((f) => f.id !== folderId));
       setSummaries((prev) => prev.filter((s) => s.folderId !== folderId));
       setAssignments((prev) => prev.filter((a) => a.folderId !== folderId));
+      setMindMaps((prev) => prev.filter((m) => m.folderId !== folderId));
       setQuizzes((prev) => prev.filter((q) => q.folderId !== folderId));
       if (selectedFolderId === folderId) {
         setSelectedFolderId(null);
@@ -606,6 +651,64 @@ export function CourseDetailModal({
     }
   };
 
+  const handleUploadMindMap = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMindMapError(null);
+    if (!mindMapTitle.trim()) {
+      setMindMapError(tr('يرجى كتابة عنوان الخريطة الذهنية.', 'Please enter mind map title.'));
+      return;
+    }
+    if (!mindMapFile) {
+      setMindMapError(
+        tr('يرجى رفع صورة أو ملف PDF للخريطة الذهنية.', 'Please upload an image or PDF file.')
+      );
+      return;
+    }
+
+    setSavingMindMap(true);
+    try {
+      const fd = new FormData();
+      fd.append('title', mindMapTitle.trim());
+      if (mindMapDesc.trim()) fd.append('description', mindMapDesc.trim());
+      const effectiveFolderId = mindMapFolderId || selectedFolderId || '';
+      if (effectiveFolderId) fd.append('folderId', effectiveFolderId);
+      fd.append('file', mindMapFile);
+
+      const res = await apiRequest<{ mindMap: CourseMindMap }>(
+        `/api/courses/${courseId}/mind-maps`,
+        {
+          method: 'POST',
+          body: fd,
+        }
+      );
+
+      setMindMaps((prev) => [res.mindMap, ...prev]);
+      setMindMapTitle('');
+      setMindMapDesc('');
+      setMindMapFile(null);
+      setShowMindMapForm(false);
+      onContentChanged();
+    } catch (err) {
+      setMindMapError(
+        err instanceof Error
+          ? err.message
+          : tr('تعذر رفع الخريطة الذهنية.', 'Failed to upload mind map.')
+      );
+    } finally {
+      setSavingMindMap(false);
+    }
+  };
+
+  const handleDeleteMindMap = async (id: string) => {
+    try {
+      await apiRequest(`/api/mind-maps/${id}`, { method: 'DELETE' });
+      setMindMaps((prev) => prev.filter((m) => m.id !== id));
+      onContentChanged();
+    } catch {
+      // Ignore
+    }
+  };
+
   const visibleSummaries = selectedFolderId
     ? summaries.filter((s) => s.folderId === selectedFolderId)
     : summaries;
@@ -617,6 +720,9 @@ export function CourseDetailModal({
   const visibleAssignments = selectedFolderId
     ? assignments.filter((a) => a.folderId === selectedFolderId)
     : assignments;
+  const visibleMindMaps = selectedFolderId
+    ? mindMaps.filter((m) => m.folderId === selectedFolderId)
+    : mindMaps;
   const activeFolder = folders.find((f) => f.id === selectedFolderId) || null;
 
   const getDifficultyBadge = (diff?: QuizDifficulty) => {
@@ -1458,13 +1564,335 @@ export function CourseDetailModal({
     </div>
   );
 
+  const renderMindMapForm = () => (
+    <form
+      onSubmit={handleUploadMindMap}
+      className="p-4 sm:p-5 rounded-xl bg-[#F6F4EF] dark:bg-[#09090B] border border-[#D4AF37]/35 space-y-4"
+    >
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h4 className="font-display text-sm sm:text-base font-bold text-[#856104] dark:text-[#E5C158] flex items-center gap-2">
+          <Network className="w-4 h-4" />
+          <span>
+            {tr(
+              'إضافة خريطة ذهنية جديدة (عنوان + رفع صورة أو PDF)',
+              'Add Mind Map (Title + Upload Image or PDF)'
+            )}
+          </span>
+        </h4>
+        {showMindMapForm && (
+          <button
+            type="button"
+            onClick={() => setShowMindMapForm(false)}
+            className="text-xs text-[#5C5850] dark:text-[#A8A29E] hover:text-[#141418] dark:hover:text-white cursor-pointer"
+          >
+            {tr('إغلاق', 'Close')}
+          </button>
+        )}
+      </div>
+
+      {mindMapError && (
+        <div className="p-2.5 rounded-lg bg-red-50 dark:bg-red-950/50 border border-red-500/40 text-red-700 dark:text-red-200 text-xs">
+          {mindMapError}
+        </div>
+      )}
+
+      {/* Upload Type Selector: Image | PDF */}
+      <div className="flex flex-wrap items-center gap-2">
+        <GoldChip
+          type="button"
+          active={mindMapFileType === 'image'}
+          onClick={() => {
+            setMindMapFileType('image');
+            setMindMapFile(null);
+          }}
+          className="text-xs px-3.5 py-2"
+        >
+          <ImagePlus className="w-3.5 h-3.5" />
+          <span>{tr('رفع صورة', 'Upload Image')}</span>
+        </GoldChip>
+        <GoldChip
+          type="button"
+          active={mindMapFileType === 'pdf'}
+          onClick={() => {
+            setMindMapFileType('pdf');
+            setMindMapFile(null);
+          }}
+          className="text-xs px-3.5 py-2"
+        >
+          <FileUp className="w-3.5 h-3.5" />
+          <span>{tr('رفع ملف PDF', 'Upload PDF')}</span>
+        </GoldChip>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="space-y-1">
+          <label className="block text-xs font-semibold text-[#856104] dark:text-[#E5C158]">
+            {tr('العنوان', 'Title')}
+          </label>
+          <input
+            type="text"
+            required
+            value={mindMapTitle}
+            onChange={(e) => setMindMapTitle(e.target.value)}
+            placeholder={tr(
+              'عنوان الخريطة الذهنية (مثال: خريطة الفصل الأول)',
+              'Mind map title...'
+            )}
+            className="w-full px-3.5 py-2 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+          />
+        </div>
+
+        <div className="space-y-1">
+          <label className="block text-xs font-semibold text-[#856104] dark:text-[#E5C158]">
+            {tr('المجلد (اختياري)', 'Folder (optional)')}
+          </label>
+          <select
+            value={mindMapFolderId || selectedFolderId || ''}
+            onChange={(e) => setMindMapFolderId(e.target.value)}
+            className="w-full px-3.5 py-2 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+          >
+            <option value="">
+              {tr('رئيسي في مجلد المادة', 'Course Root')}
+            </option>
+            {folders.map((f) => (
+              <option key={f.id} value={f.id}>
+                {f.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <input
+        type="text"
+        value={mindMapDesc}
+        onChange={(e) => setMindMapDesc(e.target.value)}
+        placeholder={tr(
+          'وصف أو ملاحظة مختصرة للخريطة الذهنية (اختياري)',
+          'Optional notes or description...'
+        )}
+        className="w-full px-3.5 py-2 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+      />
+
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <label className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-[#F5F2EA] dark:bg-[#151519] border border-dashed border-[#D4AF37]/60 text-xs font-semibold text-[#735303] dark:text-[#F5D061] cursor-pointer hover:border-[#D4AF37] transition-colors">
+            {mindMapFileType === 'image' ? (
+              <ImagePlus className="w-4 h-4 shrink-0" />
+            ) : (
+              <FileUp className="w-4 h-4 shrink-0" />
+            )}
+            <span className="truncate max-w-[240px]">
+              {mindMapFile
+                ? `${tr('تم اختيار:', 'Selected:')} ${mindMapFile.name}`
+                : mindMapFileType === 'image'
+                ? tr('اختيار صورة من الجهاز (PNG / JPG / WEBP)', 'Choose Image from Device')
+                : tr('اختيار ملف PDF من الجهاز', 'Choose PDF from Device')}
+            </span>
+            <input
+              type="file"
+              accept={
+                mindMapFileType === 'image'
+                  ? 'image/*'
+                  : 'application/pdf,.pdf'
+              }
+              onChange={(e) => {
+                const picked = e.target.files?.[0] || null;
+                setMindMapFile(picked);
+                if (picked) {
+                  const isPdf =
+                    picked.type === 'application/pdf' ||
+                    picked.name.toLowerCase().endsWith('.pdf');
+                  setMindMapFileType(isPdf ? 'pdf' : 'image');
+                }
+              }}
+              className="sr-only"
+            />
+          </label>
+
+          {mindMapFilePreview && (
+            <img
+              src={mindMapFilePreview}
+              alt="Mind Map Preview"
+              className="h-14 w-20 object-cover rounded-lg border border-[#D4AF37]/50"
+            />
+          )}
+        </div>
+
+        <GoldChip type="submit" active={true} disabled={savingMindMap}>
+          <Network className="w-4 h-4" />
+          <span>
+            {savingMindMap
+              ? tr('جاري الرفع...', 'Uploading...')
+              : tr('نشر الخريطة الذهنية', 'Publish Mind Map')}
+          </span>
+        </GoldChip>
+      </div>
+    </form>
+  );
+
+  const renderMindMapsList = (items: CourseMindMap[]) => {
+    if (items.length === 0) {
+      return (
+        <div className="py-8 text-center text-sm text-[#5C5850] dark:text-[#A8A29E] rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10">
+          {tr(
+            'لا توجد خرائط ذهنية مضافة هنا حتى الآن.',
+            'No mind maps added here yet.'
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <div className="grid grid-cols-1 gap-3.5">
+        {items.map((item) => {
+          const itemFolder = item.folderId
+            ? folders.find((f) => f.id === item.folderId)
+            : null;
+
+          return (
+            <div
+              key={item.id}
+              className="p-4 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 space-y-3"
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="space-y-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[10px] font-bold text-[#735303] dark:text-[#F5D061]">
+                      <Network className="w-3 h-3" />
+                      <span>
+                        {item.fileType === 'pdf'
+                          ? 'PDF'
+                          : tr('صورة', 'Image')}
+                      </span>
+                    </span>
+                    {itemFolder && !selectedFolderId && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-[10px] text-[#5C5850] dark:text-[#A8A29E]">
+                        <Folder className="w-3 h-3 text-[#9A7209] dark:text-[#D4AF37]" />
+                        <span>{itemFolder.name}</span>
+                      </span>
+                    )}
+                    {item.fileType === 'pdf' ? (
+                      <a
+                        href={buildPdfViewerHref(item.fileUrl, item.title, item.fileName)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-semibold text-sm text-[#141418] dark:text-[#F5F0E6] hover:text-[#856104] dark:hover:text-[#F5D061] underline decoration-[#D4AF37]/40 underline-offset-4 inline-flex items-center gap-1.5"
+                      >
+                        <span>{item.title}</span>
+                        <ExternalLink className="w-3.5 h-3.5 text-[#9A7209] dark:text-[#D4AF37] shrink-0" />
+                      </a>
+                    ) : (
+                      <h4 className="font-semibold text-sm text-[#141418] dark:text-[#F5F0E6]">
+                        {item.title}
+                      </h4>
+                    )}
+                  </div>
+
+                  {item.description && (
+                    <p className="text-xs text-[#3F3D38] dark:text-[#C8C2B8]">
+                      {item.description}
+                    </p>
+                  )}
+
+                  <div className="flex flex-wrap items-center gap-2 text-[11px] text-[#5C5850] dark:text-[#A8A29E]">
+                    <span>
+                      {tr('بواسطة', 'By')} {item.createdBy}
+                    </span>
+                    {item.fileName && (
+                      <>
+                        <span aria-hidden="true">·</span>
+                        <span className="truncate max-w-[200px]">{item.fileName}</span>
+                      </>
+                    )}
+                    {item.fileSize && (
+                      <>
+                        <span aria-hidden="true">·</span>
+                        <span className="font-mono tabular-nums">
+                          {(item.fileSize / 1024).toFixed(0)} KB
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 shrink-0">
+                  {item.fileType === 'pdf' ? (
+                    <a
+                      href={buildPdfViewerHref(item.fileUrl, item.title, item.fileName)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[#735303] dark:text-[#F5D061] hover:bg-[#D4AF37] hover:text-[#09090B] transition-colors"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>{tr('معاينة PDF', 'Preview PDF')}</span>
+                    </a>
+                  ) : (
+                    <a
+                      href={resolveApiUrl(item.fileUrl)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[#735303] dark:text-[#F5D061] hover:bg-[#D4AF37] hover:text-[#09090B] transition-colors"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>{tr('عرض الصورة', 'Open Image')}</span>
+                    </a>
+                  )}
+
+                  <a
+                    href={resolveApiUrl(item.fileUrl)}
+                    download={
+                      item.fileName ||
+                      (item.fileType === 'pdf' ? 'mindmap.pdf' : 'mindmap.png')
+                    }
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#F5F2EA] dark:bg-[#151519] border border-black/10 dark:border-white/10 text-[#141418] dark:text-[#F5F0E6] hover:border-[#D4AF37]/60 hover:text-[#856104] dark:hover:text-[#F5D061] transition-colors"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>{tr('تحميل', 'Download')}</span>
+                  </a>
+
+                  {canManageCourses && (
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteMindMap(item.id)}
+                      className="p-2 rounded-lg bg-red-50 dark:bg-red-950/50 border border-red-500/30 text-red-700 dark:text-red-300 hover:bg-red-600 hover:text-white transition-colors cursor-pointer"
+                      aria-label={tr('حذف الخريطة الذهنية', 'Delete mind map')}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {item.fileType === 'image' && (
+                <a
+                  href={resolveApiUrl(item.fileUrl)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block rounded-xl overflow-hidden border border-black/10 dark:border-white/10 bg-[#F6F4EF] dark:bg-[#09090B]"
+                >
+                  <img
+                    src={resolveApiUrl(item.fileUrl)}
+                    alt={item.title}
+                    loading="lazy"
+                    className="w-full max-h-80 object-contain"
+                  />
+                </a>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
   return (
     <div
       role="dialog"
       aria-modal="true"
       className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4"
     >
-      <div className="w-full max-w-4xl max-h-[92vh] overflow-y-auto rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/30 p-4 sm:p-6 space-y-5">
+      <div className="w-full max-w-4xl max-h-[92dvh] overflow-y-auto rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/30 p-3.5 sm:p-6 space-y-5">
         {loading || !course ? (
           <div className="py-12 text-center text-sm text-[#5C5850] dark:text-[#A8A29E]">
             {tr('جاري تحميل تفاصيل المادة...', 'Loading course details...')}
@@ -1529,8 +1957,8 @@ export function CourseDetailModal({
 
             {/* Interactive Tab Switcher */}
             {!activeQuiz && (
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="flex flex-wrap items-center gap-2">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-2 overflow-x-auto scrollbar-none pb-1 sm:pb-0 sm:flex-wrap">
                   <GoldChip
                     active={activeTab === 'folders'}
                     layoutId="course-modal-tab"
@@ -1539,6 +1967,7 @@ export function CourseDetailModal({
                       setActiveQuiz(null);
                       setReviewSubmission(null);
                     }}
+                    className="shrink-0 whitespace-nowrap"
                   >
                     <Folder className="w-4 h-4" />
                     <span>
@@ -1553,6 +1982,7 @@ export function CourseDetailModal({
                       setActiveQuiz(null);
                       setReviewSubmission(null);
                     }}
+                    className="shrink-0 whitespace-nowrap"
                   >
                     <FileText className="w-4 h-4" />
                     <span>
@@ -1561,9 +1991,26 @@ export function CourseDetailModal({
                     </span>
                   </GoldChip>
                   <GoldChip
+                    active={activeTab === 'mindmaps'}
+                    layoutId="course-modal-tab"
+                    onClick={() => {
+                      setActiveTab('mindmaps');
+                      setActiveQuiz(null);
+                      setReviewSubmission(null);
+                    }}
+                    className="shrink-0 whitespace-nowrap"
+                  >
+                    <Network className="w-4 h-4" />
+                    <span>
+                      {tr('الخرائط الذهنية', 'Mind Maps')} (
+                      {visibleMindMaps.length})
+                    </span>
+                  </GoldChip>
+                  <GoldChip
                     active={activeTab === 'quizzes'}
                     layoutId="course-modal-tab"
                     onClick={() => setActiveTab('quizzes')}
+                    className="shrink-0 whitespace-nowrap"
                   >
                     <Play className="w-4 h-4" />
                     <span>
@@ -1579,17 +2026,18 @@ export function CourseDetailModal({
                       setActiveQuiz(null);
                       setReviewSubmission(null);
                     }}
+                    className="shrink-0 whitespace-nowrap"
                   >
                     <GraduationCap className="w-4 h-4" />
                     <span>{tr('مدرسك الذكي', 'Smart Tutor')}</span>
                   </GoldChip>
                 </div>
 
-                {isAdmin && activeTab === 'folders' && !activeFolder && (
+                {canManageCourses && activeTab === 'folders' && !activeFolder && (
                   <GoldChip
                     active={showFolderForm}
                     onClick={() => setShowFolderForm((p) => !p)}
-                    className="text-xs px-3 py-1.5"
+                    className="text-xs px-3 py-1.5 self-start sm:self-auto shrink-0"
                   >
                     <FolderPlus className="w-3.5 h-3.5" />
                     <span>
@@ -1600,11 +2048,11 @@ export function CourseDetailModal({
                   </GoldChip>
                 )}
 
-                {isAdmin && activeTab === 'summaries' && (
+                {canManageCourses && activeTab === 'summaries' && (
                   <GoldChip
                     active={showSummaryForm}
                     onClick={() => setShowSummaryForm((p) => !p)}
-                    className="text-xs px-3 py-1.5"
+                    className="text-xs px-3 py-1.5 self-start sm:self-auto shrink-0"
                   >
                     <FileUp className="w-3.5 h-3.5" />
                     <span>
@@ -1615,11 +2063,26 @@ export function CourseDetailModal({
                   </GoldChip>
                 )}
 
+                {canManageCourses && activeTab === 'mindmaps' && (
+                  <GoldChip
+                    active={showMindMapForm}
+                    onClick={() => setShowMindMapForm((p) => !p)}
+                    className="text-xs px-3 py-1.5 self-start sm:self-auto shrink-0"
+                  >
+                    <Network className="w-3.5 h-3.5" />
+                    <span>
+                      {showMindMapForm
+                        ? tr('إغلاق', 'Close')
+                        : tr('إضافة خريطة ذهنية', 'Add Mind Map')}
+                    </span>
+                  </GoldChip>
+                )}
+
                 {isAdmin && activeTab === 'quizzes' && (
                   <GoldChip
                     active={showQuizBuilder}
                     onClick={() => setShowQuizBuilder((p) => !p)}
-                    className="text-xs px-3 py-1.5"
+                    className="text-xs px-3 py-1.5 self-start sm:self-auto shrink-0"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>
@@ -1720,12 +2183,12 @@ export function CourseDetailModal({
                           </div>
                         </div>
 
-                        {/* Folder Internal Navigation Bar: All 5 Requested Pillars */}
-                        <div className="flex flex-wrap items-center gap-2 p-2.5 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10">
+                        {/* Folder Internal Navigation Bar */}
+                        <div className="flex items-center gap-2 p-2 sm:p-2.5 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10 overflow-x-auto scrollbar-none sm:flex-wrap">
                           <GoldChip
                             active={folderSubTab === 'all'}
                             onClick={() => setFolderSubTab('all')}
-                            className="text-xs px-3 py-1.5"
+                            className="text-xs px-3 py-1.5 shrink-0 whitespace-nowrap"
                           >
                             <FolderOpen className="w-3.5 h-3.5" />
                             <span>{tr('كل المحتوى', 'All')}</span>
@@ -1733,7 +2196,7 @@ export function CourseDetailModal({
                           <GoldChip
                             active={folderSubTab === 'books'}
                             onClick={() => setFolderSubTab('books')}
-                            className="text-xs px-3 py-1.5"
+                            className="text-xs px-3 py-1.5 shrink-0 whitespace-nowrap"
                           >
                             <BookOpen className="w-3.5 h-3.5" />
                             <span>
@@ -1743,7 +2206,7 @@ export function CourseDetailModal({
                           <GoldChip
                             active={folderSubTab === 'summaries'}
                             onClick={() => setFolderSubTab('summaries')}
-                            className="text-xs px-3 py-1.5"
+                            className="text-xs px-3 py-1.5 shrink-0 whitespace-nowrap"
                           >
                             <FileText className="w-3.5 h-3.5" />
                             <span>
@@ -1751,9 +2214,19 @@ export function CourseDetailModal({
                             </span>
                           </GoldChip>
                           <GoldChip
+                            active={folderSubTab === 'mindmaps'}
+                            onClick={() => setFolderSubTab('mindmaps')}
+                            className="text-xs px-3 py-1.5 shrink-0 whitespace-nowrap"
+                          >
+                            <Network className="w-3.5 h-3.5" />
+                            <span>
+                              {tr('الخرائط الذهنية', 'Mind Maps')} ({visibleMindMaps.length})
+                            </span>
+                          </GoldChip>
+                          <GoldChip
                             active={folderSubTab === 'quizzes'}
                             onClick={() => setFolderSubTab('quizzes')}
-                            className="text-xs px-3 py-1.5"
+                            className="text-xs px-3 py-1.5 shrink-0 whitespace-nowrap"
                           >
                             <Sparkles className="w-3.5 h-3.5" />
                             <span>
@@ -1763,7 +2236,7 @@ export function CourseDetailModal({
                           <GoldChip
                             active={folderSubTab === 'tutor'}
                             onClick={() => setFolderSubTab('tutor')}
-                            className="text-xs px-3 py-1.5"
+                            className="text-xs px-3 py-1.5 shrink-0 whitespace-nowrap"
                           >
                             <GraduationCap className="w-3.5 h-3.5" />
                             <span>{tr('مدرسك الذكي', 'Smart Tutor')}</span>
@@ -1771,7 +2244,7 @@ export function CourseDetailModal({
                           <GoldChip
                             active={folderSubTab === 'assignments'}
                             onClick={() => setFolderSubTab('assignments')}
-                            className="text-xs px-3 py-1.5"
+                            className="text-xs px-3 py-1.5 shrink-0 whitespace-nowrap"
                           >
                             <ClipboardList className="w-3.5 h-3.5" />
                             <span>
@@ -1847,6 +2320,37 @@ export function CourseDetailModal({
                               visibleNotes,
                               tr('لا توجد ملخصات مضافة في هذا المجلد حتى الآن.', 'No summaries added in this folder yet.')
                             )}
+                          </div>
+                        )}
+
+                        {/* 2.5 Mind Maps Section ("خانة الخرائط الذهنية") */}
+                        {(folderSubTab === 'all' || folderSubTab === 'mindmaps') && (
+                          <div className="space-y-3 pt-2 border-t border-black/10 dark:border-white/10">
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <h4 className="font-display text-base font-bold text-[#856104] dark:text-[#E5C158] flex items-center gap-2">
+                                <Network className="w-4 h-4" />
+                                <span>
+                                  {tr('خانة الخرائط الذهنية (PDF / صورة)', 'Mind Maps (PDF / Image)')} ({visibleMindMaps.length})
+                                </span>
+                              </h4>
+                              {canManageCourses && folderSubTab !== 'mindmaps' && (
+                                <GoldChip
+                                  active={showMindMapForm}
+                                  onClick={() => {
+                                    setMindMapFolderId(activeFolder.id);
+                                    setShowMindMapForm((p) => !p);
+                                  }}
+                                  className="text-xs px-3 py-1.5"
+                                >
+                                  <Network className="w-3.5 h-3.5" />
+                                  <span>{tr('إضافة خريطة ذهنية', 'Add Mind Map')}</span>
+                                </GoldChip>
+                              )}
+                            </div>
+                            {canManageCourses &&
+                              (folderSubTab === 'mindmaps' || showMindMapForm) &&
+                              renderMindMapForm()}
+                            {renderMindMapsList(visibleMindMaps)}
                           </div>
                         )}
 
@@ -2099,6 +2603,9 @@ export function CourseDetailModal({
                               const folderAssignCount = assignments.filter(
                                 (a) => a.folderId === folder.id
                               ).length;
+                              const folderMindMapCount = mindMaps.filter(
+                                (m) => m.folderId === folder.id
+                              ).length;
                               const viewsCount = folder.viewsCount ?? 0;
                               const isTrending = Boolean(
                                 folder.isTrending || viewsCount > 20
@@ -2266,6 +2773,7 @@ export function CourseDetailModal({
                                     <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-black/10 dark:border-white/10">
                                       <span className="text-[11px] text-[#5C5850] dark:text-[#A8A29E] tabular-nums">
                                         {folderSumCount} {tr('ملفات', 'Files')} ·{' '}
+                                        {folderMindMapCount} {tr('خرائط', 'Mind Maps')} ·{' '}
                                         {folderQuizCount} {tr('اختبارات', 'Exams')} ·{' '}
                                         {folderAssignCount} {tr('تكليفات', 'Tasks')}
                                       </span>
@@ -2310,6 +2818,28 @@ export function CourseDetailModal({
                     )}
                     {isAdmin && showSummaryForm && renderSummaryForm()}
                     {renderSummariesList(visibleSummaries)}
+                  </div>
+                )}
+
+                {/* MIND MAPS TAB */}
+                {activeTab === 'mindmaps' && (
+                  <div className="space-y-4">
+                    {activeFolder && (
+                      <div className="p-3 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-[#D4AF37]/35 flex flex-wrap items-center justify-between gap-2">
+                        <span className="text-xs text-[#856104] dark:text-[#E5C158]">
+                          {tr('تصفية حسب المجلد:', 'Filtered by folder:')}{' '}
+                          <strong>{activeFolder.name}</strong>
+                        </span>
+                        <GoldChip
+                          onClick={() => setSelectedFolderId(null)}
+                          className="text-xs px-3 py-1"
+                        >
+                          {tr('عرض كل الخرائط الذهنية', 'Show All')}
+                        </GoldChip>
+                      </div>
+                    )}
+                    {canManageCourses && renderMindMapForm()}
+                    {renderMindMapsList(visibleMindMaps)}
                   </div>
                 )}
 

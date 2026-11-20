@@ -15,6 +15,7 @@ import type {
   Course,
   CourseAssignment,
   CourseFolder,
+  CourseMindMap,
   DatabaseSchema,
   QuizDifficulty,
   QuizQuestion,
@@ -113,6 +114,7 @@ function enrichFolder(folder: CourseFolder, store: DatabaseSchema) {
   const summariesCount = folderItems.filter((s) => s.category !== 'book').length;
   const quizzesCount = store.quizzes.filter((q) => q.folderId === folder.id).length;
   const assignmentsCount = (store.assignments || []).filter((a) => a.folderId === folder.id).length;
+  const mindMapsCount = (store.mindMaps || []).filter((m) => m.folderId === folder.id).length;
 
   return {
     ...rest,
@@ -126,6 +128,7 @@ function enrichFolder(folder: CourseFolder, store: DatabaseSchema) {
     summariesCount,
     quizzesCount,
     assignmentsCount,
+    mindMapsCount,
   };
 }
 
@@ -360,6 +363,7 @@ router.get('/courses', requireAuth, (req, res) => {
     summariesCount: store.summaries.filter((s) => s.courseId === course.id).length,
     quizzesCount: store.quizzes.filter((q) => q.courseId === course.id).length,
     foldersCount: folders.filter((f) => f.courseId === course.id).length,
+    mindMapsCount: (store.mindMaps || []).filter((m) => m.courseId === course.id).length,
   }));
   const courseIds = new Set(courses.map((c) => c.id));
   const enrichedFolders = folders
@@ -452,6 +456,7 @@ router.post(
           summariesCount: 0,
           quizzesCount: 0,
           foldersCount: 0,
+          mindMapsCount: 0,
         },
       });
     } catch (err) {
@@ -546,12 +551,14 @@ router.delete('/courses/:id', requireAuth, requirePermission('manage_courses'), 
       ...courseFolders.map((f) => removeStoredFile(f.coverUrl)),
       ...store.summaries.filter((s) => s.courseId === id).map((s) => removeStoredFile(s.fileUrl)),
       ...(store.assignments || []).filter((a) => a.courseId === id).map((a) => removeStoredFile(a.fileUrl)),
+      ...(store.mindMaps || []).filter((m) => m.courseId === id).map((m) => removeStoredFile(m.fileUrl)),
     ]);
 
     store.courses = store.courses.filter((c) => c.id !== id);
     store.folders = (store.folders || []).filter((f) => f.courseId !== id);
     store.summaries = store.summaries.filter((s) => s.courseId !== id);
     store.assignments = (store.assignments || []).filter((a) => a.courseId !== id);
+    store.mindMaps = (store.mindMaps || []).filter((m) => m.courseId !== id);
     store.quizzes = store.quizzes.filter((q) => q.courseId !== id);
     store.quizSubmissions = store.quizSubmissions.filter((s) => s.courseId !== id);
     db.save();
@@ -607,6 +614,7 @@ router.get('/courses/:courseId/details', requireAuth, (req: AuthenticatedRequest
   const submissions = store.quizSubmissions.filter(
     (s) => s.courseId === courseId && s.userId === req.currentUser!.id
   );
+  const mindMaps = (store.mindMaps || []).filter((m) => m.courseId === courseId);
   const progress = getOrInitStudentProgress(req.currentUser!);
 
   res.json({
@@ -614,6 +622,7 @@ router.get('/courses/:courseId/details', requireAuth, (req: AuthenticatedRequest
     folders,
     summaries,
     assignments,
+    mindMaps,
     quizzes,
     submissions,
     enrolled: progress.enrolledCourseIds.includes(courseId),
@@ -785,11 +794,13 @@ router.delete('/folders/:folderId', requireAuth, requirePermission('manage_cours
       removeStoredFile(folder.coverUrl),
       ...store.summaries.filter((s) => s.folderId === folderId).map((s) => removeStoredFile(s.fileUrl)),
       ...(store.assignments || []).filter((a) => a.folderId === folderId).map((a) => removeStoredFile(a.fileUrl)),
+      ...(store.mindMaps || []).filter((m) => m.folderId === folderId).map((m) => removeStoredFile(m.fileUrl)),
     ]);
 
     store.folders = (store.folders || []).filter((f) => f.id !== folderId);
     store.summaries = store.summaries.filter((s) => s.folderId !== folderId);
     store.assignments = (store.assignments || []).filter((a) => a.folderId !== folderId);
+    store.mindMaps = (store.mindMaps || []).filter((m) => m.folderId !== folderId);
     store.quizzes = store.quizzes.filter((q) => q.folderId !== folderId);
     db.save();
 
@@ -1001,6 +1012,114 @@ router.delete('/assignments/:id', requireAuth, async (req: AuthenticatedRequest,
     next(err);
   }
 });
+
+// Mind Maps inside Course or Course Folder (Title + PDF or Image upload)
+router.post(
+  '/courses/:courseId/mind-maps',
+  requireAuth,
+  requirePermission('manage_courses'),
+  optionalAssignmentUpload('file'),
+  async (req: AuthenticatedRequest, res, next) => {
+    try {
+      const { courseId } = req.params;
+      const { title, description, folderId } = req.body as {
+        title?: string;
+        description?: string;
+        folderId?: string;
+      };
+
+      const store = db.get();
+      const course = store.courses.find((c) => c.id === courseId);
+      if (!course) {
+        res.status(404).json({ error: 'المادة غير موجودة.' });
+        return;
+      }
+
+      if (!title?.trim()) {
+        res.status(400).json({ error: 'يرجى كتابة عنوان الخريطة الذهنية.' });
+        return;
+      }
+
+      const file = req.file;
+      if (!file) {
+        res.status(400).json({ error: 'يرجى رفع صورة أو ملف PDF للخريطة الذهنية.' });
+        return;
+      }
+
+      const isPdf =
+        file.mimetype === 'application/pdf' ||
+        file.originalname.toLowerCase().endsWith('.pdf');
+      const fileType: 'pdf' | 'image' = isPdf ? 'pdf' : 'image';
+
+      const stored = await saveUploadedBuffer({
+        buffer: file.buffer,
+        originalName: file.originalname || (isPdf ? 'mindmap.pdf' : 'mindmap.png'),
+        mimeType: file.mimetype || (isPdf ? 'application/pdf' : 'image/png'),
+        folderPrefix: 'mind-maps',
+      });
+
+      if (!Array.isArray(store.mindMaps)) {
+        store.mindMaps = [];
+      }
+
+      const mindMap: CourseMindMap = {
+        id: `mindmap-${crypto.randomUUID()}`,
+        courseId,
+        folderId: folderId?.trim() || undefined,
+        title: title.trim(),
+        description: description?.trim() || undefined,
+        fileType,
+        fileUrl: stored.fileUrl,
+        fileName: Buffer.from(file.originalname, 'latin1').toString('utf8'),
+        fileSize: file.size,
+        mimeType: file.mimetype,
+        createdBy: req.currentUser!.name,
+        createdById: req.currentUser!.id,
+        createdAt: new Date().toISOString(),
+      };
+
+      store.mindMaps.unshift(mindMap);
+      db.save();
+
+      pushNotification({
+        title: `خريطة ذهنية جديدة في ${course.title}`,
+        message: `تمت إضافة "${mindMap.title}" (${fileType === 'pdf' ? 'PDF' : 'صورة'}) داخل خانة الخرائط الذهنية.`,
+        type: 'course',
+        targetSection: 'courses',
+        year: course.year,
+        createdBy: req.currentUser!.name,
+      });
+
+      res.status(201).json({ mindMap });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+router.delete(
+  '/mind-maps/:id',
+  requireAuth,
+  requirePermission('manage_courses'),
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const store = db.get();
+      const target = (store.mindMaps || []).find((m) => m.id === id);
+      if (!target) {
+        res.status(404).json({ error: 'الخريطة الذهنية غير موجودة.' });
+        return;
+      }
+
+      await removeStoredFile(target.fileUrl);
+      store.mindMaps = (store.mindMaps || []).filter((m) => m.id !== id);
+      db.save();
+      res.json({ ok: true });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
 
 // AI Interactive Exam Generator from Folder Content (Official Save for Admin / Practice for Students)
 router.post(

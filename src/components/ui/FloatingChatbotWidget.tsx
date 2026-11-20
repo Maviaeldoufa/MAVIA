@@ -271,7 +271,7 @@ export function FloatingChatbotWidget({
 
   return (
     <>
-    <div className="fixed bottom-4 left-4 sm:bottom-5 sm:left-5 z-40 flex flex-col items-start gap-2.5 sm:gap-3">
+    <div className="fixed bottom-3 left-3 sm:bottom-5 sm:left-5 z-40 flex flex-col items-start gap-2 sm:gap-3">
       <AnimatePresence>
         {open && (
           <motion.section
@@ -280,7 +280,7 @@ export function FloatingChatbotWidget({
             exit={{ opacity: 0, y: 12, scale: 0.95 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
             aria-label={tr('مرشد منصة MAVIA الذكي', 'MAVIA Smart Platform Guide')}
-            className="w-[calc(100vw-2rem)] sm:w-[390px] max-h-[calc(100dvh-10rem)] rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/45 shadow-[0_24px_70px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col"
+            className="w-[min(calc(100vw-1.5rem),390px)] max-h-[calc(100dvh-9rem)] rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/45 shadow-[0_24px_70px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col"
           >
             {/* Header */}
             <div className="px-4 py-3 border-b border-black/10 dark:border-white/10 bg-[#EFECE4] dark:bg-[#0D0D10] flex items-center justify-between gap-2">
@@ -414,7 +414,7 @@ export function FloatingChatbotWidget({
       </AnimatePresence>
 
       {/* Bottom-Left Stacked Floating Icons: Admin Exams (Admin Only) -> Technical Support -> Chatbot */}
-      <div className="flex flex-col items-start gap-2.5 sm:gap-3">
+      <div className="flex flex-col items-start gap-2 sm:gap-3">
         {/* Admin-Only Comprehensive Exams Floating Icon */}
         {canManageExams && (
           <div className="relative flex items-center">
@@ -449,7 +449,7 @@ export function FloatingChatbotWidget({
                   'Comprehensive Exams & Manual Grading (Admin)'
                 )}
                 title={tr('الامتحانات الشاملة (للأدمن فقط)', 'Comprehensive Exams (Admin Only)')}
-                className={`relative w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-[#1C1A3A] via-[#2B245A] to-[#131229] text-[#F5D061] border flex items-center justify-center cursor-pointer transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 ${
+                className={`relative w-11 h-11 sm:w-13 sm:h-13 lg:w-14 lg:h-14 rounded-full bg-gradient-to-br from-[#1C1A3A] via-[#2B245A] to-[#131229] text-[#F5D061] border flex items-center justify-center cursor-pointer transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 ${
                   examsLit
                     ? 'border-[#FFF1B8] text-white brightness-125 shadow-[0_0_34px_rgba(129,140,248,0.9),0_0_60px_rgba(212,175,55,0.55)]'
                     : examsHovered
@@ -457,7 +457,7 @@ export function FloatingChatbotWidget({
                     : 'border-[#D4AF37]/65 shadow-[0_10px_28px_rgba(67,56,202,0.38)]'
                 }`}
               >
-                <ClipboardCheck className="w-5 h-5 sm:w-6 sm:h-6" />
+                <ClipboardCheck className="w-5 h-5 lg:w-6 lg:h-6" />
                 {pendingExamSubmissions > 0 && (
                   <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 rounded-full bg-red-600 text-white text-[10px] font-mono font-bold tabular-nums flex items-center justify-center border-2 border-[#09090B] shadow">
                     {pendingExamSubmissions > 99 ? '99+' : pendingExamSubmissions}
@@ -467,7 +467,7 @@ export function FloatingChatbotWidget({
             </motion.div>
 
             {examsHovered && (
-              <span className="pointer-events-none absolute left-full ml-2.5 px-2.5 py-1 rounded-lg bg-white/95 dark:bg-[#121216]/95 border border-[#D4AF37]/55 text-[#735303] dark:text-[#F5D061] text-[11px] font-semibold whitespace-nowrap shadow-lg">
+              <span className="pointer-events-none hidden sm:inline-block absolute left-full ml-2.5 px-2.5 py-1 rounded-lg bg-white/95 dark:bg-[#121216]/95 border border-[#D4AF37]/55 text-[#735303] dark:text-[#F5D061] text-[11px] font-semibold whitespace-nowrap shadow-lg">
                 {pendingExamSubmissions > 0
                   ? tr(
                       `الامتحانات (${pendingExamSubmissions} بانتظار التصحيح)`,
@@ -504,7 +504,7 @@ export function FloatingChatbotWidget({
               whileTap={{ scale: 0.93 }}
               aria-label={tr('الدعم الفني والتواصل مع الإدارة', 'Technical Support & Contact')}
               title={tr('الدعم الفني', 'Technical Support')}
-              className={`relative w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-[#0F2C24] via-[#134235] to-[#0B221C] text-emerald-200 border flex items-center justify-center cursor-pointer transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 ${
+              className={`relative w-11 h-11 sm:w-13 sm:h-13 lg:w-14 lg:h-14 rounded-full bg-gradient-to-br from-[#0F2C24] via-[#134235] to-[#0B221C] text-emerald-200 border flex items-center justify-center cursor-pointer transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 ${
                 supportLit
                   ? 'border-emerald-200 text-white brightness-125 shadow-[0_0_34px_rgba(52,211,153,0.95),0_0_62px_rgba(212,175,55,0.5)]'
                   : supportHovered
@@ -512,13 +512,13 @@ export function FloatingChatbotWidget({
                   : 'border-emerald-400/55 shadow-[0_10px_28px_rgba(16,185,129,0.28)]'
               }`}
             >
-              <Headset className="w-5 h-5 sm:w-6 sm:h-6" />
+              <Headset className="w-5 h-5 lg:w-6 lg:h-6" />
             </motion.button>
           </motion.div>
 
           {/* Side floating label shown smoothly on hover/focus */}
           {supportHovered && (
-            <span className="pointer-events-none absolute left-full ml-2.5 px-2.5 py-1 rounded-lg bg-white/95 dark:bg-[#121216]/95 border border-emerald-400/50 text-emerald-800 dark:text-emerald-200 text-[11px] font-semibold whitespace-nowrap shadow-lg">
+            <span className="pointer-events-none hidden sm:inline-block absolute left-full ml-2.5 px-2.5 py-1 rounded-lg bg-white/95 dark:bg-[#121216]/95 border border-emerald-400/50 text-emerald-800 dark:text-emerald-200 text-[11px] font-semibold whitespace-nowrap shadow-lg">
               {tr('الدعم الفني', 'Support')}
             </span>
           )}
@@ -554,7 +554,7 @@ export function FloatingChatbotWidget({
               whileTap={{ scale: 0.93 }}
               aria-label={tr('فتح شات بوت إرشاد المنصة', 'Open MAVIA Guide Chatbot')}
               title={tr('المرشد الذكي (الشات بوت)', 'MAVIA Smart Guide Chatbot')}
-              className={`relative w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-[#D4AF37] via-[#E5C158] to-[#B68D20] text-[#09090B] border flex items-center justify-center cursor-pointer transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFF1B8] ${
+              className={`relative w-11 h-11 sm:w-13 sm:h-13 lg:w-14 lg:h-14 rounded-full bg-gradient-to-br from-[#D4AF37] via-[#E5C158] to-[#B68D20] text-[#09090B] border flex items-center justify-center cursor-pointer transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFF1B8] ${
                 botLit
                   ? 'border-[#FFF6D6] brightness-125 shadow-[0_0_36px_rgba(255,241,184,0.95),0_0_68px_rgba(212,175,55,0.7)]'
                   : botHovered
@@ -563,15 +563,15 @@ export function FloatingChatbotWidget({
               }`}
             >
               {open ? (
-                <X className="w-5 h-5 sm:w-6 sm:h-6" />
+                <X className="w-5 h-5 lg:w-6 lg:h-6" />
               ) : (
-                <Bot className="w-5 h-5 sm:w-6 sm:h-6" />
+                <Bot className="w-5 h-5 lg:w-6 lg:h-6" />
               )}
             </motion.button>
           </motion.div>
 
           {botHovered && !open && (
-            <span className="pointer-events-none absolute left-full ml-2.5 px-2.5 py-1 rounded-lg bg-white/95 dark:bg-[#121216]/95 border border-[#D4AF37]/60 text-[#735303] dark:text-[#F5D061] text-[11px] font-semibold whitespace-nowrap shadow-lg">
+            <span className="pointer-events-none hidden sm:inline-block absolute left-full ml-2.5 px-2.5 py-1 rounded-lg bg-white/95 dark:bg-[#121216]/95 border border-[#D4AF37]/60 text-[#735303] dark:text-[#F5D061] text-[11px] font-semibold whitespace-nowrap shadow-lg">
               {tr('الشات بوت الذكي', 'Smart Guide')}
             </span>
           )}
@@ -588,22 +588,22 @@ export function FloatingChatbotWidget({
         aria-modal="true"
         aria-label={tr('إدارة الامتحانات الشاملة والتصحيح اليدوي', 'Comprehensive Exams & Manual Grading')}
         onClick={() => setExamsOpen(false)}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-3 sm:p-5"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-2.5 sm:p-5"
       >
         <div
           onClick={(e) => e.stopPropagation()}
-          className="w-full max-w-5xl max-h-[90vh] flex flex-col rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/40 shadow-[0_24px_80px_rgba(0,0,0,0.85)] overflow-hidden"
+          className="w-full max-w-5xl max-h-[92dvh] flex flex-col rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/40 shadow-[0_24px_80px_rgba(0,0,0,0.85)] overflow-hidden"
         >
-          <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-4 border-b border-black/10 dark:border-white/10 bg-[#EFECE4] dark:bg-[#0D0D10] shrink-0">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/45 flex items-center justify-center text-[#735303] dark:text-[#F5D061]">
+          <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-3.5 sm:py-4 border-b border-black/10 dark:border-white/10 bg-[#EFECE4] dark:bg-[#0D0D10] shrink-0">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/45 flex items-center justify-center text-[#735303] dark:text-[#F5D061] shrink-0">
                 <ClipboardCheck className="w-5 h-5" />
               </div>
-              <div>
-                <h2 className="font-display text-base sm:text-lg font-bold text-[#141418] dark:text-[#F5F0E6]">
+              <div className="min-w-0">
+                <h2 className="font-display text-sm sm:text-lg font-bold text-[#141418] dark:text-[#F5F0E6] truncate">
                   {tr('بوابة الامتحانات الشاملة والتصحيح اليدوي', 'Comprehensive Exams & Manual Grading')}
                 </h2>
-                <p className="text-xs text-[#5C5850] dark:text-[#A8A29E]">
+                <p className="text-[11px] sm:text-xs text-[#5C5850] dark:text-[#A8A29E] truncate">
                   {tr(
                     'تظهر هذه النافذة للأدمن فقط — أنشئ الامتحان حسب الفرقة وصحح إجابات الطلاب يدوياً.',
                     'Admin only — create targeted exams by academic year and grade submissions manually.'
@@ -616,13 +616,13 @@ export function FloatingChatbotWidget({
               type="button"
               onClick={() => setExamsOpen(false)}
               aria-label={tr('إغلاق نافذة الامتحانات', 'Close exams dialog')}
-              className="w-10 h-10 rounded-xl bg-[#ECE8DE] dark:bg-[#18181D] border border-black/10 dark:border-white/10 text-[#3F3D38] dark:text-[#C8C2B8] hover:text-[#141418] dark:hover:text-white hover:border-[#D4AF37]/50 flex items-center justify-center cursor-pointer shrink-0"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#ECE8DE] dark:bg-[#18181D] border border-black/10 dark:border-white/10 text-[#3F3D38] dark:text-[#C8C2B8] hover:text-[#141418] dark:hover:text-white hover:border-[#D4AF37]/50 flex items-center justify-center cursor-pointer shrink-0"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+          <div className="flex-1 overflow-y-auto p-3.5 sm:p-6">
             <AdminComprehensiveExamPanel embeddedInModal />
           </div>
         </div>

@@ -289,6 +289,7 @@ export function ComprehensiveExamBannerAndModal() {
   const [mySubmissions, setMySubmissions] = useState<ComprehensiveSubmission[]>([]);
   const [openExam, setOpenExam] = useState<ComprehensiveExamPublic | null>(null);
   const [openReviewSub, setOpenReviewSub] = useState<ComprehensiveSubmission | null>(null);
+  const [nowMs, setNowMs] = useState(() => Date.now());
 
   // Active exam attempt state
   const [selectedChoices, setSelectedChoices] = useState<Record<string, number>>({});
@@ -373,6 +374,7 @@ export function ComprehensiveExamBannerAndModal() {
   useEffect(() => {
     void loadState();
     const interval = window.setInterval(() => void loadState(), 12000);
+    const clockTick = window.setInterval(() => setNowMs(Date.now()), 5000);
     const onChanged = () => void loadState();
     const onFocus = () => void loadState();
     const onVisibility = () => {
@@ -388,6 +390,7 @@ export function ComprehensiveExamBannerAndModal() {
 
     return () => {
       window.clearInterval(interval);
+      window.clearInterval(clockTick);
       window.removeEventListener('mvia:comprehensive-exam-changed', onChanged);
       window.removeEventListener('focus', onFocus);
       window.removeEventListener('online', onFocus);
@@ -528,17 +531,36 @@ export function ComprehensiveExamBannerAndModal() {
     return () => window.clearInterval(timer);
   }, [handleSubmitExam, justSubmitted, openExam]);
 
+  const visibleBannerExams = activeExams.filter((exam) => {
+    if (!exam.isActive) return false;
+    if (!exam.announcementExpiresAt) return true;
+    const expMs = new Date(exam.announcementExpiresAt).getTime();
+    return !Number.isFinite(expMs) || expMs > nowMs;
+  });
+
+  const hasExpiredExamInState = activeExams.some((exam) => {
+    if (!exam.isActive || !exam.announcementExpiresAt) return false;
+    const expMs = new Date(exam.announcementExpiresAt).getTime();
+    return Number.isFinite(expMs) && expMs <= nowMs;
+  });
+
+  useEffect(() => {
+    if (!hasExpiredExamInState) return;
+    void loadState();
+    window.dispatchEvent(new CustomEvent('mvia:comprehensive-exam-changed'));
+  }, [hasExpiredExamInState, loadState]);
+
   if (!user) return null;
 
   const isAnyModalOpen = Boolean(openExam || openReviewSub);
 
   return (
     <>
-      {/* Persistent Top News Bar whenever at least one comprehensive exam is active */}
-      {activeExams.length > 0 && (
+      {/* Persistent Top News Bar whenever at least one comprehensive exam is within its announced window */}
+      {visibleBannerExams.length > 0 && (
         <div className="relative z-30 border-b border-[#D4AF37]/45 bg-gradient-to-l from-[#FBF4DE] via-[#F7ECC8] to-[#FBF4DE] dark:from-[#1E190C] dark:via-[#171410] dark:to-[#1E190C]">
           <div className="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 flex flex-col gap-2">
-            {activeExams.map((exam) => {
+            {visibleBannerExams.map((exam) => {
               const mySub = mySubmissions.find((s) => s.examId === exam.id);
               const status = mySub?.status || exam.mySubmissionStatus;
 
@@ -572,6 +594,11 @@ export function ComprehensiveExamBannerAndModal() {
                         {tr(`المدة: ${exam.durationMinutes} دقيقة`, `Duration: ${exam.durationMinutes} min`)}
                         {' · '}
                         {exam.questionsCount} {tr('سؤال', 'questions')}
+                        {exam.announcementExpiresAt
+                          ? ` · ${tr('متاح حتى:', 'Until:')} ${new Date(
+                              exam.announcementExpiresAt
+                            ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                          : ''}
                         {status === 'pending_grading'
                           ? ` · ${tr('تم التسليم — في انتظار التصحيح اليدوي', 'Submitted — Pending Grading')}`
                           : status === 'graded'
@@ -609,13 +636,13 @@ export function ComprehensiveExamBannerAndModal() {
       {/* Modal: Either Active Exam Runner OR Pending/Graded Review */}
       {isAnyModalOpen && (
         <div
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 overflow-y-auto"
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-2.5 sm:p-5 overflow-y-auto"
           role="dialog"
           aria-modal="true"
         >
-          <div className="w-full max-w-4xl max-h-[92vh] flex flex-col rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/40 shadow-[0_24px_80px_rgba(0,0,0,0.85)] overflow-hidden">
+          <div className="w-full max-w-4xl max-h-[92dvh] flex flex-col rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/40 shadow-[0_24px_80px_rgba(0,0,0,0.85)] overflow-hidden">
             {/* Modal Header */}
-            <div className="px-5 py-4 border-b border-black/10 dark:border-white/10 bg-[#EFECE4] dark:bg-[#0D0D10] flex items-center justify-between gap-3 shrink-0">
+            <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-black/10 dark:border-white/10 bg-[#EFECE4] dark:bg-[#0D0D10] flex items-center justify-between gap-3 shrink-0">
               <div className="flex items-center gap-2.5 min-w-0">
                 <FileText className="w-5 h-5 text-[#9A7209] dark:text-[#D4AF37] shrink-0" />
                 <div className="min-w-0">

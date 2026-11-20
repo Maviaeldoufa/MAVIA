@@ -51,12 +51,12 @@ export function LeaderboardPanel({ refreshTrigger }: { refreshTrigger?: number }
   }, [isAdmin, selectedYear, currentUser?.year, refreshTrigger]);
 
   return (
-    <section className="rounded-2xl bg-white dark:bg-[#121216] border border-black/10 dark:border-white/10 p-6 space-y-6">
+    <section className="rounded-2xl bg-white dark:bg-[#121216] border border-black/10 dark:border-white/10 p-4 sm:p-6 space-y-5 sm:space-y-6">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <Trophy className="w-5 h-5 text-[#9A7209] dark:text-[#D4AF37]" />
-            <h2 className="font-display text-xl font-bold text-[#141418] dark:text-[#F5F0E6]">
+            <h2 className="font-display text-lg sm:text-xl font-bold text-[#141418] dark:text-[#F5F0E6]">
               {tr('لوحة تصدر الدفعة', 'Batch Leaderboard')}
             </h2>
           </div>
@@ -69,14 +69,14 @@ export function LeaderboardPanel({ refreshTrigger }: { refreshTrigger?: number }
         </div>
 
         {isAdmin ? (
-          <div className="flex items-center gap-2 overflow-x-auto pb-1">
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-none pb-1">
             {yearFilters.map((f) => (
               <GoldChip
                 key={f.value}
                 active={selectedYear === f.value}
                 layoutId="leaderboard-year-filter"
                 onClick={() => setSelectedYear(f.value)}
-                className="text-xs px-3 py-1.5"
+                className="text-xs px-3 py-1.5 shrink-0 whitespace-nowrap"
               >
                 {f.label}
               </GoldChip>
@@ -109,7 +109,7 @@ export function LeaderboardPanel({ refreshTrigger }: { refreshTrigger?: number }
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full text-start border-collapse">
+          <table className="w-full min-w-[540px] text-start border-collapse">
             <thead>
               <tr className="border-b border-black/10 dark:border-white/10 text-xs text-[#5C5850] dark:text-[#A8A29E]">
                 <th className="py-3 px-3 font-semibold">{tr('الترتيب', 'Rank')}</th>

@@ -197,32 +197,32 @@ export function AuthScreen() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F6F4EF] dark:bg-[#09090B] text-[#141418] dark:text-[#F5F0E6] flex flex-col relative overflow-x-hidden transition-colors duration-200">
+    <div className="min-h-screen bg-[#F6F4EF] dark:bg-[#09090B] text-[#141418] dark:text-[#F5F0E6] flex flex-col relative overflow-x-clip transition-colors duration-200">
       <GeoEngineeringBackground variant="page" />
       <div className="relative z-10 flex-1 grid grid-cols-1 lg:grid-cols-2 items-stretch">
         {/* Form Column */}
-        <div className="flex flex-col justify-center px-6 py-8 sm:px-12 lg:px-14">
-          <div className="w-full max-w-md mx-auto space-y-6">
+        <div className="flex flex-col justify-center px-4 py-6 sm:px-10 lg:px-14">
+          <div className="w-full max-w-md mx-auto space-y-5 sm:space-y-6">
             {/* Top Bar with Terms Badge, Theme Toggle & Language Switcher */}
             <div className="flex flex-wrap items-center justify-between gap-2">
               <GoldChip
                 type="button"
                 onClick={() => setTermsOpen(true)}
-                className="text-xs px-3 py-1.5"
+                className="text-xs px-2.5 sm:px-3 py-1.5"
               >
                 <Scale className="w-3.5 h-3.5 text-[#856104] dark:text-[#D4AF37]" />
                 <span>{tr('الشروط والأحكام', 'Terms & Conditions')}</span>
               </GoldChip>
 
-              <div className="flex items-center gap-2">
-                <GoldChip onClick={toggleTheme} className="text-xs px-3 py-1.5">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <GoldChip onClick={toggleTheme} className="text-xs px-2.5 sm:px-3 py-1.5">
                   {isLight ? <Moon className="w-3.5 h-3.5" /> : <Sun className="w-3.5 h-3.5" />}
                   <span>{isLight ? tr('مظلم', 'Dark') : tr('فاتح', 'Light')}</span>
                 </GoldChip>
 
-                <GoldChip onClick={toggleLang} className="text-xs px-3 py-1.5 font-mono">
+                <GoldChip onClick={toggleLang} className="text-xs px-2.5 sm:px-3 py-1.5 font-mono">
                   <Languages className="w-3.5 h-3.5" />
-                  <span>{lang === 'ar' ? 'English (EN)' : 'العربية (AR)'}</span>
+                  <span>{lang === 'ar' ? 'EN' : 'AR'}</span>
                 </GoldChip>
               </div>
             </div>
@@ -477,7 +477,7 @@ export function AuthScreen() {
                       )}
                     </div>
                     <div
-                      className={`grid grid-cols-4 gap-2 p-1 rounded-xl border transition-colors ${
+                      className={`grid grid-cols-2 sm:grid-cols-4 gap-2 p-1 rounded-xl border transition-colors ${
                         fieldErrors.year
                           ? 'border-amber-500/80 dark:border-amber-400/80 bg-amber-50 dark:bg-amber-950/15'
                           : 'border-transparent'
@@ -685,7 +685,7 @@ export function AuthScreen() {
         </div>
 
         {/* Showcase Column with Large Floating MAVIA Logo */}
-        <div className="relative hidden lg:flex flex-col justify-between p-12 overflow-hidden border-s border-black/10 dark:border-[#D4AF37]/20 bg-[#EFECE4] dark:bg-[#0D0D10]/90">
+        <div className="relative hidden lg:flex flex-col justify-between p-10 xl:p-12 overflow-hidden border-s border-black/10 dark:border-[#D4AF37]/20 bg-[#EFECE4] dark:bg-[#0D0D10]/90">
           <GeoEngineeringBackground variant="hero" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#EFECE4]/95 via-[#F6F4EF]/70 to-[#EFECE4]/40 dark:from-[#09090B] dark:via-[#09090B]/55 dark:to-[#09090B]/30" />
 

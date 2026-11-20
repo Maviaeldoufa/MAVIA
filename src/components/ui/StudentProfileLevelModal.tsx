@@ -132,11 +132,11 @@ export function StudentProfileLevelModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-black/80 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/35 shadow-[0_24px_80px_rgba(0,0,0,0.85)]"
+        className="w-full max-w-4xl max-h-[92dvh] overflow-y-auto rounded-2xl bg-white dark:bg-[#121216] border border-[#D4AF37]/35 shadow-[0_24px_80px_rgba(0,0,0,0.85)]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

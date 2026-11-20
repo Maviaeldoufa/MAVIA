@@ -11,7 +11,7 @@ export function Footer() {
 
   return (
     <>
-      <footer className="relative z-10 border-t border-black/10 dark:border-white/10 bg-white/95 dark:bg-[#09090B]/95 backdrop-blur-sm py-5 px-4 sm:px-6 text-xs text-[#5C5850] dark:text-[#A8A29E] transition-colors duration-200">
+      <footer className="relative z-10 border-t border-black/10 dark:border-white/10 bg-white/95 dark:bg-[#09090B]/95 backdrop-blur-sm pt-5 pb-24 sm:pb-6 px-4 sm:px-6 lg:px-8 text-xs text-[#5C5850] dark:text-[#A8A29E] transition-colors duration-200">
         <div className="max-w-7xl mx-auto space-y-3">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 pb-3 border-b border-black/10 dark:border-white/5">
             <div className="space-y-2">

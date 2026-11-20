@@ -64,6 +64,10 @@ export function AdminComprehensiveExamPanel({
   // Create form state
   const [subjectName, setSubjectName] = useState('');
   const [durationMinutes, setDurationMinutes] = useState(30);
+  const [announcementDurationValue, setAnnouncementDurationValue] = useState(24);
+  const [announcementDurationUnit, setAnnouncementDurationUnit] = useState<
+    'minutes' | 'hours' | 'days'
+  >('hours');
   const [targetYear, setTargetYear] = useState<number>(0);
   const [questions, setQuestions] = useState<DraftQuestion[]>([
     {
@@ -176,6 +180,17 @@ export function AdminComprehensiveExamPanel({
       }
     }
 
+    const multiplier =
+      announcementDurationUnit === 'days'
+        ? 1440
+        : announcementDurationUnit === 'hours'
+        ? 60
+        : 1;
+    const computedAnnouncementMinutes = Math.max(
+      1,
+      Math.min(43200, Math.round((Number(announcementDurationValue) || 1) * multiplier))
+    );
+
     setCreating(true);
     try {
       await apiRequest('/api/admin/comprehensive-exams', {
@@ -183,6 +198,7 @@ export function AdminComprehensiveExamPanel({
         body: JSON.stringify({
           subjectName: subjectName.trim(),
           durationMinutes,
+          announcementDurationMinutes: computedAnnouncementMinutes,
           targetYear,
           questions: questions.map((q) => ({
             type: q.type,
@@ -196,6 +212,8 @@ export function AdminComprehensiveExamPanel({
       });
       setSubjectName('');
       setDurationMinutes(30);
+      setAnnouncementDurationValue(24);
+      setAnnouncementDurationUnit('hours');
       setTargetYear(0);
       setQuestions([
         {
@@ -209,8 +227,8 @@ export function AdminComprehensiveExamPanel({
       ]);
       setStatusMsg(
         tr(
-          'تم نشر الامتحان الشامل وظهور الخبر في أعلى الشاشة لجميع الطلاب.',
-          'Comprehensive exam published and top banner is now live.'
+          'تم نشر الامتحان الشامل وظهور الخبر للمستهدفين طوال المدة الزمنية المعلنة.',
+          'Comprehensive exam published and visible for the announced duration.'
         )
       );
       setActiveTab('manage');
@@ -428,7 +446,7 @@ export function AdminComprehensiveExamPanel({
       {/* TAB 1: CREATE COMPREHENSIVE EXAM */}
       {activeTab === 'create' && (
         <form onSubmit={handleCreateExam} className="space-y-5">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 p-4 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 p-4 rounded-xl bg-[#EFECE4] dark:bg-[#0D0D10] border border-black/10 dark:border-white/10">
             <div className="space-y-1.5">
               <label className="block text-xs font-semibold text-[#856104] dark:text-[#E5C158]">
                 {tr('اسم المادة', 'Subject Name')}
@@ -445,21 +463,6 @@ export function AdminComprehensiveExamPanel({
 
             <div className="space-y-1.5">
               <label className="block text-xs font-semibold text-[#856104] dark:text-[#E5C158]">
-                {tr('المدة الزمنية للامتحان (بالدقائق)', 'Exam Duration (Minutes)')}
-              </label>
-              <input
-                type="number"
-                min={1}
-                max={360}
-                required
-                value={durationMinutes}
-                onChange={(e) => setDurationMinutes(Math.max(1, Number(e.target.value) || 30))}
-                className="w-full px-3.5 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-sm text-[#141418] dark:text-[#F5F0E6] font-mono tabular-nums focus:outline-none focus:border-[#D4AF37]"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-[#5C5850] dark:text-[#A8A29E]">
                 {tr('الفرقة المستهدفة', 'Target Year')}
               </label>
               <select
@@ -473,6 +476,59 @@ export function AdminComprehensiveExamPanel({
                 <option value={3}>{formatYear(3)}</option>
                 <option value={4}>{formatYear(4)}</option>
               </select>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-[#856104] dark:text-[#E5C158]">
+                {tr('مدة الحل للطالب (بالدقائق)', 'Exam Timer (Minutes)')}
+              </label>
+              <input
+                type="number"
+                min={1}
+                max={360}
+                required
+                value={durationMinutes}
+                onChange={(e) => setDurationMinutes(Math.max(1, Number(e.target.value) || 30))}
+                className="w-full px-3.5 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-sm text-[#141418] dark:text-[#F5F0E6] font-mono tabular-nums focus:outline-none focus:border-[#D4AF37]"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-[#856104] dark:text-[#E5C158]">
+                {tr('المدة الزمنية المعلنة للخبر', 'Published Banner Duration')}
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  min={1}
+                  max={announcementDurationUnit === 'minutes' ? 43200 : announcementDurationUnit === 'hours' ? 720 : 30}
+                  required
+                  value={announcementDurationValue}
+                  onChange={(e) =>
+                    setAnnouncementDurationValue(Math.max(1, Number(e.target.value) || 1))
+                  }
+                  className="w-24 px-3 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-sm text-[#141418] dark:text-[#F5F0E6] font-mono tabular-nums focus:outline-none focus:border-[#D4AF37]"
+                />
+                <select
+                  value={announcementDurationUnit}
+                  onChange={(e) =>
+                    setAnnouncementDurationUnit(
+                      e.target.value as 'minutes' | 'hours' | 'days'
+                    )
+                  }
+                  className="flex-1 px-2.5 py-2 rounded-lg bg-[#F5F2EA] dark:bg-[#151519] border border-black/15 dark:border-white/15 text-sm text-[#141418] dark:text-[#F5F0E6] focus:outline-none focus:border-[#D4AF37]"
+                >
+                  <option value="minutes">{tr('دقيقة', 'Minutes')}</option>
+                  <option value="hours">{tr('ساعة', 'Hours')}</option>
+                  <option value="days">{tr('يوم', 'Days')}</option>
+                </select>
+              </div>
+              <p className="text-[11px] text-[#5C5850] dark:text-[#A8A29E] leading-snug">
+                {tr(
+                  'تختفي الرسالة تلقائياً بعد انتهاء هذه المدة ولا تظهر مجدداً إلا عند نشر امتحان جديد.',
+                  'Banner disappears automatically after this duration until a new exam is published.'
+                )}
+              </p>
             </div>
           </div>
 
@@ -736,6 +792,20 @@ export function AdminComprehensiveExamPanel({
                         <span className="text-emerald-700 dark:text-emerald-300">
                           {tr(`تم التصحيح: ${exam.gradedCount}`, `Graded: ${exam.gradedCount}`)}
                         </span>
+                        {exam.announcementExpiresAt && (
+                          <>
+                            <span aria-hidden="true">·</span>
+                            <span>
+                              {exam.isActive
+                                ? `${tr('يختفي الخبر:', 'Expires:')} ${new Date(
+                                    exam.announcementExpiresAt
+                                  ).toLocaleString()}`
+                                : `${tr('انتهت مدة الإعلان:', 'Expired:')} ${new Date(
+                                    exam.announcementExpiresAt
+                                  ).toLocaleString()}`}
+                            </span>
+                          </>
+                        )}
                       </div>
                     </div>
 

@@ -13,7 +13,28 @@ router.get('/notifications', requireAuth, (req: AuthenticatedRequest, res) => {
   const userYear = req.currentUser!.year;
   const isAdmin = req.currentUser!.role === 'admin';
 
+  const nowMs = Date.now();
+  const examById = new Map(
+    (store.comprehensiveExams || []).map((ex) => [ex.id, ex])
+  );
+
   const relevant = (store.notifications || []).filter((n) => {
+    if (n.expiresAt) {
+      const expMs = new Date(n.expiresAt).getTime();
+      if (Number.isFinite(expMs) && expMs <= nowMs) {
+        return false;
+      }
+    }
+    if (!n.userId && n.comprehensiveExamId) {
+      const linkedExam = examById.get(n.comprehensiveExamId);
+      if (linkedExam) {
+        if (!linkedExam.isActive) return false;
+        if (linkedExam.announcementExpiresAt) {
+          const exMs = new Date(linkedExam.announcementExpiresAt).getTime();
+          if (Number.isFinite(exMs) && exMs <= nowMs) return false;
+        }
+      }
+    }
     if (n.userId) {
       return n.userId === userId;
     }
